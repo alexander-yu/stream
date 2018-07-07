@@ -29,14 +29,17 @@ func NewStats(sums map[int]float64) (*Stats, error) {
 // Using a window will mean that power sums will only be calculated over the current
 // running window; count/min/max will still be global values (i.e. over all values seen).
 func NewWindowedStats(sums map[int]float64, window int) (*Stats, error) {
-	if len(sums) == 0 {
-		return nil, errors.New("stream: map is empty")
-	} else if window <= 0 {
+	if window <= 0 {
 		return nil, errors.New("stream: window size is nonpositive")
 	}
 
-	vals := make([]float64, window)
-	return &Stats{sums: sums, window: window, vals: vals, min: math.Inf(1), max: math.Inf(-1)}, nil
+	stats, err := NewStats(sums)
+	if err != nil {
+		return nil, err
+}
+
+	stats.window = window
+	return stats, nil
 }
 
 // Push adds a new value for a Stats object to consume.
