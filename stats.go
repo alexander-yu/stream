@@ -141,6 +141,32 @@ func (s *Stats) Mean() (float64, error) {
 	return mean, nil
 }
 
+// Skewness returns the skewness of values seen.
+func (s *Stats) Skewness() (float64, error) {
+	variance, err2 := s.Moment(2)
+	moment, err3 := s.Moment(3)
+	if err2 != nil {
+		return 0, err2
+	} else if err3 != nil {
+		return 0, err3
+	}
+
+	return moment / math.Pow(variance, float64(3)/float64(2)), nil
+}
+
+// Kurtosis returns the kurtosis of values seen.
+func (s *Stats) Kurtosis() (float64, error) {
+	variance, err2 := s.Moment(2)
+	moment, err4 := s.Moment(4)
+	if err2 != nil {
+		return 0, err2
+	} else if err4 != nil {
+		return 0, err4
+	}
+
+	return moment / math.Pow(variance, float64(2)), nil
+}
+
 // Clear clears all stats being tracked.
 func (s *Stats) Clear() {
 	for k := range s.sums {
