@@ -36,7 +36,7 @@ func NewWindowedStats(sums map[int]float64, window int) (*Stats, error) {
 	stats, err := NewStats(sums)
 	if err != nil {
 		return nil, err
-}
+	}
 
 	stats.window = window
 	return stats, nil
@@ -98,15 +98,10 @@ func (s *Stats) Moment(k int) (float64, error) {
 		return s.Sum(0)
 	}
 
-	count, err0 := s.Sum(0)
-	sum, err1 := s.Sum(1)
-	if err0 != nil {
-		return 0, errors.New("stream: 0 is not a tracked power sum")
-	} else if err1 != nil {
-		return 0, errors.New("stream: 1 is not a tracked power sum")
+	mean, err := s.Mean()
+	if err != nil {
+		return 0, err
 	}
-
-	mean := sum / count
 
 	var moment float64
 	for i := 0; i <= k; i++ {
@@ -118,7 +113,42 @@ func (s *Stats) Moment(k int) (float64, error) {
 		moment += float64(binom(k, i)*sign(k-i)) * math.Pow(mean, float64(k-i)) * sum
 	}
 
+	// Ignore the error; if execution gets here, then s.Sum(0) should already have a valid result
+	count, _ := s.Sum(0)
 	moment /= count
 
 	return moment, nil
+}
+
+// Std returns the running standard deviation of values seen.
+func (s *Stats) Std() (float64, error) {
+	variance, err := s.Moment(2)
+	return math.Sqrt(variance), err
+}
+
+// Mean returns the running mean of values seen.
+func (s *Stats) Mean() (float64, error) {
+	count, err0 := s.Sum(0)
+	sum, err1 := s.Sum(1)
+	if err0 != nil {
+		return 0, errors.New("stream: 0 is not a tracked power sum")
+	} else if err1 != nil {
+		return 0, errors.New("stream: 1 is not a tracked power sum")
+	}
+
+	mean := sum / count
+
+	return mean, nil
+}
+
+// Clear clears all stats being tracked.
+func (s *Stats) Clear() {
+	for k := range s.sums {
+		s.sums[k] = 0
+	}
+
+	s.count = 0
+	s.min = 0
+	s.max = 0
+	s.vals = nil
 }
