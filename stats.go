@@ -16,30 +16,30 @@ type Stats struct {
 	vals   []float64
 }
 
-// NewStats returns a Stats object with initiated sums.
-func NewStats(sums map[int]float64) (*Stats, error) {
-	if len(sums) == 0 {
-		return nil, errors.New("stream: map is empty")
-	}
-
-	return &Stats{sums: sums, min: math.Inf(1), max: math.Inf(-1)}, nil
+// StatsConfig is the struct containing configuration options for
+// instantiating a Stats object.
+type StatsConfig struct {
+	sums   map[int]bool
+	window int
 }
 
-// NewWindowedStats returns a Stats object with initiated sums and window size.
-// Using a window will mean that power sums will only be calculated over the current
-// running window; count/min/max will still be global values (i.e. over all values seen).
-func NewWindowedStats(sums map[int]float64, window int) (*Stats, error) {
-	if window <= 0 {
+// NewStats returns a Stats object with initiated sums.
+func NewStats(config *StatsConfig) (*Stats, error) {
+	if len(config.sums) == 0 {
+		return nil, errors.New("stream: map is empty")
+	} else if config.window <= 0 {
 		return nil, errors.New("stream: window size is nonpositive")
 	}
 
-	stats, err := NewStats(sums)
-	if err != nil {
-		return nil, err
+	stats := Stats{min: math.Inf(1), max: math.Inf(-1)}
+	stats.window = config.window
+	stats.sums = make(map[int]float64)
+
+	for k := range config.sums {
+		stats.sums[k] = 0
 	}
 
-	stats.window = window
-	return stats, nil
+	return &stats, nil
 }
 
 // Push adds a new value for a Stats object to consume.
