@@ -8,15 +8,14 @@ import (
 
 // Stats is the struct that provides stats being tracked.
 type Stats struct {
-	sums     map[int]float64
-	count    int
-	min      float64
-	max      float64
-	window   int
-	vals     []float64
-	median   bool
-	lowHeap  *heap
-	highHeap *heap
+	sums        map[int]float64
+	count       int
+	min         float64
+	max         float64
+	window      int
+	vals        []float64
+	median      bool
+	medianStats *medianStats
 }
 
 // StatsConfig is the struct containing configuration options for
@@ -45,8 +44,7 @@ func NewStats(config *StatsConfig) (*Stats, error) {
 	}
 
 	if s.median {
-		s.lowHeap = newHeap([]float64{}, true)
-		s.highHeap = newHeap([]float64{}, false)
+		s.medianStats = newMedianStats()
 	}
 
 	return &s, nil
@@ -76,7 +74,7 @@ func (s *Stats) Push(x float64) {
 	s.max = math.Max(s.max, x)
 
 	if s.median {
-		s.pushMedian(x)
+		s.medianStats.pushMedian(x)
 	}
 }
 
@@ -95,7 +93,7 @@ func (s *Stats) Max() float64 {
 	return s.max
 }
 
-// Sum returns the running kth-power sum of values seen.
+// Sum returns the kth-power sum of values seen.
 func (s *Stats) Sum(k int) (float64, error) {
 	if s.count == 0 {
 		return 0, errors.New("stream: no values seen yet")
@@ -108,7 +106,7 @@ func (s *Stats) Sum(k int) (float64, error) {
 	return 0, fmt.Errorf("stream: %d is not a tracked power sum", k)
 }
 
-// Moment returns the running kth-moment of values seen.
+// Moment returns the kth-moment of values seen.
 func (s *Stats) Moment(k int) (float64, error) {
 	if s.count == 0 {
 		return 0, errors.New("stream: no values seen yet")
@@ -142,13 +140,13 @@ func (s *Stats) Moment(k int) (float64, error) {
 	return moment, nil
 }
 
-// Std returns the running standard deviation of values seen.
+// Std returns the standard deviation of values seen.
 func (s *Stats) Std() (float64, error) {
 	variance, err := s.Moment(2)
 	return math.Sqrt(variance), err
 }
 
-// Mean returns the running mean of values seen.
+// Mean returns the mean of values seen.
 func (s *Stats) Mean() (float64, error) {
 	count, err0 := s.Sum(0)
 	sum, err1 := s.Sum(1)
@@ -189,6 +187,15 @@ func (s *Stats) Kurtosis() (float64, error) {
 	return moment / math.Pow(variance, float64(2)), nil
 }
 
+// Median returns the median of values seen.
+func (s *Stats) Median() (float64, error) {
+	if !s.median {
+		return 0, errors.New("stream: median is not a tracked stat")
+	}
+
+	return s.medianStats.median()
+}
+
 // Clear clears all stats being tracked.
 func (s *Stats) Clear() {
 	for k := range s.sums {
@@ -201,7 +208,6 @@ func (s *Stats) Clear() {
 	s.vals = nil
 
 	if s.median {
-		s.lowHeap = newHeap([]float64{}, true)
-		s.highHeap = newHeap([]float64{}, false)
+		s.medianStats = newMedianStats()
 	}
 }

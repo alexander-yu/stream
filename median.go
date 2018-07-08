@@ -5,7 +5,20 @@ import (
 	"errors"
 )
 
-func (s *Stats) pushMedian(x float64) {
+// MedianStats is a struct that keeps track of the running median.
+type medianStats struct {
+	lowHeap  *heap
+	highHeap *heap
+}
+
+func newMedianStats() *medianStats {
+	return &medianStats{
+		lowHeap:  newHeap([]float64{}, true),
+		highHeap: newHeap([]float64{}, false),
+	}
+}
+
+func (s *medianStats) pushMedian(x float64) {
 	if s.lowHeap.Len() == 0 || x <= s.lowHeap.peek() {
 		heapops.Push(s.lowHeap, x)
 	} else {
@@ -19,11 +32,8 @@ func (s *Stats) pushMedian(x float64) {
 	}
 }
 
-// Median returns the running median of values seen.
-func (s *Stats) Median() (float64, error) {
-	if !s.median {
-		return 0, errors.New("stream: median is not a tracked stat")
-	} else if s.count == 0 {
+func (s *medianStats) median() (float64, error) {
+	if s.lowHeap.Len()+s.highHeap.Len() == 0 {
 		return 0, errors.New("stream: no values seen yet")
 	}
 
