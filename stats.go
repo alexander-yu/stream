@@ -8,38 +8,48 @@ import (
 
 // Stats is the struct that provides stats being tracked.
 type Stats struct {
-	sums   map[int]float64
-	count  int
-	min    float64
-	max    float64
-	window int
-	vals   []float64
+	sums     map[int]float64
+	count    int
+	min      float64
+	max      float64
+	window   int
+	vals     []float64
+	median   bool
+	lowHeap  *heap
+	highHeap *heap
 }
 
 // StatsConfig is the struct containing configuration options for
 // instantiating a Stats object.
 type StatsConfig struct {
-	sums   map[int]bool
-	window int
+	Sums   map[int]bool
+	Window int
+	Median bool
 }
 
 // NewStats returns a Stats object with initiated sums.
 func NewStats(config *StatsConfig) (*Stats, error) {
-	if len(config.sums) == 0 {
+	if len(config.Sums) == 0 {
 		return nil, errors.New("stream: map is empty")
-	} else if config.window <= 0 {
+	} else if config.Window <= 0 {
 		return nil, errors.New("stream: window size is nonpositive")
 	}
 
-	stats := Stats{min: math.Inf(1), max: math.Inf(-1)}
-	stats.window = config.window
-	stats.sums = make(map[int]float64)
+	s := Stats{min: math.Inf(1), max: math.Inf(-1)}
+	s.median = config.Median
+	s.window = config.Window
+	s.sums = make(map[int]float64)
 
-	for k := range config.sums {
-		stats.sums[k] = 0
+	for k := range config.Sums {
+		s.sums[k] = 0
 	}
 
-	return &stats, nil
+	if s.median {
+		s.lowHeap = newHeap([]float64{}, true)
+		s.highHeap = newHeap([]float64{}, false)
+	}
+
+	return &s, nil
 }
 
 // Push adds a new value for a Stats object to consume.
@@ -64,6 +74,10 @@ func (s *Stats) Push(x float64) {
 	s.count++
 	s.min = math.Min(s.min, x)
 	s.max = math.Max(s.max, x)
+
+	if s.median {
+		s.pushMedian(x)
+	}
 }
 
 // Count returns the number of values seen.
@@ -83,6 +97,10 @@ func (s *Stats) Max() float64 {
 
 // Sum returns the running kth-power sum of values seen.
 func (s *Stats) Sum(k int) (float64, error) {
+	if s.count == 0 {
+		return 0, errors.New("stream: no values seen yet")
+	}
+
 	if sum, ok := s.sums[k]; ok {
 		return sum, nil
 	}
@@ -92,6 +110,10 @@ func (s *Stats) Sum(k int) (float64, error) {
 
 // Moment returns the running kth-moment of values seen.
 func (s *Stats) Moment(k int) (float64, error) {
+	if s.count == 0 {
+		return 0, errors.New("stream: no values seen yet")
+	}
+
 	if k < 0 {
 		return 0, errors.New("stream: negative moment")
 	} else if k == 0 {
@@ -174,7 +196,12 @@ func (s *Stats) Clear() {
 	}
 
 	s.count = 0
-	s.min = 0
-	s.max = 0
+	s.min = math.Inf(1)
+	s.max = math.Inf(-1)
 	s.vals = nil
+
+	if s.median {
+		s.lowHeap = newHeap([]float64{}, true)
+		s.highHeap = newHeap([]float64{}, false)
+	}
 }

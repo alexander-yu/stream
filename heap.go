@@ -38,3 +38,7 @@ func (h *heap) Pop() interface{} {
 	h.vals = h.vals[:len(h.vals)-1]
 	return x
 }
+
+func (h *heap) peek() float64 {
+	return h.vals[0]
+}
