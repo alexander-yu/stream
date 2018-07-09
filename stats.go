@@ -171,7 +171,7 @@ func (s *Stats) Skewness() (float64, error) {
 		return 0, err3
 	}
 
-	return moment / math.Pow(variance, float64(3)/float64(2)), nil
+	return moment / math.Pow(variance, 1.5), nil
 }
 
 // Kurtosis returns the kurtosis of values seen.
@@ -184,7 +184,7 @@ func (s *Stats) Kurtosis() (float64, error) {
 		return 0, err4
 	}
 
-	return moment / math.Pow(variance, float64(2)), nil
+	return moment / math.Pow(variance, 2.), nil
 }
 
 // Median returns the median of values seen.
