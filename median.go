@@ -11,15 +11,23 @@ type medianStats struct {
 	highHeap *heap
 }
 
+func fmax(x interface{}, y interface{}) bool {
+	return x.(float64) > y.(float64)
+}
+
+func fmin(x interface{}, y interface{}) bool {
+	return x.(float64) < y.(float64)
+}
+
 func newMedianStats() *medianStats {
 	return &medianStats{
-		lowHeap:  newHeap([]float64{}, true),
-		highHeap: newHeap([]float64{}, false),
+		lowHeap:  newHeap([]interface{}{}, fmax),
+		highHeap: newHeap([]interface{}{}, fmin),
 	}
 }
 
-func (s *medianStats) pushMedian(x float64) {
-	if s.lowHeap.Len() == 0 || x <= s.lowHeap.peek() {
+func (s *medianStats) push(x float64) {
+	if s.lowHeap.Len() == 0 || x <= s.lowHeap.peek().(float64) {
 		heapops.Push(s.lowHeap, x)
 	} else {
 		heapops.Push(s.highHeap, x)
@@ -38,12 +46,12 @@ func (s *medianStats) median() (float64, error) {
 	}
 
 	if s.lowHeap.Len() < s.highHeap.Len() {
-		return s.highHeap.peek(), nil
+		return s.highHeap.peek().(float64), nil
 	} else if s.lowHeap.Len() > s.highHeap.Len() {
-		return s.lowHeap.peek(), nil
+		return s.lowHeap.peek().(float64), nil
 	} else {
-		low := s.lowHeap.peek()
-		high := s.highHeap.peek()
+		low := s.lowHeap.peek().(float64)
+		high := s.highHeap.peek().(float64)
 		return (low + high) / 2, nil
 	}
 }

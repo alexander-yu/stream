@@ -6,38 +6,38 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPushMedian(t *testing.T) {
+func TestMedianPush(t *testing.T) {
 	medianStats := newMedianStats()
 	for i := 0.; i < 5; i++ {
-		medianStats.pushMedian(i)
+		medianStats.push(i)
 	}
 
-	assert.Equal(t, medianStats.lowHeap.vals, []float64{1, 0})
-	assert.Equal(t, medianStats.highHeap.vals, []float64{2, 3, 4})
+	assert.Equal(t, medianStats.lowHeap.vals, []interface{}{1., 0.})
+	assert.Equal(t, medianStats.highHeap.vals, []interface{}{2., 3., 4.})
 
-	medianStats.pushMedian(3.)
+	medianStats.push(3.)
 
-	assert.Equal(t, medianStats.lowHeap.vals, []float64{2, 0, 1})
-	assert.Equal(t, medianStats.highHeap.vals, []float64{3, 3, 4})
+	assert.Equal(t, medianStats.lowHeap.vals, []interface{}{2., 0., 1.})
+	assert.Equal(t, medianStats.highHeap.vals, []interface{}{3., 3., 4.})
 
-	medianStats.pushMedian(2.)
-	medianStats.pushMedian(1.)
+	medianStats.push(2.)
+	medianStats.push(1.)
 
-	assert.Equal(t, medianStats.lowHeap.vals, []float64{2, 1, 1, 0})
-	assert.Equal(t, medianStats.highHeap.vals, []float64{2, 3, 4, 3})
+	assert.Equal(t, medianStats.lowHeap.vals, []interface{}{2., 1., 1., 0.})
+	assert.Equal(t, medianStats.highHeap.vals, []interface{}{2., 3., 4., 3.})
 }
 
 func TestMedian(t *testing.T) {
 	medianStats := newMedianStats()
 	for i := 0.; i < 5; i++ {
-		medianStats.pushMedian(i)
+		medianStats.push(i)
 	}
 
 	median, _ := medianStats.median()
 
 	assert.Equal(t, median, 2.)
 
-	medianStats.pushMedian(5)
+	medianStats.push(5)
 	median, _ = medianStats.median()
 
 	assert.Equal(t, median, 2.5)

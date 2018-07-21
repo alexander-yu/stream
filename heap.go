@@ -3,12 +3,12 @@ package stream
 import heapops "container/heap"
 
 type heap struct {
-	max  bool
-	vals []float64
+	vals []interface{}
+	cmp  func(interface{}, interface{}) bool
 }
 
-func newHeap(vals []float64, max bool) *heap {
-	h := &heap{max: max, vals: vals}
+func newHeap(vals []interface{}, cmp func(interface{}, interface{}) bool) *heap {
+	h := &heap{vals: vals, cmp: cmp}
 	heapops.Init(h)
 	return h
 }
@@ -18,11 +18,7 @@ func (h *heap) Len() int {
 }
 
 func (h *heap) Less(i, j int) bool {
-	if h.max {
-		return h.vals[i] > h.vals[j]
-	}
-
-	return h.vals[i] < h.vals[j]
+	return h.cmp(h.vals[i], h.vals[j])
 }
 
 func (h *heap) Swap(i, j int) {
@@ -30,7 +26,7 @@ func (h *heap) Swap(i, j int) {
 }
 
 func (h *heap) Push(x interface{}) {
-	h.vals = append(h.vals, x.(float64))
+	h.vals = append(h.vals, x)
 }
 
 func (h *heap) Pop() interface{} {
@@ -39,6 +35,6 @@ func (h *heap) Pop() interface{} {
 	return x
 }
 
-func (h *heap) peek() float64 {
+func (h *heap) peek() interface{} {
 	return h.vals[0]
 }

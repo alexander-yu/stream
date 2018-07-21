@@ -74,7 +74,7 @@ func (s *Stats) Push(x float64) {
 	s.max = math.Max(s.max, x)
 
 	if s.median {
-		s.medianStats.pushMedian(x)
+		s.medianStats.push(x)
 	}
 }
 
