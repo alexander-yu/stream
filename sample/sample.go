@@ -1,4 +1,4 @@
-package stream
+package sample
 
 import (
 	"math/rand"
