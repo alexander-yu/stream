@@ -1,4 +1,4 @@
-package stream
+package median
 
 import heapops "container/heap"
 

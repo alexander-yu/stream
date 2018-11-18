@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"math"
+
+	"stream/median"
 )
 
 // Stats is the struct that provides stats being tracked.
@@ -15,7 +17,7 @@ type Stats struct {
 	window      int
 	vals        []float64
 	median      bool
-	medianStats *medianStats
+	medianStats median.Median
 }
 
 // StatsConfig is the struct containing configuration options for
@@ -44,7 +46,7 @@ func NewStats(config *StatsConfig) (*Stats, error) {
 	}
 
 	if s.median {
-		s.medianStats = newMedianStats()
+		s.medianStats = median.NewHeapMedian()
 	}
 
 	return &s, nil
@@ -74,7 +76,7 @@ func (s *Stats) Push(x float64) {
 	s.max = math.Max(s.max, x)
 
 	if s.median {
-		s.medianStats.push(x)
+		s.medianStats.Push(x)
 	}
 }
 
@@ -206,7 +208,7 @@ func (s *Stats) Median() (float64, error) {
 		return 0, errors.New("stream: median is not a tracked stat")
 	}
 
-	return s.medianStats.median()
+	return s.medianStats.Median()
 }
 
 // Clear clears all stats being tracked.
@@ -221,6 +223,6 @@ func (s *Stats) Clear() {
 	s.vals = nil
 
 	if s.median {
-		s.medianStats = newMedianStats()
+		s.medianStats = median.NewHeapMedian()
 	}
 }
