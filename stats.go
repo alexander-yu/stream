@@ -1,9 +1,10 @@
 package stream
 
 import (
-	"errors"
 	"fmt"
 	"math"
+
+	"github.com/pkg/errors"
 
 	"stream/median"
 )
@@ -20,27 +21,20 @@ type Stats struct {
 	medianStats median.Median
 }
 
-// StatsConfig is the struct containing configuration options for
-// instantiating a Stats object.
-type StatsConfig struct {
-	Sums   map[int]bool
-	Window int
-	Median bool
-}
-
 // NewStats returns a Stats object with initiated sums.
 func NewStats(config *StatsConfig) (*Stats, error) {
-	if len(config.Sums) == 0 {
-		return nil, errors.New("stream: map is empty")
-	} else if config.Window <= 0 {
-		return nil, errors.New("stream: window size is nonpositive")
+	err := validateConfig(config)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to validate config")
 	}
 
-	s := Stats{min: math.Inf(1), max: math.Inf(-1)}
-	s.median = config.Median
-	s.window = config.Window
-	s.sums = make(map[int]float64)
+	config = setConfigDefaults(config)
 
+	s := Stats{min: math.Inf(1), max: math.Inf(-1)}
+	s.median = *config.Median
+	s.window = *config.Window
+
+	s.sums = make(map[int]float64)
 	for k := range config.Sums {
 		s.sums[k] = 0
 	}

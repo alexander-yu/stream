@@ -19,8 +19,8 @@ func testStats() *Stats {
 			3:  true,
 			4:  true,
 		},
-		Window: 3,
-		Median: true,
+		Window: IntPtr(3),
+		Median: BoolPtr(true),
 	})
 
 	for i := 1.; i < 5; i++ {
@@ -43,7 +43,7 @@ func approx(t *testing.T, x float64, y float64) {
 
 func TestPush(t *testing.T) {
 	stats := testStats()
-	median, _ := stats.medianStats.median()
+	median, _ := stats.medianStats.Median()
 
 	sums := map[int]float64{
 		-1: 13. / 12.,
