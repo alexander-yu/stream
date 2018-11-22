@@ -2,21 +2,58 @@ package stream
 
 import "github.com/pkg/errors"
 
-// StatsConfig is the struct containing configuration options for
-// instantiating a Stats object.
-type StatsConfig struct {
-	Sums   map[int]bool
+// CoreConfig is the struct containing configuration options for
+// instantiating a Core object.
+type CoreConfig struct {
+	Sums   SumsConfig
 	Window *int
-	Median *bool
 }
 
-var defaultConfig = &StatsConfig{
+var defaultConfig = &CoreConfig{
 	Sums:   map[int]bool{1: true},
 	Window: IntPtr(1),
-	Median: BoolPtr(true),
 }
 
-func validateConfig(config *StatsConfig) error {
+// SumsConfig is an alias for a map of ints to bools; this configures
+// the sums that a Core object will track.
+type SumsConfig map[int]bool
+
+func (s1 SumsConfig) add(s2 SumsConfig) {
+	for k := range s2 {
+		s1[k] = true
+	}
+}
+
+// MergeConfigs merges a slice of CoreConfig objects.
+func MergeConfigs(configs []*CoreConfig) (*CoreConfig, error) {
+	switch len(configs) {
+	case 0:
+		return nil, errors.New("no configs available to merge")
+	case 1:
+		return configs[0], nil
+	default:
+		var window *int
+		mergedConfig := &CoreConfig{
+			Sums: SumsConfig{},
+		}
+
+		for _, config := range configs {
+			mergedConfig.Sums.add(config.Sums)
+			if config.Window != nil {
+				if window == nil {
+					window = IntPtr(*config.Window)
+				} else if *window != *config.Window {
+					return nil, errors.New("configs have differing windows")
+				}
+			}
+		}
+
+		mergedConfig.Window = window
+		return mergedConfig, nil
+	}
+}
+
+func validateConfig(config *CoreConfig) error {
 	if config.Sums != nil && len(config.Sums) == 0 {
 		errors.New("config sums map is empty")
 	}
@@ -28,17 +65,13 @@ func validateConfig(config *StatsConfig) error {
 	return nil
 }
 
-func setConfigDefaults(config *StatsConfig) *StatsConfig {
+func setConfigDefaults(config *CoreConfig) *CoreConfig {
 	if config.Sums == nil {
 		config.Sums = defaultConfig.Sums
 	}
 
 	if config.Window == nil {
 		config.Window = defaultConfig.Window
-	}
-
-	if config.Median == nil {
-		config.Median = defaultConfig.Median
 	}
 
 	return config

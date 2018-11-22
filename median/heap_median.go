@@ -45,7 +45,7 @@ func (s *HeapMedian) Push(x float64) {
 // Median returns the current running median, or error if no median is available.
 func (s *HeapMedian) Median() (float64, error) {
 	if s.lowHeap.Len()+s.highHeap.Len() == 0 {
-		return 0, errors.New("stream: no values seen yet")
+		return 0, errors.New("no values seen yet")
 	}
 
 	if s.lowHeap.Len() < s.highHeap.Len() {
