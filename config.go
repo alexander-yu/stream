@@ -38,7 +38,10 @@ func MergeConfigs(configs []*CoreConfig) (*CoreConfig, error) {
 		}
 
 		for _, config := range configs {
-			mergedConfig.Sums.add(config.Sums)
+			if config.Sums != nil {
+				mergedConfig.Sums.add(config.Sums)
+			}
+
 			if config.Window != nil {
 				if window == nil {
 					window = IntPtr(*config.Window)
@@ -55,7 +58,7 @@ func MergeConfigs(configs []*CoreConfig) (*CoreConfig, error) {
 
 func validateConfig(config *CoreConfig) error {
 	if config.Sums != nil && len(config.Sums) == 0 {
-		errors.New("config sums map is empty")
+		errors.New("config sums map is not nil but empty")
 	}
 
 	if config.Window != nil && *config.Window <= 0 {
