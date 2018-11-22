@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"stream"
+	"github.com/alexander-yu/stream"
 )
 
 // Kurtosis is a metric that tracks the kurtosis.
@@ -28,10 +28,7 @@ func NewKurtosis() (*Kurtosis, error) {
 		return nil, errors.Wrap(err, "error creating 4th Moment")
 	}
 
-	config, err := stream.MergeConfigs([]*stream.CoreConfig{
-		variance.Config(),
-		moment4.Config(),
-	})
+	config, err := stream.MergeConfigs(variance.Config(), moment4.Config())
 	if err != nil {
 		return nil, errors.Wrap(err, "error merging configs")
 	}
@@ -57,7 +54,7 @@ func (k *Kurtosis) Config() *stream.CoreConfig {
 
 // Value returns the value of the sample excess kurtosis.
 func (k *Kurtosis) Value() (float64, error) {
-	count := float64(k.core.Count())
+	count := float64(k.core.WindowCount())
 	variance, err := k.variance.Value()
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving 2nd moment")

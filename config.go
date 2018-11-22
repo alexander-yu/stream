@@ -11,7 +11,7 @@ type CoreConfig struct {
 
 var defaultConfig = &CoreConfig{
 	Sums:   map[int]bool{1: true},
-	Window: IntPtr(1),
+	Window: IntPtr(0),
 }
 
 // SumsConfig is an alias for a map of ints to bools; this configures
@@ -24,8 +24,8 @@ func (s1 SumsConfig) add(s2 SumsConfig) {
 	}
 }
 
-// MergeConfigs merges a slice of CoreConfig objects.
-func MergeConfigs(configs []*CoreConfig) (*CoreConfig, error) {
+// MergeConfigs merges CoreConfig objects.
+func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 	switch len(configs) {
 	case 0:
 		return nil, errors.New("no configs available to merge")
@@ -58,11 +58,11 @@ func MergeConfigs(configs []*CoreConfig) (*CoreConfig, error) {
 
 func validateConfig(config *CoreConfig) error {
 	if config.Sums != nil && len(config.Sums) == 0 {
-		errors.New("config sums map is not nil but empty")
+		return errors.New("config sums map is not nil but empty")
 	}
 
-	if config.Window != nil && *config.Window <= 0 {
-		errors.New("config window is nonpositive")
+	if config.Window != nil && *config.Window < 0 {
+		return errors.New("config window is negative")
 	}
 
 	return nil

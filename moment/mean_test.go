@@ -5,17 +5,16 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"stream"
+	"github.com/alexander-yu/stream"
 )
 
 func TestMean(t *testing.T) {
-	mean, err := NewMean()
-	require.NoError(err)
+	mean := &Mean{}
 
-	core := stream.TestData(mean)
+	stream.TestData(mean)
 
 	value, err := mean.Value()
 	require.NoError(t, err)
 
-	approx(t, 3., value)
+	stream.Approx(t, 5, value)
 }

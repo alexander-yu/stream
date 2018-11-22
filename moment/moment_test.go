@@ -5,18 +5,17 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"stream"
+	"github.com/alexander-yu/stream"
 )
 
 func TestMoment(t *testing.T) {
 	moment, err := NewMoment(2)
 	require.NoError(t, err)
 
-	core := stream.TestData(moment)
-	core.Push(8)
+	stream.TestData(moment)
 
 	value, err := moment.Value()
 	require.NoError(t, err)
 
-	approx(t, 7., value)
+	stream.Approx(t, 7, value)
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"stream"
+	"github.com/alexander-yu/stream"
 )
 
 // Skewness is a metric that tracks the adjusted Fisher-Pearson sample skewness.
@@ -28,10 +28,7 @@ func NewSkewness() (*Skewness, error) {
 		return nil, errors.Wrap(err, "error creating 3rd Moment")
 	}
 
-	config, err := stream.MergeConfigs([]*stream.CoreConfig{
-		variance.Config(),
-		moment3.Config(),
-	})
+	config, err := stream.MergeConfigs(variance.Config(), moment3.Config())
 	if err != nil {
 		return nil, errors.Wrap(err, "error merging configs")
 	}
@@ -57,16 +54,18 @@ func (s *Skewness) Config() *stream.CoreConfig {
 
 // Value returns the value of the adjusted Fisher-Pearson sample skewness.
 func (s *Skewness) Value() (float64, error) {
-	count := float64(s.core.Count())
+	count := float64(s.core.WindowCount())
 	variance, err := s.variance.Value()
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving 2nd moment")
 	}
+	variance *= (count - 1) / count
 
 	moment, err := s.moment3.Value()
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving 3rd moment")
 	}
+	moment *= (count - 1) / count
 
 	adjust := math.Sqrt(count*(count-1)) / (count - 2)
 	return adjust * moment / math.Pow(variance, 1.5), nil

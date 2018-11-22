@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"stream"
+	"github.com/alexander-yu/stream"
 )
 
 // Moment is a metric that tracks the kth sample central moment.
@@ -40,7 +40,8 @@ func (m *Moment) Config() *stream.CoreConfig {
 
 // Value returns the value of the kth sample central moment.
 func (m *Moment) Value() (float64, error) {
-	if m.core.Count() == 0 {
+	count := m.core.WindowCount()
+	if count == 0 {
 		return 0, errors.New("no values seen yet")
 	}
 
@@ -54,7 +55,7 @@ func (m *Moment) Value() (float64, error) {
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving 1-power sum")
 	}
-	mean := sum / float64(m.core.Count())
+	mean := sum / float64(count)
 
 	var moment float64
 	for i := 0; i <= m.k; i++ {
@@ -66,7 +67,7 @@ func (m *Moment) Value() (float64, error) {
 		moment += float64(binom(m.k, i)*sign(m.k-i)) * math.Pow(mean, float64(m.k-i)) * sum
 	}
 
-	moment /= (float64(m.core.Count()) - 1.)
+	moment /= (float64(count) - 1.)
 
 	return moment, nil
 }

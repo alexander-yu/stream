@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"stream"
+	"github.com/alexander-yu/stream"
 )
 
 // Std is a metric that tracks the sample standard deviation.

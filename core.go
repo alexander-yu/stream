@@ -31,7 +31,7 @@ func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
 	}
 
 	// merge metric configs and set defaults for any remaining unset fields
-	config, err := MergeConfigs(configs)
+	config, err := MergeConfigs(configs...)
 	if err != nil {
 		return nil, errors.Wrap(err, "error merging metric configs")
 	}
@@ -77,17 +77,29 @@ func (c *Core) Push(x float64) {
 	c.max = math.Max(c.max, x)
 }
 
-// Count returns the number of values seen.
+// Count returns the number of values seen seen globally.
 func (c *Core) Count() int {
 	return c.count
 }
 
-// Min returns the min of values seen.
+// WindowCount returns the number of values seen within the
+// rolling window; in other words, this just returns the
+// minimum of the global count and the window size.
+func (c *Core) WindowCount() int {
+	count := c.Count()
+	if count > c.window {
+		return c.window
+	}
+
+	return count
+}
+
+// Min returns the min of values seen globally.
 func (c *Core) Min() float64 {
 	return c.min
 }
 
-// Max returns the max of values seen.
+// Max returns the max of values seen globally.
 func (c *Core) Max() float64 {
 	return c.max
 }

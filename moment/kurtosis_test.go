@@ -6,15 +6,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"stream"
+	"github.com/alexander-yu/stream"
 )
 
 func TestKurtosis(t *testing.T) {
 	kurtosis, err := NewKurtosis()
-	require.NoError(err)
+	require.NoError(t, err)
 
-	core := stream.TestData(kurtosis)
-	core.Push(8)
+	stream.TestData(kurtosis)
 
 	value, err := kurtosis.Value()
 	require.NoError(t, err)
@@ -22,5 +21,5 @@ func TestKurtosis(t *testing.T) {
 	moment := 98. / 3.
 	variance := 14. / 3.
 
-	approx(t, moment/math.Pow(variance, 2.)-3., value)
+	stream.Approx(t, moment/math.Pow(variance, 2.)-3., value)
 }

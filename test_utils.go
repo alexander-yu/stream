@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
@@ -14,7 +15,9 @@ func roundFloat(x float64, n int) float64 {
 	return math.Round(x/unit) * unit
 }
 
-func approx(t *testing.T, x float64, y float64) {
+// Approx asserts that two floats are approximately equal to each other,
+// within 9 decimal points of precision.
+func Approx(t *testing.T, x float64, y float64) {
 	x = roundFloat(x, precision)
 	y = roundFloat(y, precision)
 	assert.Equal(t, x, y)
@@ -33,12 +36,16 @@ func TestData(metrics ...Metric) *Core {
 			4:  true,
 		},
 		Window: IntPtr(3),
-	}, metrics)
-	require.Nil(t, err)
+	}, metrics...)
+	if err != nil {
+		panic(fmt.Sprintf("%+v", err))
+	}
 
 	for i := 1.; i < 5; i++ {
 		core.Push(i)
 	}
+
+	core.Push(8)
 
 	return core
 }
