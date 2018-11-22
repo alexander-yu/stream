@@ -54,7 +54,7 @@ func (s *Skewness) Config() *stream.CoreConfig {
 
 // Value returns the value of the adjusted Fisher-Pearson sample skewness.
 func (s *Skewness) Value() (float64, error) {
-	count := float64(s.core.WindowCount())
+	count := float64(s.core.Count())
 	variance, err := s.variance.Value()
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving 2nd moment")

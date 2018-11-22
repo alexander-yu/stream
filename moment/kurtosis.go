@@ -54,7 +54,7 @@ func (k *Kurtosis) Config() *stream.CoreConfig {
 
 // Value returns the value of the sample excess kurtosis.
 func (k *Kurtosis) Value() (float64, error) {
-	count := float64(k.core.WindowCount())
+	count := float64(k.core.Count())
 	variance, err := k.variance.Value()
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving 2nd moment")

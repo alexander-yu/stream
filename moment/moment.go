@@ -40,7 +40,7 @@ func (m *Moment) Config() *stream.CoreConfig {
 
 // Value returns the value of the kth sample central moment.
 func (m *Moment) Value() (float64, error) {
-	count := m.core.WindowCount()
+	count := m.core.Count()
 	if count == 0 {
 		return 0, errors.New("no values seen yet")
 	}

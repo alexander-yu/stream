@@ -61,6 +61,7 @@ func (c *Core) Push(x float64) {
 		if len(c.vals) > c.window {
 			tail := c.vals[0]
 			c.vals = c.vals[1:]
+			c.count--
 
 			for k := range c.sums {
 				c.sums[k] -= math.Pow(tail, float64(k))
@@ -82,24 +83,12 @@ func (c *Core) Count() int {
 	return c.count
 }
 
-// WindowCount returns the number of values seen within the
-// rolling window; in other words, this just returns the
-// minimum of the global count and the window size.
-func (c *Core) WindowCount() int {
-	count := c.Count()
-	if count > c.window {
-		return c.window
-	}
-
-	return count
-}
-
-// Min returns the min of values seen globally.
+// Min returns the min of values seen.
 func (c *Core) Min() float64 {
 	return c.min
 }
 
-// Max returns the max of values seen globally.
+// Max returns the max of values seen.
 func (c *Core) Max() float64 {
 	return c.max
 }

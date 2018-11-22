@@ -56,12 +56,7 @@ func TestMax(t *testing.T) {
 
 func TestCount(t *testing.T) {
 	core := TestData()
-	assert.Equal(t, 5, core.Count())
-}
-
-func TestWindowCount(t *testing.T) {
-	core := TestData()
-	assert.Equal(t, 3, core.WindowCount())
+	assert.Equal(t, 3, core.Count())
 }
 
 func TestSum(t *testing.T) {

@@ -29,5 +29,5 @@ func (m *Mean) Value() (float64, error) {
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum")
 	}
-	return sum / float64(m.core.WindowCount()), nil
+	return sum / float64(m.core.Count()), nil
 }
