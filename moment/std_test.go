@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/alexander-yu/stream"
+	"github.com/alexander-yu/stream/testutil"
 )
 
 func TestStd(t *testing.T) {
@@ -18,5 +19,5 @@ func TestStd(t *testing.T) {
 	value, err := std.Value()
 	require.NoError(t, err)
 
-	stream.Approx(t, math.Sqrt(7.), value)
+	testutil.Approx(t, math.Sqrt(7.), value)
 }

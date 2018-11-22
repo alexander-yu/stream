@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/alexander-yu/stream"
+	"github.com/alexander-yu/stream/testutil"
 )
 
 func TestMoment(t *testing.T) {
@@ -17,5 +18,5 @@ func TestMoment(t *testing.T) {
 	value, err := moment.Value()
 	require.NoError(t, err)
 
-	stream.Approx(t, 7, value)
+	testutil.Approx(t, 7, value)
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/alexander-yu/stream"
+	"github.com/alexander-yu/stream/testutil"
 )
 
 func TestKurtosis(t *testing.T) {
@@ -21,5 +22,5 @@ func TestKurtosis(t *testing.T) {
 	moment := 98. / 3.
 	variance := 14. / 3.
 
-	stream.Approx(t, moment/math.Pow(variance, 2.)-3., value)
+	testutil.Approx(t, moment/math.Pow(variance, 2.)-3., value)
 }

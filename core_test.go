@@ -5,6 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/alexander-yu/stream/testutil"
 )
 
 func TestPush(t *testing.T) {
@@ -23,7 +25,7 @@ func TestPush(t *testing.T) {
 	for k, expectedSum := range expectedSums {
 		actualSum, ok := core.sums[k]
 		require.True(t, ok)
-		Approx(t, expectedSum, actualSum)
+		testutil.Approx(t, expectedSum, actualSum)
 	}
 }
 
@@ -44,12 +46,12 @@ func TestClear(t *testing.T) {
 
 func TestMin(t *testing.T) {
 	core := TestData()
-	Approx(t, 1, core.Min())
+	testutil.Approx(t, 1, core.Min())
 }
 
 func TestMax(t *testing.T) {
 	core := TestData()
-	Approx(t, 8, core.Max())
+	testutil.Approx(t, 8, core.Max())
 }
 
 func TestCount(t *testing.T) {
@@ -77,7 +79,7 @@ func TestSum(t *testing.T) {
 		for i := -1; i <= 4; i++ {
 			sum, err := core.Sum(i)
 			require.Nil(t, err)
-			Approx(t, expectedSums[i], sum)
+			testutil.Approx(t, expectedSums[i], sum)
 		}
 	})
 

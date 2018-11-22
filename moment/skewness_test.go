@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/alexander-yu/stream"
+	"github.com/alexander-yu/stream/testutil"
 )
 
 func TestSkewness(t *testing.T) {
@@ -22,5 +23,5 @@ func TestSkewness(t *testing.T) {
 	moment := 9.
 	variance := 7.
 
-	stream.Approx(t, adjust*moment/math.Pow(variance, 1.5), value)
+	testutil.Approx(t, adjust*moment/math.Pow(variance, 1.5), value)
 }

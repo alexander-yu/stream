@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/alexander-yu/stream"
+	"github.com/alexander-yu/stream/testutil"
 )
 
 func TestMean(t *testing.T) {
@@ -16,5 +17,5 @@ func TestMean(t *testing.T) {
 	value, err := mean.Value()
 	require.NoError(t, err)
 
-	stream.Approx(t, 5, value)
+	testutil.Approx(t, 5, value)
 }
