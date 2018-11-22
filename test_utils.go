@@ -20,8 +20,9 @@ func approx(t *testing.T, x float64, y float64) {
 	assert.Equal(t, x, y)
 }
 
-// TestData returns a Core struct with example data populated from pushes for tesitng purposes
-func TestData() *Core {
+// TestData returns a Core struct with example data populated from pushes for testing purposes.
+// You can also pass in a variety of metrics to subscribe them to the core during testing.
+func TestData(metrics ...Metric) *Core {
 	core, err := NewCore(&CoreConfig{
 		Sums: map[int]bool{
 			-1: true,
@@ -32,7 +33,7 @@ func TestData() *Core {
 			4:  true,
 		},
 		Window: IntPtr(3),
-	})
+	}, metrics)
 	require.Nil(t, err)
 
 	for i := 1.; i < 5; i++ {
