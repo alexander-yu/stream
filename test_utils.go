@@ -4,6 +4,20 @@ import (
 	"fmt"
 )
 
+type mockMetric struct {
+	id int
+}
+
+func (m *mockMetric) Subscribe(c *Core) {}
+
+func (m *mockMetric) Config() *CoreConfig {
+	return &CoreConfig{}
+}
+
+func (m *mockMetric) Value() (float64, error) {
+	return 0, nil
+}
+
 // TestData returns a Core struct with example data populated from pushes for testing purposes.
 // You can also pass in a variety of metrics to subscribe them to the core during testing.
 func TestData(metrics ...Metric) *Core {
