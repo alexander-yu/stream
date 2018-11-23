@@ -5,4 +5,5 @@ require (
 	github.com/pkg/errors v0.8.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.2.2
+	github.com/workiva/go-datastructures v1.0.50
 )

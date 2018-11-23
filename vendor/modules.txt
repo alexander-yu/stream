@@ -7,3 +7,5 @@ github.com/pmezard/go-difflib/difflib
 # github.com/stretchr/testify v1.2.2
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/require
+# github.com/workiva/go-datastructures v1.0.50
+github.com/workiva/go-datastructures/queue

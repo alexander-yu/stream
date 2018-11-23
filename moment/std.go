@@ -34,7 +34,7 @@ func (s *Std) Config() *stream.CoreConfig {
 }
 
 // Push is a no-op; Std does not consume values.
-func (s *Std) Push(x float64) {}
+func (s *Std) Push(x float64) error { return nil }
 
 // Value returns the value of the sample standard deviation.
 func (s *Std) Value() (float64, error) {

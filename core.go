@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/pkg/errors"
+	"github.com/workiva/go-datastructures/queue"
 )
 
 // Core is a struct that stores fundamental information for stats collection on a stream.
@@ -12,8 +13,8 @@ type Core struct {
 	count       int
 	min         float64
 	max         float64
-	window      int
-	vals        []float64
+	window      uint64
+	queue       *queue.RingBuffer
 	pushMetrics []Metric
 }
 
@@ -41,11 +42,12 @@ func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
 
 	// initialize and create Core
 	c := &Core{min: math.Inf(1), max: math.Inf(-1)}
-	c.window = *config.Window
+	c.window = uint64(*config.Window)
 	c.sums = map[int]float64{}
 	for k := range config.Sums {
 		c.sums[k] = 0
 	}
+	c.queue = queue.NewRingBuffer(c.window)
 	c.pushMetrics = config.PushMetrics
 
 	for _, metric := range metrics {
@@ -56,7 +58,7 @@ func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
 }
 
 // Push adds a new value for a Core object to consume.
-func (c *Core) Push(x float64) {
+func (c *Core) Push(x float64) error {
 	// Push value to all push metrics after completion
 	defer func() {
 		for _, metric := range c.pushMetrics {
@@ -65,15 +67,22 @@ func (c *Core) Push(x float64) {
 	}()
 
 	if c.window != 0 {
-		c.vals = append(c.vals, x)
+		err := c.queue.Put(x)
+		if err != nil {
+			return errors.Wrap(err, "error pushing to metric")
+		}
 
-		if len(c.vals) > c.window {
-			tail := c.vals[0]
-			c.vals = c.vals[1:]
+		if c.queue.Len() > c.window {
+			tail, err := c.queue.Get()
+			if err != nil {
+				return errors.Wrap(err, "error popping from window queue")
+			}
+
 			c.count--
 
+			tailVal := tail.(float64)
 			for k := range c.sums {
-				c.sums[k] -= math.Pow(tail, float64(k))
+				c.sums[k] -= math.Pow(tailVal, float64(k))
 			}
 		}
 	}
@@ -85,6 +94,7 @@ func (c *Core) Push(x float64) {
 	c.count++
 	c.min = math.Min(c.min, x)
 	c.max = math.Max(c.max, x)
+	return nil
 }
 
 // Count returns the number of values seen seen globally.
@@ -124,5 +134,6 @@ func (c *Core) Clear() {
 	c.count = 0
 	c.min = math.Inf(1)
 	c.max = math.Inf(-1)
-	c.vals = nil
+	c.queue.Dispose()
+	c.queue = queue.NewRingBuffer(c.window)
 }

@@ -6,3 +6,5 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
+github.com/workiva/go-datastructures v1.0.50 h1:fIBEgeOEH7fzlx6Nqn+2NyK/JVD5EgDgponNmzoFhyk=
+github.com/workiva/go-datastructures v1.0.50/go.mod h1:ZYLyltToJkj6X5blfbFnTTEbryqb3v6D00JfVYDgUI0=

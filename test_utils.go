@@ -17,8 +17,9 @@ func (m *mockMetric) Config() *CoreConfig {
 	}
 }
 
-func (m *mockMetric) Push(x float64) {
+func (m *mockMetric) Push(x float64) error {
 	m.vals = append(m.vals, x)
+	return nil
 }
 
 func (m *mockMetric) Value() (float64, error) {
@@ -44,10 +45,16 @@ func TestData(metrics ...Metric) *Core {
 	}
 
 	for i := 1.; i < 5; i++ {
-		core.Push(i)
+		err = core.Push(i)
+		if err != nil {
+			panic(fmt.Sprintf("%+v", err))
+		}
 	}
 
-	core.Push(8)
+	err = core.Push(8)
+	if err != nil {
+		panic(fmt.Sprintf("%+v", err))
+	}
 
 	return core
 }

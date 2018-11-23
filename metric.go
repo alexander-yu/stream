@@ -4,6 +4,6 @@ package stream
 type Metric interface {
 	Subscribe(*Core)
 	Config() *CoreConfig
-	Push(float64)
+	Push(float64) error
 	Value() (float64, error)
 }

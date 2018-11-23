@@ -39,7 +39,7 @@ func (m *Moment) Config() *stream.CoreConfig {
 }
 
 // Push is a no-op; Moment does not consume values.
-func (m *Moment) Push(x float64) {}
+func (m *Moment) Push(x float64) error { return nil }
 
 // Value returns the value of the kth sample central moment.
 func (m *Moment) Value() (float64, error) {
