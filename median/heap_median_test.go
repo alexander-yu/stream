@@ -4,41 +4,77 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/alexander-yu/stream/testutil"
 )
 
 func TestHeapMedianPush(t *testing.T) {
-	medianStats := NewHeapMedian()
+	median := NewHeapMedian()
 	for i := 0.; i < 5; i++ {
-		medianStats.Push(i)
+		err := median.Push(i)
+		require.NoError(t, err)
 	}
 
-	assert.Equal(t, medianStats.lowHeap.vals, []interface{}{1., 0.})
-	assert.Equal(t, medianStats.highHeap.vals, []interface{}{2., 3., 4.})
+	assert.Equal(t, []interface{}{1., 0.}, median.lowHeap.vals)
+	assert.Equal(t, []interface{}{2., 3., 4.}, median.highHeap.vals)
 
-	medianStats.Push(3.)
+	err := median.Push(3.)
+	require.NoError(t, err)
 
-	assert.Equal(t, medianStats.lowHeap.vals, []interface{}{2., 0., 1.})
-	assert.Equal(t, medianStats.highHeap.vals, []interface{}{3., 3., 4.})
+	assert.Equal(t, []interface{}{2., 0., 1.}, median.lowHeap.vals)
+	assert.Equal(t, []interface{}{3., 3., 4.}, median.highHeap.vals)
 
-	medianStats.Push(2.)
-	medianStats.Push(1.)
+	err = median.Push(2.)
+	require.NoError(t, err)
 
-	assert.Equal(t, medianStats.lowHeap.vals, []interface{}{2., 1., 1., 0.})
-	assert.Equal(t, medianStats.highHeap.vals, []interface{}{2., 3., 4., 3.})
+	assert.Equal(t, []interface{}{2., 2., 1., 0.}, median.lowHeap.vals)
+	assert.Equal(t, []interface{}{3., 3., 4.}, median.highHeap.vals)
+
+	err = median.Push(1.)
+	require.NoError(t, err)
+
+	assert.Equal(t, []interface{}{2., 1., 1., 0.}, median.lowHeap.vals)
+	assert.Equal(t, []interface{}{2., 3., 4., 3.}, median.highHeap.vals)
 }
 
-func TestHeapMedian(t *testing.T) {
-	medianStats := NewHeapMedian()
-	for i := 0.; i < 5; i++ {
-		medianStats.Push(i)
-	}
+func TestHeapMedianValue(t *testing.T) {
+	t.Run("pass: if low heap is larger, return its top", func(t *testing.T) {
+		median := NewHeapMedian()
+		median.lowHeap = newHeap([]interface{}{2., 2., 1., 0.}, fmax)
+		median.highHeap = newHeap([]interface{}{3., 3., 4.}, fmin)
 
-	median, _ := medianStats.Median()
+		value, err := median.Value()
+		require.NoError(t, err)
 
-	assert.Equal(t, median, 2.)
+		testutil.Approx(t, 2., value)
+	})
 
-	medianStats.Push(5)
-	median, _ = medianStats.Median()
+	t.Run("pass: if high heap is larger, return its top", func(t *testing.T) {
+		median := NewHeapMedian()
+		median.lowHeap = newHeap([]interface{}{1., 0.}, fmax)
+		median.highHeap = newHeap([]interface{}{2., 3., 4.}, fmin)
 
-	assert.Equal(t, median, 2.5)
+		value, err := median.Value()
+		require.NoError(t, err)
+
+		testutil.Approx(t, 2., value)
+	})
+
+	t.Run("pass: if heaps are equal in size, return average of tops", func(t *testing.T) {
+		median := NewHeapMedian()
+		median.lowHeap = newHeap([]interface{}{2., 0., 1.}, fmax)
+		median.highHeap = newHeap([]interface{}{3., 3., 4.}, fmin)
+
+		value, err := median.Value()
+		require.NoError(t, err)
+
+		testutil.Approx(t, 2.5, value)
+	})
+
+	t.Run("fail: if no values seen, return error", func(t *testing.T) {
+		median := NewHeapMedian()
+		_, err := median.Value()
+		assert.EqualError(t, err, "no values seen yet")
+	})
 }
