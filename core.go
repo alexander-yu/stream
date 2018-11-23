@@ -37,10 +37,9 @@ func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "error merging metric configs")
 	}
-
 	config = setConfigDefaults(config)
 
-	// initialize and create Core
+	// initialize and create core
 	c := &Core{min: math.Inf(1), max: math.Inf(-1)}
 	c.window = uint64(*config.Window)
 	c.sums = map[int]float64{}
@@ -50,6 +49,7 @@ func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
 	c.queue = queue.NewRingBuffer(c.window)
 	c.pushMetrics = config.PushMetrics
 
+	// subscribe metrics to core
 	for _, metric := range metrics {
 		metric.Subscribe(c)
 	}
