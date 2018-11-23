@@ -52,6 +52,9 @@ func (s *Skewness) Config() *stream.CoreConfig {
 	return s.config
 }
 
+// Push is a no-op; Skewness does not consume values.
+func (s *Skewness) Push(x float64) {}
+
 // Value returns the value of the adjusted Fisher-Pearson sample skewness.
 func (s *Skewness) Value() (float64, error) {
 	count := float64(s.core.Count())

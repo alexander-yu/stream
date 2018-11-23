@@ -10,7 +10,8 @@ import (
 )
 
 func TestPush(t *testing.T) {
-	core := TestData()
+	m := &mockMetric{}
+	core := TestData(m)
 
 	expectedSums := map[int]float64{
 		-1: 17. / 24.,
@@ -26,6 +27,12 @@ func TestPush(t *testing.T) {
 		actualSum, ok := core.sums[k]
 		require.True(t, ok)
 		testutil.Approx(t, expectedSum, actualSum)
+	}
+
+	// Check that Push also pushes the value to the metric
+	expectedVals := []float64{1., 2., 3., 4., 8.}
+	for i := range expectedVals {
+		testutil.Approx(t, expectedVals[i], m.vals[i])
 	}
 }
 

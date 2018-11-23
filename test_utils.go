@@ -5,13 +5,20 @@ import (
 )
 
 type mockMetric struct {
-	id int
+	id   int
+	vals []float64
 }
 
 func (m *mockMetric) Subscribe(c *Core) {}
 
 func (m *mockMetric) Config() *CoreConfig {
-	return &CoreConfig{}
+	return &CoreConfig{
+		PushMetrics: []Metric{m},
+	}
+}
+
+func (m *mockMetric) Push(x float64) {
+	m.vals = append(m.vals, x)
 }
 
 func (m *mockMetric) Value() (float64, error) {

@@ -8,12 +8,13 @@ import (
 
 // Core is a struct that stores fundamental information for stats collection on a stream.
 type Core struct {
-	sums   map[int]float64
-	count  int
-	min    float64
-	max    float64
-	window int
-	vals   []float64
+	sums        map[int]float64
+	count       int
+	min         float64
+	max         float64
+	window      int
+	vals        []float64
+	pushMetrics []Metric
 }
 
 // NewCore creates a new Core struct based on a provided config as well as any configs
@@ -45,6 +46,7 @@ func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
 	for k := range config.Sums {
 		c.sums[k] = 0
 	}
+	c.pushMetrics = config.PushMetrics
 
 	for _, metric := range metrics {
 		metric.Subscribe(c)
@@ -55,6 +57,13 @@ func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
 
 // Push adds a new value for a Core object to consume.
 func (c *Core) Push(x float64) {
+	// Push value to all push metrics after completion
+	defer func() {
+		for _, metric := range c.pushMetrics {
+			metric.Push(x)
+		}
+	}()
+
 	if c.window != 0 {
 		c.vals = append(c.vals, x)
 
