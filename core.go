@@ -2,6 +2,7 @@ package stream
 
 import (
 	"math"
+	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/workiva/go-datastructures/queue"
@@ -9,6 +10,7 @@ import (
 
 // Core is a struct that stores fundamental information for stats collection on a stream.
 type Core struct {
+	mux         sync.Mutex
 	sums        map[int]float64
 	count       int
 	min         float64
@@ -59,6 +61,9 @@ func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
 
 // Push adds a new value for a Core object to consume.
 func (c *Core) Push(x float64) error {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
 	// Push value to all push metrics after completion
 	defer func() {
 		for _, metric := range c.pushMetrics {
@@ -99,21 +104,30 @@ func (c *Core) Push(x float64) error {
 
 // Count returns the number of values seen seen globally.
 func (c *Core) Count() int {
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	return c.count
 }
 
 // Min returns the min of values seen.
 func (c *Core) Min() float64 {
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	return c.min
 }
 
 // Max returns the max of values seen.
 func (c *Core) Max() float64 {
+	c.mux.Lock()
+	defer c.mux.Unlock()
 	return c.max
 }
 
 // Sum returns the kth-power sum of values seen.
 func (c *Core) Sum(k int) (float64, error) {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
 	if c.count == 0 {
 		return 0, errors.New("no values seen yet")
 	}
@@ -127,6 +141,9 @@ func (c *Core) Sum(k int) (float64, error) {
 
 // Clear clears all stats being tracked.
 func (c *Core) Clear() {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
 	for k := range c.sums {
 		c.sums[k] = 0
 	}
