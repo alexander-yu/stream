@@ -9,6 +9,15 @@ import (
 	"github.com/alexander-yu/stream/testutil"
 )
 
+func interfaceToFloat(vals []interface{}) []float64 {
+	var floatVals []float64
+	for _, val := range vals {
+		floatVals = append(floatVals, val.(float64))
+	}
+
+	return floatVals
+}
+
 func TestHeapMedianPush(t *testing.T) {
 	median := NewHeapMedian()
 	for i := 0.; i < 5; i++ {
@@ -16,26 +25,26 @@ func TestHeapMedianPush(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	assert.Equal(t, []interface{}{1., 0.}, median.lowHeap.vals)
-	assert.Equal(t, []interface{}{2., 3., 4.}, median.highHeap.vals)
+	testutil.ApproxSlice(t, []float64{1., 0.}, interfaceToFloat(median.lowHeap.vals))
+	testutil.ApproxSlice(t, []float64{2., 3., 4.}, interfaceToFloat(median.highHeap.vals))
 
 	err := median.Push(3.)
 	require.NoError(t, err)
 
-	assert.Equal(t, []interface{}{2., 0., 1.}, median.lowHeap.vals)
-	assert.Equal(t, []interface{}{3., 3., 4.}, median.highHeap.vals)
+	testutil.ApproxSlice(t, []float64{2., 0., 1.}, interfaceToFloat(median.lowHeap.vals))
+	testutil.ApproxSlice(t, []float64{3., 3., 4.}, interfaceToFloat(median.highHeap.vals))
 
 	err = median.Push(2.)
 	require.NoError(t, err)
 
-	assert.Equal(t, []interface{}{2., 2., 1., 0.}, median.lowHeap.vals)
-	assert.Equal(t, []interface{}{3., 3., 4.}, median.highHeap.vals)
+	testutil.ApproxSlice(t, []float64{2., 2., 1., 0.}, interfaceToFloat(median.lowHeap.vals))
+	testutil.ApproxSlice(t, []float64{3., 3., 4.}, interfaceToFloat(median.highHeap.vals))
 
 	err = median.Push(1.)
 	require.NoError(t, err)
 
-	assert.Equal(t, []interface{}{2., 1., 1., 0.}, median.lowHeap.vals)
-	assert.Equal(t, []interface{}{2., 3., 4., 3.}, median.highHeap.vals)
+	testutil.ApproxSlice(t, []float64{2., 1., 1., 0.}, interfaceToFloat(median.lowHeap.vals))
+	testutil.ApproxSlice(t, []float64{2., 3., 4., 3.}, interfaceToFloat(median.highHeap.vals))
 }
 
 func TestHeapMedianValue(t *testing.T) {
