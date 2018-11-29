@@ -2,7 +2,6 @@ package median
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/pkg/errors"
 )
@@ -14,7 +13,6 @@ type Node struct {
 	val     float64
 	_height int
 	_size   int
-	mux     sync.Mutex
 }
 
 func max(x int, y int) int {
@@ -38,10 +36,7 @@ func (n *Node) Left() (*Node, error) {
 	if n == nil {
 		return nil, errors.New("tried to retrieve child of nil node")
 	}
-	n.mux.Lock()
-	left := n.left
-	n.mux.Unlock()
-	return left, nil
+	return n.left, nil
 }
 
 // Right returns the right child of the node.
@@ -49,34 +44,23 @@ func (n *Node) Right() (*Node, error) {
 	if n == nil {
 		return nil, errors.New("tried to retrieve child of nil node")
 	}
-	n.mux.Lock()
-	right := n.right
-	n.mux.Unlock()
-	return right, nil
+	return n.right, nil
 }
 
 // Height returns the height of the subtree rooted at the node.
 func (n *Node) Height() int {
-	// We need the extra nil check here because nil nodes do not have locks
 	if n == nil {
 		return -1
 	}
-	n.mux.Lock()
-	height := n.height()
-	n.mux.Unlock()
-	return height
+	return n._height
 }
 
 // Size returns the size of the subtree rooted at the node.
 func (n *Node) Size() int {
-	// We need the extra nil check here because nil nodes do not have locks
 	if n == nil {
 		return 0
 	}
-	n.mux.Lock()
-	size := n.size()
-	n.mux.Unlock()
-	return size
+	return n._size
 }
 
 // TreeString returns the string representation of the subtree rooted at the node.
@@ -84,24 +68,7 @@ func (n *Node) TreeString() string {
 	if n == nil {
 		return ""
 	}
-	n.mux.Lock()
-	result := n.treeString("", "", true)
-	n.mux.Unlock()
-	return result
-}
-
-func (n *Node) height() int {
-	if n == nil {
-		return -1
-	}
-	return n._height
-}
-
-func (n *Node) size() int {
-	if n == nil {
-		return 0
-	}
-	return n._size
+	return n.treeString("", "", true)
 }
 
 func (n *Node) add(val float64) *Node {
@@ -113,8 +80,8 @@ func (n *Node) add(val float64) *Node {
 		n.right = n.right.add(val)
 	}
 
-	n._size = n.left.size() + n.right.size() + 1
-	n._height = max(n.left.height(), n.right.height()) + 1
+	n._size = n.left.Size() + n.right.Size() + 1
+	n._height = max(n.left.Height(), n.right.Height()) + 1
 	return n.balance()
 }
 
@@ -135,8 +102,8 @@ func (n *Node) remove(val float64) *Node {
 		root.left = n.left
 	}
 
-	root._size = root.left.size() + root.right.size() + 1
-	root._height = max(root.left.height(), root.right.height()) + 1
+	root._size = root.left.Size() + root.right.Size() + 1
+	root._height = max(root.left.Height(), root.right.Height()) + 1
 	return root.balance()
 }
 
@@ -154,8 +121,8 @@ func (n *Node) removeMin() *Node {
 	}
 
 	n.left = n.left.removeMin()
-	n._size = n.left.size() + n.right.size() + 1
-	n._height = max(n.left.height(), n.right.height()) + 1
+	n._size = n.left.Size() + n.right.Size() + 1
+	n._height = max(n.left.Height(), n.right.Height()) + 1
 	return n.balance()
 }
 
@@ -184,7 +151,7 @@ func (n *Node) balance() *Node {
 }
 
 func (n *Node) heightDiff() int {
-	return n.left.height() - n.right.height()
+	return n.left.Height() - n.right.Height()
 }
 
 func (n *Node) rotateLeft() *Node {
@@ -195,10 +162,10 @@ func (n *Node) rotateLeft() *Node {
 	// No need to call size() here; we already know that n is not nil, since
 	// rotations are only called for non-leaf nodes
 	m._size = n._size
-	n._size = n.left.size() + n.right.size() + 1
+	n._size = n.left.Size() + n.right.Size() + 1
 
-	n._height = max(n.left.height(), n.right.height()) + 1
-	m._height = max(m.left.height(), m.right.height()) + 1
+	n._height = max(n.left.Height(), n.right.Height()) + 1
+	m._height = max(m.left.Height(), m.right.Height()) + 1
 
 	return m
 }
@@ -211,10 +178,10 @@ func (n *Node) rotateRight() *Node {
 	// No need to call size() here; we already know that n is not nil, since
 	// rotations are only called for non-leaf nodes
 	m._size = n._size
-	n._size = n.left.size() + n.right.size() + 1
+	n._size = n.left.Size() + n.right.Size() + 1
 
-	n._height = max(n.left.height(), n.right.height()) + 1
-	m._height = max(m.left.height(), m.right.height()) + 1
+	n._height = max(n.left.Height(), n.right.Height()) + 1
+	m._height = max(m.left.Height(), m.right.Height()) + 1
 
 	return m
 }
@@ -228,7 +195,7 @@ func (n *Node) get(i int) *Node {
 		return nil
 	}
 
-	size := n.left.size()
+	size := n.left.Size()
 	if i < size {
 		return n.left.get(i)
 	} else if i > size {
@@ -244,9 +211,9 @@ func (n *Node) rank(val float64) int {
 	} else if val < n.val {
 		return n.left.rank(val)
 	} else if val > n.val {
-		return 1 + n.left.size() + n.right.rank(val)
+		return 1 + n.left.Size() + n.right.rank(val)
 	}
-	return n.left.size()
+	return n.left.Size()
 }
 
 /*******************
