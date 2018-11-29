@@ -20,7 +20,7 @@ type Core struct {
 	pushMetrics []Metric
 }
 
-// NewCore creates a new Core struct based on a provided config as well as any configs
+// NewCore instantiates a Core struct based on a provided config as well as any configs
 // for optionally provided metrics and subscribes those metrics to the Core.
 func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
 	// validate configs

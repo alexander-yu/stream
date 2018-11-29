@@ -24,7 +24,7 @@ func max(x int, y int) int {
 	return y
 }
 
-// NewNode returns a new node containing a provided value.
+// NewNode instantiates a Node struct with a a provided value.
 func NewNode(val float64) *Node {
 	return &Node{
 		val:     val,

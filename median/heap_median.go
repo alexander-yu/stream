@@ -22,7 +22,7 @@ func fmin(x interface{}, y interface{}) bool {
 	return x.(float64) < y.(float64)
 }
 
-// NewHeapMedian returns an initialized HeapMedian struct.
+// NewHeapMedian instantiates a HeapMedian struct.
 func NewHeapMedian() *HeapMedian {
 	return &HeapMedian{
 		lowHeap:  newHeap([]interface{}{}, fmax),

@@ -14,7 +14,7 @@ type Moment struct {
 	core *stream.Core
 }
 
-// NewMoment creates a kth Moment.
+// NewMoment instantiates a Moment struct that tracks the kth moment.
 func NewMoment(k int) (*Moment, error) {
 	if k < 0 {
 		return nil, errors.New("cannot have a negative moment")

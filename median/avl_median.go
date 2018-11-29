@@ -18,7 +18,7 @@ type AVLMedian struct {
 	mux    sync.Mutex
 }
 
-// NewAVLMedian instantiates an AVLMedian struct
+// NewAVLMedian instantiates an AVLMedian struct.
 func NewAVLMedian(window int) (*AVLMedian, error) {
 	if window < 0 {
 		return nil, errors.Errorf("%d is a negative window", window)

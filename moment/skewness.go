@@ -16,7 +16,7 @@ type Skewness struct {
 	core     *stream.Core
 }
 
-// NewSkewness creates a skewness.
+// NewSkewness instantiates a Skewness struct.
 func NewSkewness() (*Skewness, error) {
 	variance, err := NewMoment(2)
 	if err != nil {

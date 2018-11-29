@@ -13,7 +13,7 @@ type Std struct {
 	variance *Moment
 }
 
-// NewStd creates an Std.
+// NewStd instantiates an Std struct.
 func NewStd() (*Std, error) {
 	variance, err := NewMoment(2)
 	if err != nil {

@@ -16,7 +16,7 @@ type Kurtosis struct {
 	core     *stream.Core
 }
 
-// NewKurtosis creates a kurtosis.
+// NewKurtosis instantiates a Kurtosis struct.
 func NewKurtosis() (*Kurtosis, error) {
 	variance, err := NewMoment(2)
 	if err != nil {
