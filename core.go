@@ -62,7 +62,6 @@ func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
 // Push adds a new value for a Core object to consume.
 func (c *Core) Push(x float64) error {
 	c.mux.Lock()
-	defer c.mux.Unlock()
 
 	// Push value to all push metrics after completion
 	defer func() {
@@ -70,6 +69,7 @@ func (c *Core) Push(x float64) error {
 			metric.Push(x)
 		}
 	}()
+	defer c.mux.Unlock()
 
 	if c.window != 0 {
 		err := c.queue.Put(x)
