@@ -58,6 +58,10 @@ func (k *Kurtosis) Push(x float64) error { return nil }
 // Value returns the value of the sample excess kurtosis.
 func (k *Kurtosis) Value() (float64, error) {
 	count := float64(k.core.Count())
+	if count == 0 {
+		return 0, errors.New("no values seen yet")
+	}
+
 	variance, err := k.variance.Value()
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving 2nd moment")

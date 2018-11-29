@@ -28,9 +28,14 @@ func (m *Mean) Push(x float64) error { return nil }
 
 // Value returns the value of the mean.
 func (m *Mean) Value() (float64, error) {
+	count := m.core.Count()
+	if count == 0 {
+		return 0, errors.New("no values seen yet")
+	}
+
 	sum, err := m.core.Sum(1)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum")
 	}
-	return sum / float64(m.core.Count()), nil
+	return sum / float64(count), nil
 }

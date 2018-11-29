@@ -13,7 +13,7 @@ import (
 type AVLMedian struct {
 	queue  *queue.RingBuffer
 	tree   *OrderStatisticTree
-	window *int
+	window int
 	core   *stream.Core
 	mux    sync.Mutex
 }
@@ -27,7 +27,7 @@ func NewAVLMedian(window int) (*AVLMedian, error) {
 	return &AVLMedian{
 		queue:  queue.NewRingBuffer(uint64(window)),
 		tree:   &OrderStatisticTree{},
-		window: stream.IntPtr(window),
+		window: window,
 	}, nil
 }
 
@@ -39,7 +39,7 @@ func (m *AVLMedian) Subscribe(c *stream.Core) {
 // Config returns the CoreConfig needed.
 func (m *AVLMedian) Config() *stream.CoreConfig {
 	return &stream.CoreConfig{
-		Window:      m.window,
+		Window:      &m.window,
 		PushMetrics: []stream.Metric{m},
 	}
 }
@@ -49,7 +49,7 @@ func (m *AVLMedian) Push(x float64) error {
 	m.mux.Lock()
 	defer m.mux.Unlock()
 
-	if m.queue.Len() == uint64(*m.window) {
+	if m.queue.Len() == uint64(m.window) {
 		val, err := m.queue.Get()
 		if err != nil {
 			return errors.Wrap(err, "error popping item from queue")

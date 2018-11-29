@@ -11,8 +11,20 @@ import (
 )
 
 func TestNewAVLMedian(t *testing.T) {
-	_, err := NewAVLMedian(-1)
-	assert.EqualError(t, err, "-1 is a negative window")
+	t.Run("pass: nonnegative window is valid", func(t *testing.T) {
+		median, err := NewAVLMedian(0)
+		require.NoError(t, err)
+		assert.Equal(t, 0, median.window)
+
+		median, err = NewAVLMedian(5)
+		require.NoError(t, err)
+		assert.Equal(t, 5, median.window)
+	})
+
+	t.Run("fail: negative window is invalid", func(t *testing.T) {
+		_, err := NewAVLMedian(-1)
+		assert.EqualError(t, err, "-1 is a negative window")
+	})
 }
 
 func TestAVLMedianPush(t *testing.T) {
