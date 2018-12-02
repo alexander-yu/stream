@@ -8,7 +8,16 @@ import (
 
 // Mean is a metric that tracks the mean.
 type Mean struct {
-	core *stream.Core
+	window int
+	core   *stream.Core
+}
+
+// NewMean instantiates a Mean struct.
+func NewMean(window int) (*Mean, error) {
+	if window < 0 {
+		return nil, errors.Errorf("%d is a negative window", window)
+	}
+	return &Mean{window: window}, nil
 }
 
 // Subscribe subscribes the Mean to a Core object.
@@ -19,7 +28,8 @@ func (m *Mean) Subscribe(c *stream.Core) {
 // Config returns the CoreConfig needed.
 func (m *Mean) Config() *stream.CoreConfig {
 	return &stream.CoreConfig{
-		Sums: stream.SumsConfig{1: true},
+		Sums:   stream.SumsConfig{1: true},
+		Window: &m.window,
 	}
 }
 

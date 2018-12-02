@@ -20,25 +20,23 @@ type Core struct {
 	pushMetrics []Metric
 }
 
-// NewCore instantiates a Core struct based on a provided config as well as any configs
-// for optionally provided metrics and subscribes those metrics to the Core.
-func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
-	// validate configs
-	configs := []*CoreConfig{config}
-	for _, metric := range metrics {
-		config := metric.Config()
-		err := validateConfig(config)
-		if err != nil {
-			return nil, errors.Wrap(err, "error validating config")
-		}
-		configs = append(configs, config)
+// SetupMetric sets a Metric up with a core for consuming.
+func SetupMetric(metric Metric) (*Core, error) {
+	// validate config
+	config := metric.Config()
+	err := validateConfig(config)
+	if err != nil {
+		return nil, errors.Wrap(err, "error validating config")
 	}
 
-	// merge metric configs and set defaults for any remaining unset fields
-	config, err := MergeConfigs(configs...)
-	if err != nil {
-		return nil, errors.Wrap(err, "error merging metric configs")
-	}
+	core := NewCore(config)
+	metric.Subscribe(core)
+	return core, nil
+}
+
+// NewCore instantiates a Core struct based on a provided config.
+func NewCore(config *CoreConfig) *Core {
+	// set defaults for any remaining unset fields
 	config = setConfigDefaults(config)
 
 	// initialize and create core
@@ -51,12 +49,7 @@ func NewCore(config *CoreConfig, metrics ...Metric) (*Core, error) {
 	c.queue = queue.NewRingBuffer(c.window)
 	c.pushMetrics = config.PushMetrics
 
-	// subscribe metrics to core
-	for _, metric := range metrics {
-		metric.Subscribe(c)
-	}
-
-	return c, nil
+	return c
 }
 
 // Push adds a new value for a Core object to consume.

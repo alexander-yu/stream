@@ -17,13 +17,13 @@ type Kurtosis struct {
 }
 
 // NewKurtosis instantiates a Kurtosis struct.
-func NewKurtosis() (*Kurtosis, error) {
-	variance, err := NewMoment(2)
+func NewKurtosis(window int) (*Kurtosis, error) {
+	variance, err := NewMoment(2, window)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating 2nd Moment")
 	}
 
-	moment4, err := NewMoment(4)
+	moment4, err := NewMoment(4, window)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating 4th Moment")
 	}

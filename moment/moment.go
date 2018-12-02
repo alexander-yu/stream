@@ -10,17 +10,20 @@ import (
 
 // Moment is a metric that tracks the kth sample central moment.
 type Moment struct {
-	k    int
-	core *stream.Core
+	k      int
+	window int
+	core   *stream.Core
 }
 
 // NewMoment instantiates a Moment struct that tracks the kth moment.
-func NewMoment(k int) (*Moment, error) {
+func NewMoment(k int, window int) (*Moment, error) {
 	if k < 0 {
 		return nil, errors.Errorf("%d is a negative moment", k)
+	} else if window < 0 {
+		return nil, errors.Errorf("%d is a negative window", window)
 	}
 
-	return &Moment{k: k}, nil
+	return &Moment{k: k, window: window}, nil
 }
 
 // Subscribe subscribes the Moment to a Core object.
@@ -35,7 +38,10 @@ func (m *Moment) Config() *stream.CoreConfig {
 		sums[i] = true
 	}
 
-	return &stream.CoreConfig{Sums: sums}
+	return &stream.CoreConfig{
+		Sums:   sums,
+		Window: &m.window,
+	}
 }
 
 // Push is a no-op; Moment does not consume values.

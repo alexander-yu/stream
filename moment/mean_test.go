@@ -11,9 +11,22 @@ import (
 	"github.com/alexander-yu/stream/testutil"
 )
 
-func TestMean(t *testing.T) {
+func TestNewMean(t *testing.T) {
+	t.Run("pass: returns a Mean", func(t *testing.T) {
+		_, err := NewMean(3)
+		assert.NoError(t, err)
+	})
+
+	t.Run("fail: negative window is invalid", func(t *testing.T) {
+		_, err := NewMean(-1)
+		assert.EqualError(t, err, "-1 is a negative window")
+	})
+}
+
+func TestMeanValue(t *testing.T) {
 	t.Run("pass: returns the mean", func(t *testing.T) {
-		mean := &Mean{}
+		mean, err := NewMean(3)
+		require.NoError(t, err)
 
 		stream.TestData(mean)
 
@@ -24,11 +37,13 @@ func TestMean(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		mean := &Mean{}
+		mean, err := NewMean(3)
+		require.NoError(t, err)
 
-		stream.NewCore(&stream.CoreConfig{}, mean)
+		_, err = stream.SetupMetric(mean)
+		require.NoError(t, err)
 
-		_, err := mean.Value()
+		_, err = mean.Value()
 		assert.EqualError(t, err, "no values seen yet")
 	})
 }

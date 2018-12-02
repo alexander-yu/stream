@@ -13,6 +13,15 @@ func (m *mockMetric) Subscribe(c *Core) {}
 
 func (m *mockMetric) Config() *CoreConfig {
 	return &CoreConfig{
+		Sums: map[int]bool{
+			-1: true,
+			0:  true,
+			1:  true,
+			2:  true,
+			3:  true,
+			4:  true,
+		},
+		Window:      IntPtr(3),
 		PushMetrics: []Metric{m},
 	}
 }
@@ -26,26 +35,15 @@ func (m *mockMetric) Value() (float64, error) {
 	return 0, nil
 }
 
-// TestData returns a Core struct with example data populated from pushes for testing purposes.
-// You can also pass in a variety of metrics to subscribe them to the core during testing.
-func TestData(metrics ...Metric) *Core {
-	core, err := NewCore(&CoreConfig{
-		Sums: map[int]bool{
-			-1: true,
-			0:  true,
-			1:  true,
-			2:  true,
-			3:  true,
-			4:  true,
-		},
-		Window: IntPtr(3),
-	}, metrics...)
+// TestData sets up a metric and populates a core with pushes for testing purposes.
+func TestData(metric Metric) *Core {
+	core, err := SetupMetric(metric)
 	if err != nil {
 		panic(fmt.Sprintf("%+v", err))
 	}
 
 	for i := 1.; i < 5; i++ {
-		err = core.Push(i)
+		err := core.Push(i)
 		if err != nil {
 			panic(fmt.Sprintf("%+v", err))
 		}
@@ -55,6 +53,8 @@ func TestData(metrics ...Metric) *Core {
 	if err != nil {
 		panic(fmt.Sprintf("%+v", err))
 	}
+
+	fmt.Println(core.sums)
 
 	return core
 }

@@ -11,25 +11,30 @@ import (
 )
 
 func TestNewMoment(t *testing.T) {
-	t.Run("pass: nonnegative moment is valid", func(t *testing.T) {
-		moment, err := NewMoment(0)
+	t.Run("pass: returns a Kurtosis", func(t *testing.T) {
+		moment, err := NewMoment(0, 3)
 		require.NoError(t, err)
 		assert.Equal(t, 0, moment.k)
 
-		moment, err = NewMoment(5)
+		moment, err = NewMoment(5, 3)
 		require.NoError(t, err)
 		assert.Equal(t, 5, moment.k)
 	})
 
 	t.Run("fail: negative moment is invalid", func(t *testing.T) {
-		_, err := NewMoment(-1)
+		_, err := NewMoment(-1, 3)
 		assert.EqualError(t, err, "-1 is a negative moment")
+	})
+
+	t.Run("fail: negative window is invalid", func(t *testing.T) {
+		_, err := NewMoment(3, -1)
+		assert.EqualError(t, err, "-1 is a negative window")
 	})
 }
 
 func TestMoment(t *testing.T) {
 	t.Run("pass: returns the kth moment", func(t *testing.T) {
-		moment, err := NewMoment(2)
+		moment, err := NewMoment(2, 3)
 		require.NoError(t, err)
 
 		stream.TestData(moment)
@@ -41,7 +46,7 @@ func TestMoment(t *testing.T) {
 	})
 
 	t.Run("pass: 0th moment always returns 1", func(t *testing.T) {
-		moment, err := NewMoment(0)
+		moment, err := NewMoment(0, 3)
 		require.NoError(t, err)
 
 		stream.TestData(moment)
@@ -61,7 +66,7 @@ func TestMoment(t *testing.T) {
 	})
 
 	t.Run("pass: 1st moment always returns 0", func(t *testing.T) {
-		moment, err := NewMoment(1)
+		moment, err := NewMoment(1, 3)
 		require.NoError(t, err)
 
 		stream.TestData(moment)
@@ -81,10 +86,11 @@ func TestMoment(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		moment, err := NewMoment(2)
+		moment, err := NewMoment(2, 3)
 		require.NoError(t, err)
 
-		stream.NewCore(&stream.CoreConfig{}, moment)
+		_, err = stream.SetupMetric(moment)
+		require.NoError(t, err)
 
 		_, err = moment.Value()
 		assert.EqualError(t, err, "no values seen yet")

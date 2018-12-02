@@ -12,13 +12,20 @@ import (
 )
 
 func TestNewSkewness(t *testing.T) {
-	_, err := NewSkewness()
-	assert.NoError(t, err)
+	t.Run("pass: returns a Skewness", func(t *testing.T) {
+		_, err := NewSkewness(3)
+		assert.NoError(t, err)
+	})
+
+	t.Run("fail: negative window is invalid", func(t *testing.T) {
+		_, err := NewSkewness(-1)
+		assert.EqualError(t, err, "error creating 2nd Moment: -1 is a negative window")
+	})
 }
 
 func TestSkewness(t *testing.T) {
 	t.Run("pass: returns the skewness", func(t *testing.T) {
-		skewness, err := NewSkewness()
+		skewness, err := NewSkewness(3)
 		require.NoError(t, err)
 
 		stream.TestData(skewness)
@@ -34,10 +41,11 @@ func TestSkewness(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		skewness, err := NewSkewness()
+		skewness, err := NewSkewness(3)
 		require.NoError(t, err)
 
-		stream.NewCore(&stream.CoreConfig{}, skewness)
+		_, err = stream.SetupMetric(skewness)
+		require.NoError(t, err)
 
 		_, err = skewness.Value()
 		assert.EqualError(t, err, "no values seen yet")

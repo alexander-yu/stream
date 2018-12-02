@@ -37,7 +37,7 @@ func TestPush(t *testing.T) {
 }
 
 func TestClear(t *testing.T) {
-	core := TestData()
+	core := TestData(&mockMetric{})
 	core.Clear()
 
 	expectedSums := map[int]float64{
@@ -52,23 +52,23 @@ func TestClear(t *testing.T) {
 }
 
 func TestMin(t *testing.T) {
-	core := TestData()
+	core := TestData(&mockMetric{})
 	testutil.Approx(t, 1, core.Min())
 }
 
 func TestMax(t *testing.T) {
-	core := TestData()
+	core := TestData(&mockMetric{})
 	testutil.Approx(t, 8, core.Max())
 }
 
 func TestCount(t *testing.T) {
-	core := TestData()
+	core := TestData(&mockMetric{})
 	assert.Equal(t, 3, core.Count())
 }
 
 func TestSum(t *testing.T) {
 	t.Run("pass: Sum returns the correct sum", func(t *testing.T) {
-		core := TestData()
+		core := TestData(&mockMetric{})
 		expectedSums := map[int]float64{
 			-1: 17. / 24.,
 			0:  3.,
@@ -86,15 +86,14 @@ func TestSum(t *testing.T) {
 	})
 
 	t.Run("fail: Sum fails if no elements consumed yet", func(t *testing.T) {
-		core, err := NewCore(&CoreConfig{})
-		require.NoError(t, err)
+		core := NewCore(&CoreConfig{})
 
-		_, err = core.Sum(1)
+		_, err := core.Sum(1)
 		assert.EqualError(t, err, "no values seen yet")
 	})
 
 	t.Run("fail: Sum fails for untracked power sum", func(t *testing.T) {
-		core := TestData()
+		core := TestData(&mockMetric{})
 
 		_, err := core.Sum(10)
 		assert.EqualError(t, err, "10 is not a tracked power sum")

@@ -17,13 +17,13 @@ type Skewness struct {
 }
 
 // NewSkewness instantiates a Skewness struct.
-func NewSkewness() (*Skewness, error) {
-	variance, err := NewMoment(2)
+func NewSkewness(window int) (*Skewness, error) {
+	variance, err := NewMoment(2, window)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating 2nd Moment")
 	}
 
-	moment3, err := NewMoment(3)
+	moment3, err := NewMoment(3, window)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating 3rd Moment")
 	}
