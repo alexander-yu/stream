@@ -10,13 +10,13 @@ import (
 
 // Core is a struct that stores fundamental information for stats collection on a stream.
 type Core struct {
-	mux         sync.Mutex
-	sums        map[int]float64
-	count       int
-	min         float64
-	max         float64
-	window      uint64
-	queue       *queue.RingBuffer
+	mux    sync.RWMutex
+	sums   map[int]float64
+	count  int
+	min    float64
+	max    float64
+	window uint64
+	queue  *queue.RingBuffer
 }
 
 // SetupMetric sets a Metric up with a core for consuming.
@@ -88,29 +88,29 @@ func (c *Core) Push(x float64) error {
 
 // Count returns the number of values seen seen globally.
 func (c *Core) Count() int {
-	c.mux.Lock()
-	defer c.mux.Unlock()
+	c.mux.RLock()
+	defer c.mux.RUnlock()
 	return c.count
 }
 
 // Min returns the min of values seen.
 func (c *Core) Min() float64 {
-	c.mux.Lock()
-	defer c.mux.Unlock()
+	c.mux.RLock()
+	defer c.mux.RUnlock()
 	return c.min
 }
 
 // Max returns the max of values seen.
 func (c *Core) Max() float64 {
-	c.mux.Lock()
-	defer c.mux.Unlock()
+	c.mux.RLock()
+	defer c.mux.RUnlock()
 	return c.max
 }
 
 // Sum returns the kth-power sum of values seen.
 func (c *Core) Sum(k int) (float64, error) {
-	c.mux.Lock()
-	defer c.mux.Unlock()
+	c.mux.RLock()
+	defer c.mux.RUnlock()
 
 	if c.count == 0 {
 		return 0, errors.New("no values seen yet")
