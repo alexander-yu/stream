@@ -3,6 +3,7 @@ package median
 import (
 	heapops "container/heap"
 	"errors"
+	"sync"
 
 	"github.com/alexander-yu/stream"
 )
@@ -12,6 +13,7 @@ type HeapMedian struct {
 	lowHeap  *heap
 	highHeap *heap
 	core     *stream.Core
+	mux      sync.Mutex
 }
 
 func fmax(x interface{}, y interface{}) bool {
@@ -46,6 +48,9 @@ func (m *HeapMedian) Config() *stream.CoreConfig {
 
 // Push adds a number for calculating the running median.
 func (m *HeapMedian) Push(x float64) error {
+	m.mux.Lock()
+	defer m.mux.Unlock()
+
 	if m.lowHeap.Len() == 0 || x <= m.lowHeap.peek().(float64) {
 		heapops.Push(m.lowHeap, x)
 	} else {
@@ -63,6 +68,9 @@ func (m *HeapMedian) Push(x float64) error {
 
 // Value returns the value of the median.
 func (m *HeapMedian) Value() (float64, error) {
+	m.mux.Lock()
+	defer m.mux.Unlock()
+
 	if m.lowHeap.Len()+m.highHeap.Len() == 0 {
 		return 0, errors.New("no values seen yet")
 	}
