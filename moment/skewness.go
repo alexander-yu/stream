@@ -63,6 +63,9 @@ func (s *Skewness) Push(x float64) error {
 
 // Value returns the value of the adjusted Fisher-Pearson sample skewness.
 func (s *Skewness) Value() (float64, error) {
+	s.core.RLock()
+	defer s.core.RUnlock()
+
 	count := float64(s.core.Count())
 	if count == 0 {
 		return 0, errors.New("no values seen yet")

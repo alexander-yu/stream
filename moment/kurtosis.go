@@ -63,6 +63,9 @@ func (k *Kurtosis) Push(x float64) error {
 
 // Value returns the value of the sample excess kurtosis.
 func (k *Kurtosis) Value() (float64, error) {
+	k.core.RLock()
+	defer k.core.RUnlock()
+
 	count := float64(k.core.Count())
 	if count == 0 {
 		return 0, errors.New("no values seen yet")

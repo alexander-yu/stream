@@ -55,6 +55,9 @@ func (m *Moment) Push(x float64) error {
 
 // Value returns the value of the kth sample central moment.
 func (m *Moment) Value() (float64, error) {
+	m.core.RLock()
+	defer m.core.RUnlock()
+
 	count := m.core.Count()
 	if count == 0 {
 		return 0, errors.New("no values seen yet")
