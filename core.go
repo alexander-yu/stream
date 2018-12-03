@@ -54,7 +54,13 @@ func NewCore(config *CoreConfig) *Core {
 func (c *Core) Push(x float64) error {
 	c.mux.Lock()
 	defer c.mux.Unlock()
+	return c.UnsafePush(x)
+}
 
+// UnsafePush adds a new value for a Core object to consume,
+// but does not lock. This should only be used if the user
+// plans to make use of the Lock()/Unlock() Core methods.
+func (c *Core) UnsafePush(x float64) error {
 	if c.window != 0 {
 		err := c.queue.Put(x)
 		if err != nil {
@@ -147,4 +153,14 @@ func (c *Core) RLock() {
 // RUnlock undoes a single RLock call.
 func (c *Core) RUnlock() {
 	c.mux.RUnlock()
+}
+
+// Lock locks the core internals for writing.
+func (c *Core) Lock() {
+	c.mux.Lock()
+}
+
+// Unlock undoes a Lock call.
+func (c *Core) Unlock() {
+	c.mux.Unlock()
 }

@@ -114,9 +114,11 @@ func TestLock(t *testing.T) {
 	// Lock for reading
 	m.core.RLock()
 
-	// Spawn a goroutine to read; should be blocked
+	// Spawn a goroutine to write; should be blocked
 	go func() {
-		err := m.core.Push(5)
+		m.core.Lock()
+		defer m.core.Unlock()
+		err := m.core.UnsafePush(5)
 		require.NoError(t, err)
 		done <- true
 	}()
