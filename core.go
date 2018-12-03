@@ -138,3 +138,13 @@ func (c *Core) Clear() {
 	c.queue.Dispose()
 	c.queue = queue.NewRingBuffer(c.window)
 }
+
+// RLock locks the core internals for reading.
+func (c *Core) RLock() {
+	c.mux.RLock()
+}
+
+// RUnlock undoes a single RLock call.
+func (c *Core) RUnlock() {
+	c.mux.RUnlock()
+}

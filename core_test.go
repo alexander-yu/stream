@@ -105,3 +105,34 @@ func TestSum(t *testing.T) {
 		assert.EqualError(t, err, "10 is not a tracked power sum")
 	})
 }
+
+func TestLock(t *testing.T) {
+	m := &mockMetric{}
+	TestData(m)
+	done := make(chan bool)
+
+	// Lock for reading
+	m.core.RLock()
+
+	// Spawn a goroutine to read; should be blocked
+	go func() {
+		err := m.core.Push(5)
+		require.NoError(t, err)
+		done <- true
+	}()
+
+	// Read the sum; note that Sum also uses the RLock/RUnlock of the lock internally,
+	// and this should not be blocked by the earlier RLock call
+	sum, err := m.core.Sum(1)
+	require.NoError(t, err)
+	testutil.Approx(t, 15, sum)
+
+	// Undo RLock call
+	m.core.RUnlock()
+
+	// New Push call should now be unblocked
+	<-done
+	sum, err = m.core.Sum(1)
+	require.NoError(t, err)
+	testutil.Approx(t, 17, sum)
+}
