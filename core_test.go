@@ -11,7 +11,7 @@ import (
 
 func TestPush(t *testing.T) {
 	m := &mockMetric{}
-	core := TestData(m)
+	TestData(m)
 
 	expectedSums := map[int]float64{
 		-1: 17. / 24.,
@@ -22,9 +22,9 @@ func TestPush(t *testing.T) {
 		4:  4433.,
 	}
 
-	assert.Equal(t, len(expectedSums), len(core.sums))
+	assert.Equal(t, len(expectedSums), len(m.core.sums))
 	for k, expectedSum := range expectedSums {
-		actualSum, ok := core.sums[k]
+		actualSum, ok := m.core.sums[k]
 		require.True(t, ok)
 		testutil.Approx(t, expectedSum, actualSum)
 	}
@@ -37,8 +37,9 @@ func TestPush(t *testing.T) {
 }
 
 func TestClear(t *testing.T) {
-	core := TestData(&mockMetric{})
-	core.Clear()
+	m := &mockMetric{}
+	TestData(m)
+	m.core.Clear()
 
 	expectedSums := map[int]float64{
 		-1: 0,
@@ -48,27 +49,31 @@ func TestClear(t *testing.T) {
 		3:  0,
 		4:  0,
 	}
-	assert.Equal(t, expectedSums, core.sums)
+	assert.Equal(t, expectedSums, m.core.sums)
 }
 
 func TestMin(t *testing.T) {
-	core := TestData(&mockMetric{})
-	testutil.Approx(t, 1, core.Min())
+	m := &mockMetric{}
+	TestData(m)
+	testutil.Approx(t, 1, m.core.Min())
 }
 
 func TestMax(t *testing.T) {
-	core := TestData(&mockMetric{})
-	testutil.Approx(t, 8, core.Max())
+	m := &mockMetric{}
+	TestData(m)
+	testutil.Approx(t, 8, m.core.Max())
 }
 
 func TestCount(t *testing.T) {
-	core := TestData(&mockMetric{})
-	assert.Equal(t, 3, core.Count())
+	m := &mockMetric{}
+	TestData(m)
+	assert.Equal(t, 3, m.core.Count())
 }
 
 func TestSum(t *testing.T) {
 	t.Run("pass: Sum returns the correct sum", func(t *testing.T) {
-		core := TestData(&mockMetric{})
+		m := &mockMetric{}
+		TestData(m)
 		expectedSums := map[int]float64{
 			-1: 17. / 24.,
 			0:  3.,
@@ -79,7 +84,7 @@ func TestSum(t *testing.T) {
 		}
 
 		for i := -1; i <= 4; i++ {
-			sum, err := core.Sum(i)
+			sum, err := m.core.Sum(i)
 			require.Nil(t, err)
 			testutil.Approx(t, expectedSums[i], sum)
 		}
@@ -93,9 +98,10 @@ func TestSum(t *testing.T) {
 	})
 
 	t.Run("fail: Sum fails for untracked power sum", func(t *testing.T) {
-		core := TestData(&mockMetric{})
+		m := &mockMetric{}
+		TestData(m)
 
-		_, err := core.Sum(10)
+		_, err := m.core.Sum(10)
 		assert.EqualError(t, err, "10 is not a tracked power sum")
 	})
 }

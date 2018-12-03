@@ -33,8 +33,14 @@ func (m *Mean) Config() *stream.CoreConfig {
 	}
 }
 
-// Push is a no-op; Mean does not consume values.
-func (m *Mean) Push(x float64) error { return nil }
+// Push adds a new value for Mean to consume.
+func (m *Mean) Push(x float64) error {
+	err := m.core.Push(x)
+	if err != nil {
+		return errors.Wrap(err, "error pushing to core")
+	}
+	return nil
+}
 
 // Value returns the value of the mean.
 func (m *Mean) Value() (float64, error) {

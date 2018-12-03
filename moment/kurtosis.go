@@ -52,8 +52,14 @@ func (k *Kurtosis) Config() *stream.CoreConfig {
 	return k.config
 }
 
-// Push is a no-op; Kurtosis does not consume values.
-func (k *Kurtosis) Push(x float64) error { return nil }
+// Push adds a new value for Kurtosis to consume.
+func (k *Kurtosis) Push(x float64) error {
+	err := k.core.Push(x)
+	if err != nil {
+		return errors.Wrap(err, "error pushing to core")
+	}
+	return nil
+}
 
 // Value returns the value of the sample excess kurtosis.
 func (k *Kurtosis) Value() (float64, error) {

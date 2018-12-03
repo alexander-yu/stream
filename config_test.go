@@ -44,16 +44,14 @@ func TestSetConfigDefaults(t *testing.T) {
 
 	t.Run("pass: provided fields are kept", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums:        SumsConfig{3: true},
-			Window:      IntPtr(3),
-			PushMetrics: []Metric{&mockMetric{}},
+			Sums:   SumsConfig{3: true},
+			Window: IntPtr(3),
 		}
 		config = setConfigDefaults(config)
 
 		expectedConfig := &CoreConfig{
-			Sums:        SumsConfig{3: true},
-			Window:      IntPtr(3),
-			PushMetrics: []Metric{&mockMetric{}},
+			Sums:   SumsConfig{3: true},
+			Window: IntPtr(3),
 		}
 
 		assert.Equal(t, expectedConfig, config)
@@ -68,9 +66,8 @@ func TestMergeConfigs(t *testing.T) {
 
 	t.Run("pass: single config passed returns itself", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums:        SumsConfig{3: true},
-			Window:      IntPtr(3),
-			PushMetrics: []Metric{&mockMetric{id: 1}},
+			Sums:   SumsConfig{3: true},
+			Window: IntPtr(3),
 		}
 		mergedConfig, err := MergeConfigs(config)
 		require.NoError(t, err)
@@ -80,14 +77,12 @@ func TestMergeConfigs(t *testing.T) {
 
 	t.Run("pass: multiple configs passed returns union of sums and windows if all are compatible", func(t *testing.T) {
 		config1 := &CoreConfig{
-			Sums:        SumsConfig{1: true, 2: true},
-			Window:      IntPtr(3),
-			PushMetrics: []Metric{&mockMetric{id: 1}},
+			Sums:   SumsConfig{1: true, 2: true},
+			Window: IntPtr(3),
 		}
 		config2 := &CoreConfig{
-			Sums:        SumsConfig{2: true, 3: true},
-			Window:      IntPtr(3),
-			PushMetrics: []Metric{&mockMetric{id: 2}},
+			Sums:   SumsConfig{2: true, 3: true},
+			Window: IntPtr(3),
 		}
 		config3 := &CoreConfig{}
 
@@ -95,9 +90,8 @@ func TestMergeConfigs(t *testing.T) {
 		require.NoError(t, err)
 
 		expectedConfig := &CoreConfig{
-			Sums:        SumsConfig{1: true, 2: true, 3: true},
-			Window:      IntPtr(3),
-			PushMetrics: []Metric{&mockMetric{id: 1}, &mockMetric{id: 2}},
+			Sums:   SumsConfig{1: true, 2: true, 3: true},
+			Window: IntPtr(3),
 		}
 
 		assert.Equal(t, expectedConfig, mergedConfig)

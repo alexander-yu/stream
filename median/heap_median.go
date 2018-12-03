@@ -40,8 +40,7 @@ func (m *HeapMedian) Config() *stream.CoreConfig {
 	return &stream.CoreConfig{
 		// HeapMedian does not support rolling median; the performance required to
 		// keep track of elements to remove from heap would require a linear scan
-		Window:      stream.IntPtr(0),
-		PushMetrics: []stream.Metric{m},
+		Window: stream.IntPtr(0),
 	}
 }
 

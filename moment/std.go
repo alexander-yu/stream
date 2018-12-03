@@ -33,8 +33,14 @@ func (s *Std) Config() *stream.CoreConfig {
 	return s.variance.Config()
 }
 
-// Push is a no-op; Std does not consume values.
-func (s *Std) Push(x float64) error { return nil }
+// Push adds a new value for Std to consume.
+func (s *Std) Push(x float64) error {
+	err := s.variance.Push(x)
+	if err != nil {
+		return errors.Wrap(err, "error pushing to core")
+	}
+	return nil
+}
 
 // Value returns the value of the sample standard deviation.
 func (s *Std) Value() (float64, error) {

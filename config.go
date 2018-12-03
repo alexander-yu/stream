@@ -5,15 +5,13 @@ import "github.com/pkg/errors"
 // CoreConfig is the struct containing configuration options for
 // instantiating a Core object.
 type CoreConfig struct {
-	Sums        SumsConfig
-	Window      *int
-	PushMetrics []Metric
+	Sums   SumsConfig
+	Window *int
 }
 
 var defaultConfig = &CoreConfig{
-	Sums:        map[int]bool{1: true},
-	Window:      IntPtr(0),
-	PushMetrics: nil,
+	Sums:   map[int]bool{1: true},
+	Window: IntPtr(0),
 }
 
 // SumsConfig is an alias for a map of ints to bools; this configures
@@ -36,8 +34,7 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 	default:
 		var window *int
 		mergedConfig := &CoreConfig{
-			Sums:        SumsConfig{},
-			PushMetrics: []Metric{},
+			Sums: SumsConfig{},
 		}
 
 		for _, config := range configs {
@@ -51,10 +48,6 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 				} else if *window != *config.Window {
 					return nil, errors.New("configs have differing windows")
 				}
-			}
-
-			if config.PushMetrics != nil {
-				mergedConfig.PushMetrics = append(mergedConfig.PushMetrics, config.PushMetrics...)
 			}
 		}
 

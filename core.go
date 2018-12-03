@@ -17,7 +17,6 @@ type Core struct {
 	max         float64
 	window      uint64
 	queue       *queue.RingBuffer
-	pushMetrics []Metric
 }
 
 // SetupMetric sets a Metric up with a core for consuming.
@@ -47,7 +46,6 @@ func NewCore(config *CoreConfig) *Core {
 		c.sums[k] = 0
 	}
 	c.queue = queue.NewRingBuffer(c.window)
-	c.pushMetrics = config.PushMetrics
 
 	return c
 }
@@ -55,13 +53,6 @@ func NewCore(config *CoreConfig) *Core {
 // Push adds a new value for a Core object to consume.
 func (c *Core) Push(x float64) error {
 	c.mux.Lock()
-
-	// Push value to all push metrics after completion
-	defer func() {
-		for _, metric := range c.pushMetrics {
-			metric.Push(x)
-		}
-	}()
 	defer c.mux.Unlock()
 
 	if c.window != 0 {

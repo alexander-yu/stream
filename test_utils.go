@@ -2,14 +2,19 @@ package stream
 
 import (
 	"fmt"
+
+	"github.com/pkg/errors"
 )
 
 type mockMetric struct {
 	id   int
 	vals []float64
+	core *Core
 }
 
-func (m *mockMetric) Subscribe(c *Core) {}
+func (m *mockMetric) Subscribe(c *Core) {
+	m.core = c
+}
 
 func (m *mockMetric) Config() *CoreConfig {
 	return &CoreConfig{
@@ -21,13 +26,17 @@ func (m *mockMetric) Config() *CoreConfig {
 			3:  true,
 			4:  true,
 		},
-		Window:      IntPtr(3),
-		PushMetrics: []Metric{m},
+		Window: IntPtr(3),
 	}
 }
 
 func (m *mockMetric) Push(x float64) error {
 	m.vals = append(m.vals, x)
+	err := m.core.Push(x)
+	if err != nil {
+		return errors.Wrap(err, "error pushing to core")
+	}
+
 	return nil
 }
 
@@ -36,25 +45,21 @@ func (m *mockMetric) Value() (float64, error) {
 }
 
 // TestData sets up a metric and populates a core with pushes for testing purposes.
-func TestData(metric Metric) *Core {
-	core, err := SetupMetric(metric)
+func TestData(metric Metric) {
+	_, err := SetupMetric(metric)
 	if err != nil {
 		panic(fmt.Sprintf("%+v", err))
 	}
 
 	for i := 1.; i < 5; i++ {
-		err := core.Push(i)
+		err := metric.Push(i)
 		if err != nil {
 			panic(fmt.Sprintf("%+v", err))
 		}
 	}
 
-	err = core.Push(8)
+	err = metric.Push(8)
 	if err != nil {
 		panic(fmt.Sprintf("%+v", err))
 	}
-
-	fmt.Println(core.sums)
-
-	return core
 }

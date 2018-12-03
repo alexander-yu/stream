@@ -39,8 +39,7 @@ func (m *AVLMedian) Subscribe(c *stream.Core) {
 // Config returns the CoreConfig needed.
 func (m *AVLMedian) Config() *stream.CoreConfig {
 	return &stream.CoreConfig{
-		Window:      &m.window,
-		PushMetrics: []stream.Metric{m},
+		Window: &m.window,
 	}
 }
 
