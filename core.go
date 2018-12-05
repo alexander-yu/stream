@@ -62,12 +62,7 @@ func (c *Core) Push(x float64) error {
 // plans to make use of the Lock()/Unlock() Core methods.
 func (c *Core) UnsafePush(x float64) error {
 	if c.window != 0 {
-		err := c.queue.Put(x)
-		if err != nil {
-			return errors.Wrap(err, "error pushing to metric")
-		}
-
-		if c.queue.Len() > c.window {
+		if c.queue.Len() == c.window {
 			tail, err := c.queue.Get()
 			if err != nil {
 				return errors.Wrap(err, "error popping from window queue")
@@ -79,6 +74,11 @@ func (c *Core) UnsafePush(x float64) error {
 			for k := range c.sums {
 				c.sums[k] -= math.Pow(tailVal, float64(k))
 			}
+		}
+
+		err := c.queue.Put(x)
+		if err != nil {
+			return errors.Wrap(err, "error pushing to queue")
 		}
 	}
 

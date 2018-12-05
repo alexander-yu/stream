@@ -83,4 +83,12 @@ func TestAVLMedianValue(t *testing.T) {
 
 		assert.Equal(t, float64(3), value)
 	})
+
+	t.Run("fail: if no values seen, return error", func(t *testing.T) {
+		median, err := NewAVLMedian(3)
+		require.NoError(t, err)
+
+		_, err = median.Value()
+		assert.EqualError(t, err, "no values seen yet")
+	})
 }
