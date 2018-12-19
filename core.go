@@ -20,17 +20,17 @@ type Core struct {
 }
 
 // SetupMetric sets a Metric up with a core for consuming.
-func SetupMetric(metric Metric) (*Core, error) {
+func SetupMetric(metric Metric) error {
 	// validate config
 	config := metric.Config()
 	err := validateConfig(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "error validating config")
+		return errors.Wrap(err, "error validating config")
 	}
 
 	core := NewCore(config)
 	metric.Subscribe(core)
-	return core, nil
+	return nil
 }
 
 // NewCore instantiates a Core struct based on a provided config.

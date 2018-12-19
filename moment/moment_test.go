@@ -89,7 +89,7 @@ func TestMoment(t *testing.T) {
 		moment, err := NewMoment(2, 3)
 		require.NoError(t, err)
 
-		_, err = stream.SetupMetric(moment)
+		err = stream.SetupMetric(moment)
 		require.NoError(t, err)
 
 		_, err = moment.Value()

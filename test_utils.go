@@ -46,7 +46,7 @@ func (m *mockMetric) Value() (float64, error) {
 
 // TestData sets up a metric and populates a core with pushes for testing purposes.
 func TestData(metric Metric) {
-	_, err := SetupMetric(metric)
+	err := SetupMetric(metric)
 	if err != nil {
 		panic(fmt.Sprintf("%+v", err))
 	}

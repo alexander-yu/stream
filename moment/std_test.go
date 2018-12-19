@@ -40,7 +40,7 @@ func TestStd(t *testing.T) {
 		std, err := NewStd(3)
 		require.NoError(t, err)
 
-		_, err = stream.SetupMetric(std)
+		err = stream.SetupMetric(std)
 		require.NoError(t, err)
 
 		_, err = std.Value()

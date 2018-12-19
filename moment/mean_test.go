@@ -40,7 +40,7 @@ func TestMeanValue(t *testing.T) {
 		mean, err := NewMean(3)
 		require.NoError(t, err)
 
-		_, err = stream.SetupMetric(mean)
+		err = stream.SetupMetric(mean)
 		require.NoError(t, err)
 
 		_, err = mean.Value()

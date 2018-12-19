@@ -44,7 +44,7 @@ func TestSkewness(t *testing.T) {
 		skewness, err := NewSkewness(3)
 		require.NoError(t, err)
 
-		_, err = stream.SetupMetric(skewness)
+		err = stream.SetupMetric(skewness)
 		require.NoError(t, err)
 
 		_, err = skewness.Value()

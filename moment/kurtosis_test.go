@@ -44,7 +44,7 @@ func TestKurtosisValue(t *testing.T) {
 		kurtosis, err := NewKurtosis(3)
 		require.NoError(t, err)
 
-		_, err = stream.SetupMetric(kurtosis)
+		err = stream.SetupMetric(kurtosis)
 		require.NoError(t, err)
 
 		_, err = kurtosis.Value()
