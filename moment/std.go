@@ -18,7 +18,14 @@ func NewStd(window int) (*Std, error) {
 		return nil, errors.Wrap(err, "error creating 2nd Moment")
 	}
 
-	return &Std{variance: variance}, nil
+	std := &Std{variance: variance}
+
+	err = SetupMetric(std)
+	if err != nil {
+		return nil, errors.Wrap(err, "error setting up Metric")
+	}
+
+	return std, nil
 }
 
 // Subscribe subscribes the Std to a Core object.

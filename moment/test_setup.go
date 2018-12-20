@@ -14,6 +14,16 @@ type mockMetric struct {
 	core *Core
 }
 
+func newMockMetric() *mockMetric {
+	metric := &mockMetric{}
+	err := SetupMetric(metric)
+	if err != nil {
+		panic(fmt.Sprintf("%+v", err))
+	}
+
+	return metric
+}
+
 func (m *mockMetric) Subscribe(c *Core) {
 	m.core = c
 }
@@ -47,11 +57,6 @@ func (m *mockMetric) Value() (float64, error) {
 }
 
 func testData(metric Metric) {
-	err := SetupMetric(metric)
-	if err != nil {
-		panic(fmt.Sprintf("%+v", err))
-	}
-
 	for i := 1.; i < 5; i++ {
 		err := metric.Push(i)
 		if err != nil {
@@ -59,7 +64,7 @@ func testData(metric Metric) {
 		}
 	}
 
-	err = metric.Push(8)
+	err := metric.Push(8)
 	if err != nil {
 		panic(fmt.Sprintf("%+v", err))
 	}

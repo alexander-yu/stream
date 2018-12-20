@@ -31,11 +31,18 @@ func NewSkewness(window int) (*Skewness, error) {
 		return nil, errors.Wrap(err, "error merging configs")
 	}
 
-	return &Skewness{
+	skewness := &Skewness{
 		variance: variance,
 		moment3:  moment3,
 		config:   config,
-	}, nil
+	}
+
+	err = SetupMetric(skewness)
+	if err != nil {
+		return nil, errors.Wrap(err, "error setting up Metric")
+	}
+
+	return skewness, nil
 }
 
 // Subscribe subscribes the Skewness to a Core object.

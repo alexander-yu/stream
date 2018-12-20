@@ -62,7 +62,7 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 
 func validateConfig(config *CoreConfig) error {
 	if config.Window != nil && *config.Window < 0 {
-		return errors.New("config window is negative")
+		return errors.Errorf("config has a negative window of %d", *config.Window)
 	}
 
 	return nil

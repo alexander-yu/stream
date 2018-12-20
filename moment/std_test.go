@@ -1,6 +1,7 @@
 package moment
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
@@ -18,7 +19,7 @@ func TestNewStd(t *testing.T) {
 
 	t.Run("fail: negative window is invalid", func(t *testing.T) {
 		_, err := NewStd(-1)
-		assert.EqualError(t, err, "error creating 2nd Moment: -1 is a negative window")
+		testutil.ContainsError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
 	})
 }
 
@@ -37,9 +38,6 @@ func TestStd(t *testing.T) {
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		std, err := NewStd(3)
-		require.NoError(t, err)
-
-		err = SetupMetric(std)
 		require.NoError(t, err)
 
 		_, err = std.Value()

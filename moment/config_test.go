@@ -1,6 +1,7 @@
 package moment
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,7 @@ func TestValidateConfig(t *testing.T) {
 			Window: stream.IntPtr(-1),
 		}
 		err := validateConfig(config)
-		assert.EqualError(t, err, "config window is negative")
+		assert.EqualError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
 	})
 
 	t.Run("pass: empty config is valid", func(t *testing.T) {

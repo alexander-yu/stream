@@ -1,6 +1,7 @@
 package moment
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func TestNewMean(t *testing.T) {
 
 	t.Run("fail: negative window is invalid", func(t *testing.T) {
 		_, err := NewMean(-1)
-		assert.EqualError(t, err, "-1 is a negative window")
+		testutil.ContainsError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
 	})
 }
 
@@ -36,9 +37,6 @@ func TestMeanValue(t *testing.T) {
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		mean, err := NewMean(3)
-		require.NoError(t, err)
-
-		err = SetupMetric(mean)
 		require.NoError(t, err)
 
 		_, err = mean.Value()

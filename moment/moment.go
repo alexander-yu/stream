@@ -17,11 +17,16 @@ type Moment struct {
 func NewMoment(k int, window int) (*Moment, error) {
 	if k < 0 {
 		return nil, errors.Errorf("%d is a negative moment", k)
-	} else if window < 0 {
-		return nil, errors.Errorf("%d is a negative window", window)
 	}
 
-	return &Moment{k: k, window: window}, nil
+	moment := &Moment{k: k, window: window}
+
+	err := SetupMetric(moment)
+	if err != nil {
+		return nil, errors.Wrap(err, "error setting up Metric")
+	}
+
+	return moment, nil
 }
 
 // Subscribe subscribes the Moment to a Core object.

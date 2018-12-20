@@ -10,7 +10,7 @@ import (
 )
 
 func TestPush(t *testing.T) {
-	m := &mockMetric{}
+	m := newMockMetric()
 	testData(m)
 
 	expectedSums := map[int]float64{
@@ -37,7 +37,7 @@ func TestPush(t *testing.T) {
 }
 
 func TestClear(t *testing.T) {
-	m := &mockMetric{}
+	m := newMockMetric()
 	testData(m)
 	m.core.Clear()
 
@@ -53,14 +53,14 @@ func TestClear(t *testing.T) {
 }
 
 func TestCount(t *testing.T) {
-	m := &mockMetric{}
+	m := newMockMetric()
 	testData(m)
 	assert.Equal(t, 3, m.core.Count())
 }
 
 func TestSum(t *testing.T) {
 	t.Run("pass: Sum returns the correct sum", func(t *testing.T) {
-		m := &mockMetric{}
+		m := newMockMetric()
 		testData(m)
 		expectedSums := map[int]float64{
 			-1: 17. / 24.,
@@ -86,7 +86,7 @@ func TestSum(t *testing.T) {
 	})
 
 	t.Run("fail: Sum fails for untracked power sum", func(t *testing.T) {
-		m := &mockMetric{}
+		m := newMockMetric()
 		testData(m)
 
 		_, err := m.core.Sum(10)
@@ -95,7 +95,7 @@ func TestSum(t *testing.T) {
 }
 
 func TestLock(t *testing.T) {
-	m := &mockMetric{}
+	m := newMockMetric()
 	testData(m)
 	done := make(chan bool)
 

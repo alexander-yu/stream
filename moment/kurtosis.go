@@ -31,11 +31,18 @@ func NewKurtosis(window int) (*Kurtosis, error) {
 		return nil, errors.Wrap(err, "error merging configs")
 	}
 
-	return &Kurtosis{
+	kurtosis := &Kurtosis{
 		variance: variance,
 		moment4:  moment4,
 		config:   config,
-	}, nil
+	}
+
+	err = SetupMetric(kurtosis)
+	if err != nil {
+		return nil, errors.Wrap(err, "error setting up Metric")
+	}
+
+	return kurtosis, nil
 }
 
 // Subscribe subscribes the Kurtosis to a Core object.

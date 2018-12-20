@@ -12,10 +12,12 @@ type Mean struct {
 
 // NewMean instantiates a Mean struct.
 func NewMean(window int) (*Mean, error) {
-	if window < 0 {
-		return nil, errors.Errorf("%d is a negative window", window)
+	mean := &Mean{window: window}
+	err := SetupMetric(mean)
+	if err != nil {
+		return nil, errors.Wrap(err, "error setting up Metric")
 	}
-	return &Mean{window: window}, nil
+	return mean, nil
 }
 
 // Subscribe subscribes the Mean to a Core object.
