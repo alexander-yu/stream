@@ -22,7 +22,7 @@ func TestNewMin(t *testing.T) {
 }
 
 func TestMin(t *testing.T) {
-	t.Run("pass: returns running global minimum for a window of 0", func(t *testing.T) {
+	t.Run("pass: returns global minimum for a window of 0", func(t *testing.T) {
 		min, err := NewMin(0)
 		require.NoError(t, err)
 
@@ -37,7 +37,7 @@ func TestMin(t *testing.T) {
 		testutil.Approx(t, 1., val)
 	})
 
-	t.Run("pass: returns running minimum for a provided window", func(t *testing.T) {
+	t.Run("pass: returns minimum for a provided window", func(t *testing.T) {
 		min, err := NewMin(5)
 		require.NoError(t, err)
 

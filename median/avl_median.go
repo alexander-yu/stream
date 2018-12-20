@@ -9,7 +9,7 @@ import (
 	"github.com/alexander-yu/stream"
 )
 
-// AVLMedian keeps track of the running median of a stream using AVL trees.
+// AVLMedian keeps track of the median of a stream using AVL trees.
 type AVLMedian struct {
 	queue  *queue.RingBuffer
 	tree   *OrderStatisticTree
@@ -43,7 +43,7 @@ func (m *AVLMedian) Config() *stream.CoreConfig {
 	}
 }
 
-// Push adds a number for calculating the running median.
+// Push adds a number for calculating the median.
 func (m *AVLMedian) Push(x float64) error {
 	m.mux.Lock()
 	defer m.mux.Unlock()

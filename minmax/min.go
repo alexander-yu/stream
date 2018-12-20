@@ -11,7 +11,7 @@ import (
 	"github.com/alexander-yu/stream"
 )
 
-// Min keeps track of the running minimum of a stream. Note: for global minimums,
+// Min keeps track of the minimum of a stream. Note: for global minimums,
 // Core.Min() also tracks this; Min provides the additional functionality of keeping
 // track of minimums over a rolling window.
 type Min struct {
@@ -52,7 +52,7 @@ func (m *Min) Config() *stream.CoreConfig {
 	}
 }
 
-// Push adds a number for calculating the running minimum.
+// Push adds a number for calculating the minimum.
 func (m *Min) Push(x float64) error {
 	m.mux.Lock()
 	defer m.mux.Unlock()

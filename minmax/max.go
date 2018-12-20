@@ -11,7 +11,7 @@ import (
 	"github.com/alexander-yu/stream"
 )
 
-// Max keeps track of the running maximum of a stream. Note: for global maximums,
+// Max keeps track of the maximum of a stream. Note: for global maximums,
 // Core.Max() also tracks this; Max provides the additional functionality of keeping
 // track of maximums over a rolling window.
 type Max struct {
@@ -52,7 +52,7 @@ func (m *Max) Config() *stream.CoreConfig {
 	}
 }
 
-// Push adds a number for calculating the running maximum.
+// Push adds a number for calculating the maximum.
 func (m *Max) Push(x float64) error {
 	m.mux.Lock()
 	defer m.mux.Unlock()

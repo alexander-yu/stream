@@ -8,7 +8,7 @@ import (
 	"github.com/alexander-yu/stream"
 )
 
-// HeapMedian keeps track of the running median of an entire stream using heaps.
+// HeapMedian keeps track of the median of an entire stream using heaps.
 type HeapMedian struct {
 	lowHeap  *heap
 	highHeap *heap
@@ -46,7 +46,7 @@ func (m *HeapMedian) Config() *stream.CoreConfig {
 	}
 }
 
-// Push adds a number for calculating the running median.
+// Push adds a number for calculating the median.
 func (m *HeapMedian) Push(x float64) error {
 	m.mux.Lock()
 	defer m.mux.Unlock()
