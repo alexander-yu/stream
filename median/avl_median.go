@@ -5,8 +5,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/workiva/go-datastructures/queue"
-
-	"github.com/alexander-yu/stream"
 )
 
 // AVLMedian keeps track of the median of a stream using AVL trees.
@@ -14,7 +12,6 @@ type AVLMedian struct {
 	queue  *queue.RingBuffer
 	tree   *OrderStatisticTree
 	window int
-	core   *stream.Core
 	mux    sync.Mutex
 }
 
@@ -29,18 +26,6 @@ func NewAVLMedian(window int) (*AVLMedian, error) {
 		tree:   &OrderStatisticTree{},
 		window: window,
 	}, nil
-}
-
-// Subscribe subscribes the AVLMedian to a Core object.
-func (m *AVLMedian) Subscribe(c *stream.Core) {
-	m.core = c
-}
-
-// Config returns the CoreConfig needed.
-func (m *AVLMedian) Config() *stream.CoreConfig {
-	return &stream.CoreConfig{
-		Window: &m.window,
-	}
 }
 
 // Push adds a number for calculating the median.

@@ -4,8 +4,6 @@ import (
 	"math"
 
 	"github.com/pkg/errors"
-
-	"github.com/alexander-yu/stream"
 )
 
 // Std is a metric that tracks the sample standard deviation.
@@ -24,12 +22,12 @@ func NewStd(window int) (*Std, error) {
 }
 
 // Subscribe subscribes the Std to a Core object.
-func (s *Std) Subscribe(c *stream.Core) {
+func (s *Std) Subscribe(c *Core) {
 	s.variance.Subscribe(c)
 }
 
 // Config returns the CoreConfig needed.
-func (s *Std) Config() *stream.CoreConfig {
+func (s *Std) Config() *CoreConfig {
 	return s.variance.Config()
 }
 

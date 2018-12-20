@@ -4,15 +4,12 @@ import (
 	heapops "container/heap"
 	"errors"
 	"sync"
-
-	"github.com/alexander-yu/stream"
 )
 
 // HeapMedian keeps track of the median of an entire stream using heaps.
 type HeapMedian struct {
 	lowHeap  *heap
 	highHeap *heap
-	core     *stream.Core
 	mux      sync.Mutex
 }
 
@@ -29,20 +26,6 @@ func NewHeapMedian() *HeapMedian {
 	return &HeapMedian{
 		lowHeap:  newHeap([]interface{}{}, fmax),
 		highHeap: newHeap([]interface{}{}, fmin),
-	}
-}
-
-// Subscribe subscribes the HeapMedian to a Core object.
-func (m *HeapMedian) Subscribe(c *stream.Core) {
-	m.core = c
-}
-
-// Config returns the CoreConfig needed.
-func (m *HeapMedian) Config() *stream.CoreConfig {
-	return &stream.CoreConfig{
-		// HeapMedian does not support rolling median; the performance required to
-		// keep track of elements to remove from heap would require a linear scan
-		Window: stream.IntPtr(0),
 	}
 }
 

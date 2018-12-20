@@ -5,10 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
 	"github.com/stretchr/testify/require"
 
-	"github.com/alexander-yu/stream"
 	"github.com/alexander-yu/stream/testutil"
 )
 
@@ -29,7 +27,7 @@ func TestKurtosisValue(t *testing.T) {
 		kurtosis, err := NewKurtosis(3)
 		require.NoError(t, err)
 
-		stream.TestData(kurtosis)
+		testData(kurtosis)
 
 		value, err := kurtosis.Value()
 		require.NoError(t, err)
@@ -44,7 +42,7 @@ func TestKurtosisValue(t *testing.T) {
 		kurtosis, err := NewKurtosis(3)
 		require.NoError(t, err)
 
-		err = stream.SetupMetric(kurtosis)
+		err = SetupMetric(kurtosis)
 		require.NoError(t, err)
 
 		_, err = kurtosis.Value()

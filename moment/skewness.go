@@ -4,16 +4,14 @@ import (
 	"math"
 
 	"github.com/pkg/errors"
-
-	"github.com/alexander-yu/stream"
 )
 
 // Skewness is a metric that tracks the adjusted Fisher-Pearson sample skewness.
 type Skewness struct {
 	variance *Moment
 	moment3  *Moment
-	config   *stream.CoreConfig
-	core     *stream.Core
+	config   *CoreConfig
+	core     *Core
 }
 
 // NewSkewness instantiates a Skewness struct.
@@ -28,7 +26,7 @@ func NewSkewness(window int) (*Skewness, error) {
 		return nil, errors.Wrap(err, "error creating 3rd Moment")
 	}
 
-	config, err := stream.MergeConfigs(variance.Config(), moment3.Config())
+	config, err := MergeConfigs(variance.Config(), moment3.Config())
 	if err != nil {
 		return nil, errors.Wrap(err, "error merging configs")
 	}
@@ -41,14 +39,14 @@ func NewSkewness(window int) (*Skewness, error) {
 }
 
 // Subscribe subscribes the Skewness to a Core object.
-func (s *Skewness) Subscribe(c *stream.Core) {
+func (s *Skewness) Subscribe(c *Core) {
 	s.variance.Subscribe(c)
 	s.moment3.Subscribe(c)
 	s.core = c
 }
 
 // Config returns the CoreConfig needed.
-func (s *Skewness) Config() *stream.CoreConfig {
+func (s *Skewness) Config() *CoreConfig {
 	return s.config
 }
 

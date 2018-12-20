@@ -1,16 +1,18 @@
-package stream
+package moment
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/alexander-yu/stream"
 )
 
 func TestValidateConfig(t *testing.T) {
 	t.Run("fail: config with a negative window is invalid", func(t *testing.T) {
 		config := &CoreConfig{
-			Window: IntPtr(-1),
+			Window: stream.IntPtr(-1),
 		}
 		err := validateConfig(config)
 		assert.EqualError(t, err, "config window is negative")
@@ -25,7 +27,7 @@ func TestValidateConfig(t *testing.T) {
 	t.Run("pass: config with positive window is valid", func(t *testing.T) {
 		config := &CoreConfig{
 			Sums:   SumsConfig{2: true},
-			Window: IntPtr(3),
+			Window: stream.IntPtr(3),
 		}
 		err := validateConfig(config)
 		assert.NoError(t, err)
@@ -45,13 +47,13 @@ func TestSetConfigDefaults(t *testing.T) {
 	t.Run("pass: provided fields are kept", func(t *testing.T) {
 		config := &CoreConfig{
 			Sums:   SumsConfig{3: true},
-			Window: IntPtr(3),
+			Window: stream.IntPtr(3),
 		}
 		config = setConfigDefaults(config)
 
 		expectedConfig := &CoreConfig{
 			Sums:   SumsConfig{3: true},
-			Window: IntPtr(3),
+			Window: stream.IntPtr(3),
 		}
 
 		assert.Equal(t, expectedConfig, config)
@@ -67,7 +69,7 @@ func TestMergeConfigs(t *testing.T) {
 	t.Run("pass: single config passed returns itself", func(t *testing.T) {
 		config := &CoreConfig{
 			Sums:   SumsConfig{3: true},
-			Window: IntPtr(3),
+			Window: stream.IntPtr(3),
 		}
 		mergedConfig, err := MergeConfigs(config)
 		require.NoError(t, err)
@@ -78,11 +80,11 @@ func TestMergeConfigs(t *testing.T) {
 	t.Run("pass: multiple configs passed returns union of sums and windows if all are compatible", func(t *testing.T) {
 		config1 := &CoreConfig{
 			Sums:   SumsConfig{1: true, 2: true},
-			Window: IntPtr(3),
+			Window: stream.IntPtr(3),
 		}
 		config2 := &CoreConfig{
 			Sums:   SumsConfig{2: true, 3: true},
-			Window: IntPtr(3),
+			Window: stream.IntPtr(3),
 		}
 		config3 := &CoreConfig{}
 
@@ -91,7 +93,7 @@ func TestMergeConfigs(t *testing.T) {
 
 		expectedConfig := &CoreConfig{
 			Sums:   SumsConfig{1: true, 2: true, 3: true},
-			Window: IntPtr(3),
+			Window: stream.IntPtr(3),
 		}
 
 		assert.Equal(t, expectedConfig, mergedConfig)
@@ -100,11 +102,11 @@ func TestMergeConfigs(t *testing.T) {
 	t.Run("fail: multiple configs passed fails if windows are not compatible", func(t *testing.T) {
 		config1 := &CoreConfig{
 			Sums:   SumsConfig{1: true, 2: true},
-			Window: IntPtr(3),
+			Window: stream.IntPtr(3),
 		}
 		config2 := &CoreConfig{
 			Sums:   SumsConfig{2: true, 3: true},
-			Window: IntPtr(2),
+			Window: stream.IntPtr(2),
 		}
 
 		_, err := MergeConfigs(config1, config2)

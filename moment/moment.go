@@ -4,15 +4,13 @@ import (
 	"math"
 
 	"github.com/pkg/errors"
-
-	"github.com/alexander-yu/stream"
 )
 
 // Moment is a metric that tracks the kth sample central moment.
 type Moment struct {
 	k      int
 	window int
-	core   *stream.Core
+	core   *Core
 }
 
 // NewMoment instantiates a Moment struct that tracks the kth moment.
@@ -27,18 +25,18 @@ func NewMoment(k int, window int) (*Moment, error) {
 }
 
 // Subscribe subscribes the Moment to a Core object.
-func (m *Moment) Subscribe(c *stream.Core) {
+func (m *Moment) Subscribe(c *Core) {
 	m.core = c
 }
 
 // Config returns the CoreConfig needed.
-func (m *Moment) Config() *stream.CoreConfig {
-	sums := stream.SumsConfig{}
+func (m *Moment) Config() *CoreConfig {
+	sums := SumsConfig{}
 	for i := 0; i <= m.k; i++ {
 		sums[i] = true
 	}
 
-	return &stream.CoreConfig{
+	return &CoreConfig{
 		Sums:   sums,
 		Window: &m.window,
 	}

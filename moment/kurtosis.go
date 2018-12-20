@@ -4,16 +4,14 @@ import (
 	"math"
 
 	"github.com/pkg/errors"
-
-	"github.com/alexander-yu/stream"
 )
 
 // Kurtosis is a metric that tracks the kurtosis.
 type Kurtosis struct {
 	variance *Moment
 	moment4  *Moment
-	config   *stream.CoreConfig
-	core     *stream.Core
+	config   *CoreConfig
+	core     *Core
 }
 
 // NewKurtosis instantiates a Kurtosis struct.
@@ -28,7 +26,7 @@ func NewKurtosis(window int) (*Kurtosis, error) {
 		return nil, errors.Wrap(err, "error creating 4th Moment")
 	}
 
-	config, err := stream.MergeConfigs(variance.Config(), moment4.Config())
+	config, err := MergeConfigs(variance.Config(), moment4.Config())
 	if err != nil {
 		return nil, errors.Wrap(err, "error merging configs")
 	}
@@ -41,14 +39,14 @@ func NewKurtosis(window int) (*Kurtosis, error) {
 }
 
 // Subscribe subscribes the Kurtosis to a Core object.
-func (k *Kurtosis) Subscribe(c *stream.Core) {
+func (k *Kurtosis) Subscribe(c *Core) {
 	k.variance.Subscribe(c)
 	k.moment4.Subscribe(c)
 	k.core = c
 }
 
 // Config returns the CoreConfig needed.
-func (k *Kurtosis) Config() *stream.CoreConfig {
+func (k *Kurtosis) Config() *CoreConfig {
 	return k.config
 }
 

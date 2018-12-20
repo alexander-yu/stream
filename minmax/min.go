@@ -7,8 +7,6 @@ import (
 	"github.com/gammazero/deque"
 	"github.com/pkg/errors"
 	"github.com/workiva/go-datastructures/queue"
-
-	"github.com/alexander-yu/stream"
 )
 
 // Min keeps track of the minimum of a stream. Note: for global minimums,
@@ -16,7 +14,6 @@ import (
 // track of minimums over a rolling window.
 type Min struct {
 	window int
-	core   *stream.Core
 	mux    sync.Mutex
 	// Used if window > 0
 	queue *queue.RingBuffer
@@ -38,18 +35,6 @@ func NewMin(window int) (*Min, error) {
 		min:    math.Inf(1),
 		window: window,
 	}, nil
-}
-
-// Subscribe subscribes the Min to a Core object.
-func (m *Min) Subscribe(c *stream.Core) {
-	m.core = c
-}
-
-// Config returns the CoreConfig needed.
-func (m *Min) Config() *stream.CoreConfig {
-	return &stream.CoreConfig{
-		Window: &m.window,
-	}
 }
 
 // Push adds a number for calculating the minimum.

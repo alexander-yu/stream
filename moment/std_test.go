@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/alexander-yu/stream"
 	"github.com/alexander-yu/stream/testutil"
 )
 
@@ -28,7 +27,7 @@ func TestStd(t *testing.T) {
 		std, err := NewStd(3)
 		require.NoError(t, err)
 
-		stream.TestData(std)
+		testData(std)
 
 		value, err := std.Value()
 		require.NoError(t, err)
@@ -40,7 +39,7 @@ func TestStd(t *testing.T) {
 		std, err := NewStd(3)
 		require.NoError(t, err)
 
-		err = stream.SetupMetric(std)
+		err = SetupMetric(std)
 		require.NoError(t, err)
 
 		_, err = std.Value()

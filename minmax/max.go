@@ -7,8 +7,6 @@ import (
 	"github.com/gammazero/deque"
 	"github.com/pkg/errors"
 	"github.com/workiva/go-datastructures/queue"
-
-	"github.com/alexander-yu/stream"
 )
 
 // Max keeps track of the maximum of a stream. Note: for global maximums,
@@ -16,7 +14,6 @@ import (
 // track of maximums over a rolling window.
 type Max struct {
 	window int
-	core   *stream.Core
 	mux    sync.Mutex
 	// Used if window > 0
 	queue *queue.RingBuffer
@@ -38,18 +35,6 @@ func NewMax(window int) (*Max, error) {
 		max:    math.Inf(-1),
 		window: window,
 	}, nil
-}
-
-// Subscribe subscribes the Max to a Core object.
-func (m *Max) Subscribe(c *stream.Core) {
-	m.core = c
-}
-
-// Config returns the CoreConfig needed.
-func (m *Max) Config() *stream.CoreConfig {
-	return &stream.CoreConfig{
-		Window: &m.window,
-	}
 }
 
 // Push adds a number for calculating the maximum.

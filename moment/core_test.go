@@ -1,4 +1,4 @@
-package stream
+package moment
 
 import (
 	"testing"
@@ -11,7 +11,7 @@ import (
 
 func TestPush(t *testing.T) {
 	m := &mockMetric{}
-	TestData(m)
+	testData(m)
 
 	expectedSums := map[int]float64{
 		-1: 17. / 24.,
@@ -38,7 +38,7 @@ func TestPush(t *testing.T) {
 
 func TestClear(t *testing.T) {
 	m := &mockMetric{}
-	TestData(m)
+	testData(m)
 	m.core.Clear()
 
 	expectedSums := map[int]float64{
@@ -54,26 +54,26 @@ func TestClear(t *testing.T) {
 
 func TestMin(t *testing.T) {
 	m := &mockMetric{}
-	TestData(m)
+	testData(m)
 	testutil.Approx(t, 1, m.core.Min())
 }
 
 func TestMax(t *testing.T) {
 	m := &mockMetric{}
-	TestData(m)
+	testData(m)
 	testutil.Approx(t, 8, m.core.Max())
 }
 
 func TestCount(t *testing.T) {
 	m := &mockMetric{}
-	TestData(m)
+	testData(m)
 	assert.Equal(t, 3, m.core.Count())
 }
 
 func TestSum(t *testing.T) {
 	t.Run("pass: Sum returns the correct sum", func(t *testing.T) {
 		m := &mockMetric{}
-		TestData(m)
+		testData(m)
 		expectedSums := map[int]float64{
 			-1: 17. / 24.,
 			0:  3.,
@@ -99,7 +99,7 @@ func TestSum(t *testing.T) {
 
 	t.Run("fail: Sum fails for untracked power sum", func(t *testing.T) {
 		m := &mockMetric{}
-		TestData(m)
+		testData(m)
 
 		_, err := m.core.Sum(10)
 		assert.EqualError(t, err, "10 is not a tracked power sum")
@@ -108,7 +108,7 @@ func TestSum(t *testing.T) {
 
 func TestLock(t *testing.T) {
 	m := &mockMetric{}
-	TestData(m)
+	testData(m)
 	done := make(chan bool)
 
 	// Lock for reading

@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/alexander-yu/stream"
 	"github.com/alexander-yu/stream/testutil"
 )
 
@@ -37,7 +36,7 @@ func TestMoment(t *testing.T) {
 		moment, err := NewMoment(2, 3)
 		require.NoError(t, err)
 
-		stream.TestData(moment)
+		testData(moment)
 
 		value, err := moment.Value()
 		require.NoError(t, err)
@@ -49,7 +48,7 @@ func TestMoment(t *testing.T) {
 		moment, err := NewMoment(0, 3)
 		require.NoError(t, err)
 
-		stream.TestData(moment)
+		testData(moment)
 
 		value, err := moment.Value()
 		require.NoError(t, err)
@@ -69,7 +68,7 @@ func TestMoment(t *testing.T) {
 		moment, err := NewMoment(1, 3)
 		require.NoError(t, err)
 
-		stream.TestData(moment)
+		testData(moment)
 
 		value, err := moment.Value()
 		require.NoError(t, err)
@@ -89,7 +88,7 @@ func TestMoment(t *testing.T) {
 		moment, err := NewMoment(2, 3)
 		require.NoError(t, err)
 
-		err = stream.SetupMetric(moment)
+		err = SetupMetric(moment)
 		require.NoError(t, err)
 
 		_, err = moment.Value()

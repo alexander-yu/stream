@@ -8,6 +8,3 @@ package stream
 
 // IntPtr returns a pointer to an int.
 func IntPtr(v int) *int { return &v }
-
-// BoolPtr returns a pointer to a bool.
-func BoolPtr(v bool) *bool { return &v }

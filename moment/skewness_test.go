@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/alexander-yu/stream"
 	"github.com/alexander-yu/stream/testutil"
 )
 
@@ -28,7 +27,7 @@ func TestSkewness(t *testing.T) {
 		skewness, err := NewSkewness(3)
 		require.NoError(t, err)
 
-		stream.TestData(skewness)
+		testData(skewness)
 
 		value, err := skewness.Value()
 		require.NoError(t, err)
@@ -44,7 +43,7 @@ func TestSkewness(t *testing.T) {
 		skewness, err := NewSkewness(3)
 		require.NoError(t, err)
 
-		err = stream.SetupMetric(skewness)
+		err = SetupMetric(skewness)
 		require.NoError(t, err)
 
 		_, err = skewness.Value()

@@ -1,9 +1,7 @@
 package stream
 
-// Metric is an interface for any metric that subscribes to a Core object.
+// Metric is the interface for a metric that consumes from a stream.
 type Metric interface {
-	Subscribe(*Core)
-	Config() *CoreConfig
 	Push(float64) error
 	Value() (float64, error)
 }

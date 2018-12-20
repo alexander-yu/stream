@@ -4,10 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
 	"github.com/stretchr/testify/require"
 
-	"github.com/alexander-yu/stream"
 	"github.com/alexander-yu/stream/testutil"
 )
 
@@ -28,7 +26,7 @@ func TestMeanValue(t *testing.T) {
 		mean, err := NewMean(3)
 		require.NoError(t, err)
 
-		stream.TestData(mean)
+		testData(mean)
 
 		value, err := mean.Value()
 		require.NoError(t, err)
@@ -40,7 +38,7 @@ func TestMeanValue(t *testing.T) {
 		mean, err := NewMean(3)
 		require.NoError(t, err)
 
-		err = stream.SetupMetric(mean)
+		err = SetupMetric(mean)
 		require.NoError(t, err)
 
 		_, err = mean.Value()

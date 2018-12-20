@@ -1,6 +1,10 @@
-package stream
+package moment
 
-import "github.com/pkg/errors"
+import (
+	"github.com/pkg/errors"
+
+	"github.com/alexander-yu/stream"
+)
 
 // CoreConfig is the struct containing configuration options for
 // instantiating a Core object.
@@ -11,7 +15,7 @@ type CoreConfig struct {
 
 var defaultConfig = &CoreConfig{
 	Sums:   map[int]bool{1: true},
-	Window: IntPtr(0),
+	Window: stream.IntPtr(0),
 }
 
 // SumsConfig is an alias for a map of ints to bools; this configures
@@ -44,7 +48,7 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 
 			if config.Window != nil {
 				if window == nil {
-					window = IntPtr(*config.Window)
+					window = stream.IntPtr(*config.Window)
 				} else if *window != *config.Window {
 					return nil, errors.New("configs have differing windows")
 				}

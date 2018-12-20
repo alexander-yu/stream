@@ -1,9 +1,11 @@
-package stream
+package moment
 
 import (
 	"fmt"
 
 	"github.com/pkg/errors"
+
+	"github.com/alexander-yu/stream"
 )
 
 type mockMetric struct {
@@ -26,7 +28,7 @@ func (m *mockMetric) Config() *CoreConfig {
 			3:  true,
 			4:  true,
 		},
-		Window: IntPtr(3),
+		Window: stream.IntPtr(3),
 	}
 }
 
@@ -44,8 +46,7 @@ func (m *mockMetric) Value() (float64, error) {
 	return 0, nil
 }
 
-// TestData sets up a metric and populates a core with pushes for testing purposes.
-func TestData(metric Metric) {
+func testData(metric Metric) {
 	err := SetupMetric(metric)
 	if err != nil {
 		panic(fmt.Sprintf("%+v", err))

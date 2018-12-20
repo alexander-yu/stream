@@ -2,14 +2,12 @@ package moment
 
 import (
 	"github.com/pkg/errors"
-
-	"github.com/alexander-yu/stream"
 )
 
 // Mean is a metric that tracks the mean.
 type Mean struct {
 	window int
-	core   *stream.Core
+	core   *Core
 }
 
 // NewMean instantiates a Mean struct.
@@ -21,14 +19,14 @@ func NewMean(window int) (*Mean, error) {
 }
 
 // Subscribe subscribes the Mean to a Core object.
-func (m *Mean) Subscribe(c *stream.Core) {
+func (m *Mean) Subscribe(c *Core) {
 	m.core = c
 }
 
 // Config returns the CoreConfig needed.
-func (m *Mean) Config() *stream.CoreConfig {
-	return &stream.CoreConfig{
-		Sums:   stream.SumsConfig{1: true},
+func (m *Mean) Config() *CoreConfig {
+	return &CoreConfig{
+		Sums:   SumsConfig{1: true},
 		Window: &m.window,
 	}
 }
