@@ -52,18 +52,6 @@ func TestClear(t *testing.T) {
 	assert.Equal(t, expectedSums, m.core.sums)
 }
 
-func TestMin(t *testing.T) {
-	m := &mockMetric{}
-	testData(m)
-	testutil.Approx(t, 1, m.core.Min())
-}
-
-func TestMax(t *testing.T) {
-	m := &mockMetric{}
-	testData(m)
-	testutil.Approx(t, 8, m.core.Max())
-}
-
 func TestCount(t *testing.T) {
 	m := &mockMetric{}
 	testData(m)

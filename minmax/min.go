@@ -9,9 +9,7 @@ import (
 	"github.com/workiva/go-datastructures/queue"
 )
 
-// Min keeps track of the minimum of a stream. Note: for global minimums,
-// Core.Min() also tracks this; Min provides the additional functionality of keeping
-// track of minimums over a rolling window.
+// Min keeps track of the minimum of a stream.
 type Min struct {
 	window int
 	mux    sync.Mutex

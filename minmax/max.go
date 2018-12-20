@@ -9,9 +9,7 @@ import (
 	"github.com/workiva/go-datastructures/queue"
 )
 
-// Max keeps track of the maximum of a stream. Note: for global maximums,
-// Core.Max() also tracks this; Max provides the additional functionality of keeping
-// track of maximums over a rolling window.
+// Max keeps track of the maximum of a stream.
 type Max struct {
 	window int
 	mux    sync.Mutex

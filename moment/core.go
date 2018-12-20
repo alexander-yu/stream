@@ -8,13 +8,11 @@ import (
 	"github.com/workiva/go-datastructures/queue"
 )
 
-// Core is a struct that stores fundamental information for stats collection on a stream.
+// Core is a struct that stores fundamental information for moments of a stream.
 type Core struct {
 	mux    sync.RWMutex
 	sums   map[int]float64
 	count  int
-	min    float64
-	max    float64
 	window uint64
 	queue  *queue.RingBuffer
 }
@@ -39,7 +37,7 @@ func NewCore(config *CoreConfig) *Core {
 	config = setConfigDefaults(config)
 
 	// initialize and create core
-	c := &Core{min: math.Inf(1), max: math.Inf(-1)}
+	c := &Core{}
 	c.window = uint64(*config.Window)
 	c.sums = map[int]float64{}
 	for k := range config.Sums {
@@ -87,8 +85,6 @@ func (c *Core) UnsafePush(x float64) error {
 	}
 
 	c.count++
-	c.min = math.Min(c.min, x)
-	c.max = math.Max(c.max, x)
 	return nil
 }
 
@@ -97,20 +93,6 @@ func (c *Core) Count() int {
 	c.mux.RLock()
 	defer c.mux.RUnlock()
 	return c.count
-}
-
-// Min returns the min of values seen.
-func (c *Core) Min() float64 {
-	c.mux.RLock()
-	defer c.mux.RUnlock()
-	return c.min
-}
-
-// Max returns the max of values seen.
-func (c *Core) Max() float64 {
-	c.mux.RLock()
-	defer c.mux.RUnlock()
-	return c.max
 }
 
 // Sum returns the kth-power sum of values seen.
@@ -139,8 +121,6 @@ func (c *Core) Clear() {
 	}
 
 	c.count = 0
-	c.min = math.Inf(1)
-	c.max = math.Inf(-1)
 	c.queue.Dispose()
 	c.queue = queue.NewRingBuffer(c.window)
 }
