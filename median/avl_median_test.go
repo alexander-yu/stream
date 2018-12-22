@@ -1,6 +1,7 @@
 package median
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -28,31 +29,59 @@ func TestNewAVLMedian(t *testing.T) {
 }
 
 func TestAVLMedianPush(t *testing.T) {
-	median, err := NewAVLMedian(3)
-	require.NoError(t, err)
-	for i := 0.; i < 5; i++ {
-		err := median.Push(i)
+	t.Run("pass: successfully pushes values", func(t *testing.T) {
+		median, err := NewAVLMedian(3)
 		require.NoError(t, err)
-	}
+		for i := 0.; i < 5; i++ {
+			err := median.Push(i)
+			require.NoError(t, err)
+		}
 
-	assert.Equal(t, uint64(3), median.queue.Len())
-	for i := 2.; i < 5; i++ {
-		val, err := median.queue.Get()
-		y := val.(float64)
+		assert.Equal(t, uint64(3), median.queue.Len())
+		for i := 2.; i < 5; i++ {
+			val, err := median.queue.Get()
+			y := val.(float64)
+			require.NoError(t, err)
+			testutil.Approx(t, i, y)
+		}
+
+		assert.Equal(
+			t,
+			strings.Join([]string{
+				"│   ┌── 4.000000",
+				"└── 3.000000",
+				"    └── 2.000000",
+				"",
+			}, "\n"),
+			median.tree.String(),
+		)
+	})
+
+	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
+		median, err := NewAVLMedian(3)
 		require.NoError(t, err)
-		testutil.Approx(t, i, y)
-	}
 
-	assert.Equal(
-		t,
-		strings.Join([]string{
-			"│   ┌── 4.000000",
-			"└── 3.000000",
-			"    └── 2.000000",
-			"",
-		}, "\n"),
-		median.tree.String(),
-	)
+		for i := 0.; i < 3; i++ {
+			err = median.Push(i)
+			require.NoError(t, err)
+		}
+
+		// dispose the queue to simulate an error when we try to retrieve from the queue
+		median.queue.Dispose()
+		err = median.Push(3.)
+		testutil.ContainsError(t, err, "error popping item from queue")
+	})
+
+	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
+		median, err := NewAVLMedian(3)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to insert into the queue
+		median.queue.Dispose()
+		val := 3.
+		err = median.Push(val)
+		testutil.ContainsError(t, err, fmt.Sprintf("error pushing %f to queue", val))
+	})
 }
 
 func TestAVLMedianValue(t *testing.T) {
