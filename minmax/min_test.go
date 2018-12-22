@@ -1,6 +1,7 @@
 package minmax
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -58,5 +59,31 @@ func TestMin(t *testing.T) {
 
 		_, err = min.Value()
 		assert.EqualError(t, err, "no values seen yet")
+	})
+
+	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
+		min, err := NewMin(3)
+		require.NoError(t, err)
+
+		for i := 0.; i < 3; i++ {
+			err = min.Push(i)
+			require.NoError(t, err)
+		}
+
+		// dispose the queue to simulate an error when we try to retrieve from the queue
+		min.queue.Dispose()
+		err = min.Push(3.)
+		testutil.ContainsError(t, err, "error popping item from queue")
+	})
+
+	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
+		min, err := NewMin(3)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to insert into the queue
+		min.queue.Dispose()
+		val := 3.
+		err = min.Push(val)
+		testutil.ContainsError(t, err, fmt.Sprintf("error pushing %f to queue", val))
 	})
 }
