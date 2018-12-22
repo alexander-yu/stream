@@ -1,0 +1,41 @@
+language: go
+
+go:
+- 1.11.x
+- master
+
+# Force-enable Go modules
+# TODO: configure this only for 1.11 when 1.12 releases
+env:
+- GO111MODULE=on
+
+matrix:
+  allow_failures:
+      - go: master
+  fast_finish: true
+
+# Only clone most recent commit
+git:
+  depth: 1
+
+# Install latest versio of golint; don't vendor this, as
+# it's technically not a dependency of this repo
+before_install:
+  - go get github.com/golang/lint/golint
+
+# Skip the install step. Don't `go get` dependencies. Only build with the code
+# in vendor/
+install: true
+
+# Disable email notifications for build results
+notifications:
+  email: false
+
+script:
+  # Ignore vendor/ when linting; golint does not automatically ignore vendor/
+  - golint $(go list ./... | grep -v /vendor/)
+  - go vet ./...
+  - go test -v -race -mod=vendor ./...
+  - go mod vendor
+  # Check for unused/missing packages
+  - git diff --exit-code go.sum go.mod vendor/
