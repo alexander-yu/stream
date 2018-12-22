@@ -7,6 +7,26 @@
 
 Stream is a Go library for online statistical algorithms. Provided statistics can be computed globally over an entire stream, or over a rolling window.
 
+## Table of Contents
+- [Installation](#Installation)
+- [Introduction](#Introduction)
+- [Example](#Example)
+- [Statistics](#Statistics)
+    - [Median](#Median)
+        - [AVLMedian](#AVLMedian)
+        - [HeapMedian](#HeapMedian)
+    - [Min/Max](#Min/Max)
+        - [Min](#Min)
+        - [Max](#Max)
+    - [Moment-Based Statistics](#Moment-Based-Statistics)
+        - [Mean](#Mean)
+        - [Moment](#Moment)
+        - [Variance](#Variance)
+        - [Std](#Std)
+        - [Skewness](#Skewness)
+        - [Kurtosis](#Kurtosis)
+        - [Core](#Core)
+
 ## Installation
 Use `go get`:
 
@@ -61,7 +81,7 @@ func main() {
 
 ## Statistics
 
-### Median (`stream/median`)
+### [Median](https://godoc.org/github.com/alexander-yu/stream/median)
 
 #### AVLMedian
 AVLMedian keeps track of the median of a stream with an [AVL tree](https://en.wikipedia.org/wiki/AVL_tree) as the underlying data structure; more specifically, it uses an AVL tree that is also an [order statistic tree](https://en.wikipedia.org/wiki/Order_statistic_tree). AVLMedian can calculate the global median of a stream, or over a rolling window.
@@ -84,7 +104,7 @@ Let `n` be the size of the stream. Then we have the following complexities:
 | `O(log n)`  | `O(log n)`   | `O(n)` |
 
 
-### Min/Max (`stream/minmax`)
+### [Min/Max](https://godoc.org/github.com/alexander-yu/stream/minmax)
 
 #### Min
 Min keeps track of the minimum of a stream; it can track either the global minimum, or over a rolling window.
@@ -105,7 +125,7 @@ Let `n` be the size of the window, or the stream if tracking the global maximum.
 | `O(1)` (amortized) | `O(1)` (amortized) | `O(1)` if global, else `O(n)` |
 
 
-### Moment-Based Statistics (`stream/moment`)
+### [Moment-Based Statistics](https://godoc.org/github.com/alexander-yu/stream/moment)
 
 #### Mean
 Mean keeps track of the mean of a stream; it can track either the global mean, or over a rolling window.
