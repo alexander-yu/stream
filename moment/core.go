@@ -105,7 +105,9 @@ func (c *Core) add(x float64) {
 		case 2:
 			c.sums[k] += (count - 1) / count * math.Pow(delta, float64(k))
 		default:
-			c.sums[k] += (count - 1) / count * (math.Pow(count-1, float64(k-1)) + float64(sign(k))) / math.Pow(count, float64(k-1)) * math.Pow(delta, float64(k))
+			coeff := (count - 1) / math.Pow(count, float64(k)) *
+				(math.Pow(count-1, float64(k-1)) + float64(sign(k)))
+			c.sums[k] += coeff * math.Pow(delta, float64(k))
 			for i := 1; i <= k-2; i++ {
 				c.sums[k] += float64(binom(k, i)*sign(i)) * math.Pow(delta/count, float64(i)) * c.sums[k-i]
 			}
@@ -130,7 +132,9 @@ func (c *Core) remove(x float64) {
 			case 2:
 				c.sums[k] -= count / (count + 1) * math.Pow(delta, float64(k))
 			default:
-				c.sums[k] -= count / (count + 1) * (math.Pow(count, float64(k-1)) + float64(sign(k))) / math.Pow(count+1, float64(k-1)) * math.Pow(delta, float64(k))
+				coeff := count / math.Pow(count+1, float64(k)) *
+					(math.Pow(count, float64(k-1)) + float64(sign(k)))
+				c.sums[k] -= coeff * math.Pow(delta, float64(k))
 				for i := 1; i <= k-2; i++ {
 					c.sums[k] -= float64(binom(k, i)*sign(i)) * math.Pow(delta/(count+1), float64(i)) * c.sums[k-i]
 				}
