@@ -63,8 +63,6 @@ func main() {
 #### AVLMedian
 AVLMedian keeps track of the median of a stream with an [AVL tree](https://en.wikipedia.org/wiki/AVL_tree) as the underlying data structure; more specifically, it uses an AVL tree that is also an [order statistic tree](https://en.wikipedia.org/wiki/Order_statistic_tree). AVLMedian can calculate the global median of a stream, or over a rolling window.
 
-##### Complexity Analysis
-
 Let `n` be the size of the window, or the stream if tracking the global median. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space  |
@@ -75,8 +73,6 @@ Let `n` be the size of the window, or the stream if tracking the global median. 
 HeapMedian keeps track of the global median of a stream with a pair of [heaps](https://en.wikipedia.org/wiki/Heap_(data_structure)). In particular, it uses a max-heap and a min-heap to keep track of elements below and above the median, respectively.
 
 **Note:** HeapMedian does not support calculating medians over a rolling window, due to the non-constant time complexity required to remove expired values from the heaps as they leave the window.
-
-##### Complexity Analysis
 
 Let `n` be the size of the stream. Then we have the following complexities:
 
@@ -90,8 +86,6 @@ Let `n` be the size of the stream. Then we have the following complexities:
 #### Min
 Min keeps track of the minimum of a stream; it can track either the global minimum, or over a rolling window.
 
-##### Complexity Analysis
-
 Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
 
 | Push (time)        | Value (time)       | Space                         |
@@ -100,8 +94,6 @@ Let `n` be the size of the window, or the stream if tracking the global minimum.
 
 #### Max
 Max keeps track of the maximum of a stream; it can track either the global maximum, or over a rolling window.
-
-##### Complexity Analysis
 
 Let `n` be the size of the window, or the stream if tracking the global maximum. Then we have the following complexities:
 
@@ -115,16 +107,12 @@ Let `n` be the size of the window, or the stream if tracking the global maximum.
 #### Mean
 Mean keeps track of the mean of a stream; it can track either the global mean, or over a rolling window.
 
-##### Complexity Analysis
-
 | Push (time) | Value (time) | Space  |
 | :---------: | :----------: | :----: |
 | `O(1)`      | `O(1)`       | `O(1)` |
 
 #### Moment
 Moment keeps track of the `k`-th sample [central moment](https://en.wikipedia.org/wiki/Central_moment); it can track either the global moment, or over a rolling window.
-
-##### Complexity Analysis
 
 | Push (time) | Value (time) | Space  |
 | :---------: | :----------: | :----: |
@@ -133,16 +121,12 @@ Moment keeps track of the `k`-th sample [central moment](https://en.wikipedia.or
 #### Variance
 Variance keeps track of the sample [variance](https://en.wikipedia.org/wiki/Variance) of a stream; it can track either the global variance, or over a rolling window.
 
-##### Complexity Analysis
-
 | Push (time) | Value (time) | Space  |
 | :---------: | :----------: | :----: |
 | `O(1)`      | `O(1)`       | `O(1)` |
 
 #### Std
 Std keeps track of the sample [standard deviation](https://en.wikipedia.org/wiki/Standard_deviation) of a stream; it can track either the global standard deviation, or over a rolling window.
-
-##### Complexity Analysis
 
 | Push (time) | Value (time) | Space  |
 | :---------: | :----------: | :----: |
@@ -151,16 +135,12 @@ Std keeps track of the sample [standard deviation](https://en.wikipedia.org/wiki
 #### Skewness
 Skewness keeps track of the sample [skewness](https://en.wikipedia.org/wiki/Skewness) of a stream (in particular, the [adjusted Fisher-Pearson standardized moment coefficient](https://en.wikipedia.org/wiki/Skewness#Sample_skewness)); it can track either the global skewness, or over a rolling window.
 
-##### Complexity Analysis
-
 | Push (time) | Value (time) | Space  |
 | :---------: | :----------: | :----: |
 | `O(1)`      | `O(1)`       | `O(1)` |
 
 #### Kurtosis
 Kurtosis keeps track of the sample [kurtosis](https://en.wikipedia.org/wiki/Kurtosis) of a stream (in particular, the [sample excess kurtosis](https://en.wikipedia.org/wiki/Kurtosis#Sample_kurtosis)); it can track either the global kurtosis, or over a rolling window.
-
-##### Complexity Analysis
 
 | Push (time) | Value (time) | Space  |
 | :---------: | :----------: | :----: |
@@ -183,8 +163,6 @@ core, err := NewCore(config)
 ```
 
 See the [godoc](https://godoc.org/github.com/alexander-yu/stream/moment#Core) entry for more details on Core's methods (note it does not satisfy the Metric interface, since it is capable of storing multiple values).
-
-##### Complexity Analysis
 
 | Push (time) | Sum (time) | Count (time) | Space  |
 | :---------: | :--------: | :----------: | :----: |
