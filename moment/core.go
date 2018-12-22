@@ -67,7 +67,7 @@ func (c *Core) UnsafePush(x float64) error {
 		if c.queue.Len() == c.window {
 			tail, err := c.queue.Get()
 			if err != nil {
-				return errors.Wrap(err, "error popping from window queue")
+				return errors.Wrap(err, "error popping item from queue")
 			}
 
 			c.count--
@@ -80,7 +80,7 @@ func (c *Core) UnsafePush(x float64) error {
 
 		err := c.queue.Put(x)
 		if err != nil {
-			return errors.Wrap(err, "error pushing to queue")
+			return errors.Wrapf(err, "error pushing %f to queue", x)
 		}
 	}
 

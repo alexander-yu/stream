@@ -28,7 +28,8 @@ func TestSkewness(t *testing.T) {
 		skewness, err := NewSkewness(3)
 		require.NoError(t, err)
 
-		testData(skewness)
+		err = testData(skewness)
+		require.NoError(t, err)
 
 		value, err := skewness.Value()
 		require.NoError(t, err)
@@ -46,5 +47,29 @@ func TestSkewness(t *testing.T) {
 
 		_, err = skewness.Value()
 		assert.EqualError(t, err, "no values seen yet")
+	})
+
+	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
+		skewness, err := NewSkewness(3)
+		require.NoError(t, err)
+
+		err = testData(skewness)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to retrieve from the queue
+		skewness.core.queue.Dispose()
+		err = skewness.Push(3.)
+		testutil.ContainsError(t, err, "error pushing to core: error popping item from queue")
+	})
+
+	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
+		skewness, err := NewSkewness(3)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to insert into the queue
+		skewness.core.queue.Dispose()
+		val := 3.
+		err = skewness.Push(val)
+		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
 }

@@ -28,7 +28,8 @@ func TestStd(t *testing.T) {
 		std, err := NewStd(3)
 		require.NoError(t, err)
 
-		testData(std)
+		err = testData(std)
+		require.NoError(t, err)
 
 		value, err := std.Value()
 		require.NoError(t, err)
@@ -42,5 +43,29 @@ func TestStd(t *testing.T) {
 
 		_, err = std.Value()
 		assert.EqualError(t, err, "error retrieving 2nd moment: no values seen yet")
+	})
+
+	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
+		std, err := NewStd(3)
+		require.NoError(t, err)
+
+		err = testData(std)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to retrieve from the queue
+		std.variance.core.queue.Dispose()
+		err = std.Push(3.)
+		testutil.ContainsError(t, err, "error pushing to core: error popping item from queue")
+	})
+
+	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
+		std, err := NewStd(3)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to insert into the queue
+		std.variance.core.queue.Dispose()
+		val := 3.
+		err = std.Push(val)
+		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
 }

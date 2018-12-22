@@ -1,6 +1,7 @@
 package moment
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,35 +11,61 @@ import (
 )
 
 func TestPush(t *testing.T) {
-	m := newMockMetric()
-	testData(m)
+	t.Run("pass: successfully pushes values", func(t *testing.T) {
+		m := newMockMetric()
+		err := testData(m)
+		require.NoError(t, err)
 
-	expectedSums := map[int]float64{
-		-1: 17. / 24.,
-		0:  3.,
-		1:  15.,
-		2:  89.,
-		3:  603.,
-		4:  4433.,
-	}
+		expectedSums := map[int]float64{
+			-1: 17. / 24.,
+			0:  3.,
+			1:  15.,
+			2:  89.,
+			3:  603.,
+			4:  4433.,
+		}
 
-	assert.Equal(t, len(expectedSums), len(m.core.sums))
-	for k, expectedSum := range expectedSums {
-		actualSum, ok := m.core.sums[k]
-		require.True(t, ok)
-		testutil.Approx(t, expectedSum, actualSum)
-	}
+		assert.Equal(t, len(expectedSums), len(m.core.sums))
+		for k, expectedSum := range expectedSums {
+			actualSum, ok := m.core.sums[k]
+			require.True(t, ok)
+			testutil.Approx(t, expectedSum, actualSum)
+		}
 
-	// Check that Push also pushes the value to the metric
-	expectedVals := []float64{1., 2., 3., 4., 8.}
-	for i := range expectedVals {
-		testutil.Approx(t, expectedVals[i], m.vals[i])
-	}
+		// Check that Push also pushes the value to the metric
+		expectedVals := []float64{1., 2., 3., 4., 8.}
+		for i := range expectedVals {
+			testutil.Approx(t, expectedVals[i], m.vals[i])
+		}
+	})
+
+	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
+		m := newMockMetric()
+		err := testData(m)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to retrieve from the queue
+		m.core.queue.Dispose()
+		err = m.Push(3.)
+		testutil.ContainsError(t, err, "error popping item from queue")
+	})
+
+	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
+		m := newMockMetric()
+
+		// dispose the queue to simulate an error when we try to insert into the queue
+		m.core.queue.Dispose()
+		val := 3.
+		err := m.Push(val)
+		testutil.ContainsError(t, err, fmt.Sprintf("error pushing %f to queue", val))
+	})
 }
 
 func TestClear(t *testing.T) {
 	m := newMockMetric()
-	testData(m)
+	err := testData(m)
+	require.NoError(t, err)
+
 	m.core.Clear()
 
 	expectedSums := map[int]float64{
@@ -54,14 +81,18 @@ func TestClear(t *testing.T) {
 
 func TestCount(t *testing.T) {
 	m := newMockMetric()
-	testData(m)
+	err := testData(m)
+	require.NoError(t, err)
+
 	assert.Equal(t, 3, m.core.Count())
 }
 
 func TestSum(t *testing.T) {
 	t.Run("pass: Sum returns the correct sum", func(t *testing.T) {
 		m := newMockMetric()
-		testData(m)
+		err := testData(m)
+		require.NoError(t, err)
+
 		expectedSums := map[int]float64{
 			-1: 17. / 24.,
 			0:  3.,
@@ -88,16 +119,19 @@ func TestSum(t *testing.T) {
 
 	t.Run("fail: Sum fails for untracked power sum", func(t *testing.T) {
 		m := newMockMetric()
-		testData(m)
+		err := testData(m)
+		require.NoError(t, err)
 
-		_, err := m.core.Sum(10)
+		_, err = m.core.Sum(10)
 		assert.EqualError(t, err, "10 is not a tracked power sum")
 	})
 }
 
 func TestLock(t *testing.T) {
 	m := newMockMetric()
-	testData(m)
+	err := testData(m)
+	require.NoError(t, err)
+
 	done := make(chan bool)
 
 	// Lock for reading

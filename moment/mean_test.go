@@ -27,7 +27,8 @@ func TestMeanValue(t *testing.T) {
 		mean, err := NewMean(3)
 		require.NoError(t, err)
 
-		testData(mean)
+		err = testData(mean)
+		require.NoError(t, err)
 
 		value, err := mean.Value()
 		require.NoError(t, err)
@@ -41,5 +42,29 @@ func TestMeanValue(t *testing.T) {
 
 		_, err = mean.Value()
 		assert.EqualError(t, err, "no values seen yet")
+	})
+
+	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
+		mean, err := NewMean(3)
+		require.NoError(t, err)
+
+		err = testData(mean)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to retrieve from the queue
+		mean.core.queue.Dispose()
+		err = mean.Push(3.)
+		testutil.ContainsError(t, err, "error pushing to core: error popping item from queue")
+	})
+
+	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
+		mean, err := NewMean(3)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to insert into the queue
+		mean.core.queue.Dispose()
+		val := 3.
+		err = mean.Push(val)
+		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
 }

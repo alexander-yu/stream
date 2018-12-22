@@ -37,7 +37,8 @@ func TestMoment(t *testing.T) {
 		moment, err := NewMoment(2, 3)
 		require.NoError(t, err)
 
-		testData(moment)
+		err = testData(moment)
+		require.NoError(t, err)
 
 		value, err := moment.Value()
 		require.NoError(t, err)
@@ -49,7 +50,8 @@ func TestMoment(t *testing.T) {
 		moment, err := NewMoment(0, 3)
 		require.NoError(t, err)
 
-		testData(moment)
+		err = testData(moment)
+		require.NoError(t, err)
 
 		value, err := moment.Value()
 		require.NoError(t, err)
@@ -69,7 +71,8 @@ func TestMoment(t *testing.T) {
 		moment, err := NewMoment(1, 3)
 		require.NoError(t, err)
 
-		testData(moment)
+		err = testData(moment)
+		require.NoError(t, err)
 
 		value, err := moment.Value()
 		require.NoError(t, err)
@@ -91,5 +94,29 @@ func TestMoment(t *testing.T) {
 
 		_, err = moment.Value()
 		assert.EqualError(t, err, "no values seen yet")
+	})
+
+	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
+		moment, err := NewMoment(1, 3)
+		require.NoError(t, err)
+
+		err = testData(moment)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to retrieve from the queue
+		moment.core.queue.Dispose()
+		err = moment.Push(3.)
+		testutil.ContainsError(t, err, "error pushing to core: error popping item from queue")
+	})
+
+	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
+		moment, err := NewMoment(1, 3)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to insert into the queue
+		moment.core.queue.Dispose()
+		val := 3.
+		err = moment.Push(val)
+		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
 }

@@ -28,7 +28,8 @@ func TestKurtosisValue(t *testing.T) {
 		kurtosis, err := NewKurtosis(3)
 		require.NoError(t, err)
 
-		testData(kurtosis)
+		err = testData(kurtosis)
+		require.NoError(t, err)
 
 		value, err := kurtosis.Value()
 		require.NoError(t, err)
@@ -45,5 +46,29 @@ func TestKurtosisValue(t *testing.T) {
 
 		_, err = kurtosis.Value()
 		assert.EqualError(t, err, "no values seen yet")
+	})
+
+	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
+		kurtosis, err := NewKurtosis(3)
+		require.NoError(t, err)
+
+		err = testData(kurtosis)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to retrieve from the queue
+		kurtosis.core.queue.Dispose()
+		err = kurtosis.Push(3.)
+		testutil.ContainsError(t, err, "error pushing to core: error popping item from queue")
+	})
+
+	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
+		kurtosis, err := NewKurtosis(3)
+		require.NoError(t, err)
+
+		// dispose the queue to simulate an error when we try to insert into the queue
+		kurtosis.core.queue.Dispose()
+		val := 3.
+		err = kurtosis.Push(val)
+		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
 }
