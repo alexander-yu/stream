@@ -19,20 +19,24 @@ type Core struct {
 
 // SetupMetric sets a Metric up with a core for consuming.
 func SetupMetric(metric Metric) error {
-	// validate config
 	config := metric.Config()
-	err := validateConfig(config)
+	core, err := NewCore(config)
 	if err != nil {
-		return errors.Wrap(err, "error validating config")
+		return errors.Wrap(err, "error creating Core")
 	}
 
-	core := NewCore(config)
 	metric.Subscribe(core)
 	return nil
 }
 
 // NewCore instantiates a Core struct based on a provided config.
-func NewCore(config *CoreConfig) *Core {
+func NewCore(config *CoreConfig) (*Core, error) {
+	// validate config
+	err := validateConfig(config)
+	if err != nil {
+		return nil, errors.Wrap(err, "error validating config")
+	}
+
 	// set defaults for any remaining unset fields
 	config = setConfigDefaults(config)
 
@@ -45,7 +49,7 @@ func NewCore(config *CoreConfig) *Core {
 	}
 	c.queue = queue.NewRingBuffer(c.window)
 
-	return c
+	return c, nil
 }
 
 // Push adds a new value for a Core object to consume.

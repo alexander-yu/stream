@@ -79,9 +79,10 @@ func TestSum(t *testing.T) {
 	})
 
 	t.Run("fail: Sum fails if no elements consumed yet", func(t *testing.T) {
-		core := NewCore(&CoreConfig{})
+		core, err := NewCore(&CoreConfig{})
+		require.NoError(t, err)
 
-		_, err := core.Sum(1)
+		_, err = core.Sum(1)
 		assert.EqualError(t, err, "no values seen yet")
 	})
 
