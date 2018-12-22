@@ -11,7 +11,8 @@ import (
 // Core is a struct that stores fundamental information for moments of a stream.
 type Core struct {
 	mux    sync.RWMutex
-	sums   map[int]float64
+	mean   float64
+	sums   []float64
 	count  int
 	window uint64
 	queue  *queue.RingBuffer
@@ -43,10 +44,15 @@ func NewCore(config *CoreConfig) (*Core, error) {
 	// initialize and create core
 	c := &Core{}
 	c.window = uint64(*config.Window)
-	c.sums = map[int]float64{}
+
+	maxSum := -1
 	for k := range config.Sums {
-		c.sums[k] = 0
+		if k > maxSum {
+			maxSum = k
+		}
 	}
+	c.sums = make([]float64, maxSum+1)
+
 	c.queue = queue.NewRingBuffer(c.window)
 
 	return c, nil
@@ -70,12 +76,7 @@ func (c *Core) UnsafePush(x float64) error {
 				return errors.Wrap(err, "error popping item from queue")
 			}
 
-			c.count--
-
-			tailVal := tail.(float64)
-			for k := range c.sums {
-				c.sums[k] -= math.Pow(tailVal, float64(k))
-			}
+			c.remove(tail.(float64))
 		}
 
 		err := c.queue.Put(x)
@@ -84,12 +85,54 @@ func (c *Core) UnsafePush(x float64) error {
 		}
 	}
 
-	for k := range c.sums {
-		c.sums[k] += math.Pow(x, float64(k))
-	}
-
-	c.count++
+	c.add(x)
 	return nil
+}
+
+func (c *Core) add(x float64) {
+	c.count++
+	count := float64(c.count)
+	delta := x - c.mean
+	c.mean += delta / count
+	for k := len(c.sums) - 1; k >= 2; k-- {
+		switch k {
+		case 2:
+			c.sums[k] += (count - 1) / count * math.Pow(delta, float64(k))
+		default:
+			c.sums[k] += (count - 1) / count * (math.Pow(count-1, float64(k-1)) + float64(sign(k))) / math.Pow(count, float64(k-1)) * math.Pow(delta, float64(k))
+			for i := 1; i <= k-2; i++ {
+				c.sums[k] += float64(binom(k, i)*sign(i)) * math.Pow(delta/count, float64(i)) * c.sums[k-i]
+			}
+		}
+	}
+}
+
+func (c *Core) remove(x float64) {
+	c.count--
+	if c.count > 0 {
+		count := float64(c.count)
+		c.mean -= (x - c.mean) / count
+		delta := x - c.mean
+		for k := range c.sums {
+			switch k {
+			case 0:
+			case 1:
+				continue
+			case 2:
+				c.sums[k] -= count / (count + 1) * math.Pow(delta, float64(k))
+			default:
+				c.sums[k] -= count / (count + 1) * (math.Pow(count, float64(k-1)) + float64(sign(k))) / math.Pow(count+1, float64(k-1)) * math.Pow(delta, float64(k))
+				for i := 1; i <= k-2; i++ {
+					c.sums[k] -= float64(binom(k, i)*sign(i)) * math.Pow(delta/(count+1), float64(i)) * c.sums[k-i]
+				}
+			}
+		}
+	} else {
+		c.mean = 0
+		for k := range c.sums {
+			c.sums[k] = 0
+		}
+	}
 }
 
 // Count returns the number of values seen seen globally.
@@ -99,7 +142,21 @@ func (c *Core) Count() int {
 	return c.count
 }
 
-// Sum returns the kth-power sum of values seen.
+// Mean returns the mean of values seem.
+func (c *Core) Mean() (float64, error) {
+	c.mux.RLock()
+	defer c.mux.RUnlock()
+
+	if c.count == 0 {
+		return 0, errors.New("no values seen yet")
+	}
+
+	return c.mean, nil
+}
+
+// Sum returns the kth-power centralized sum of values seen.
+// In other words, this returns the kth power sum of the differences
+// of the values seen from their mean.
 func (c *Core) Sum(k int) (float64, error) {
 	c.mux.RLock()
 	defer c.mux.RUnlock()
@@ -108,11 +165,11 @@ func (c *Core) Sum(k int) (float64, error) {
 		return 0, errors.New("no values seen yet")
 	}
 
-	if sum, ok := c.sums[k]; ok {
-		return sum, nil
+	if k <= 0 || k >= len(c.sums) {
+		return 0, errors.Errorf("%d is not a tracked power sum", k)
 	}
 
-	return 0, errors.Errorf("%d is not a tracked power sum", k)
+	return c.sums[k], nil
 }
 
 // Clear clears all stats being tracked.

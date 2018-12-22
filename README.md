@@ -184,17 +184,17 @@ Let `n` be the size of the window, or the stream if tracking the global minimum.
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Core
-Core is the struct powering all of the statistics in the `stream/moment` subpackage; it keeps track of a pre-configured set of `k`-th raw moments of a stream; it can track either the global moments, or over a rolling window. This can be used to implement any custom moment-based statistic you desire that isn't part of this package.
+Core is the struct powering all of the statistics in the `stream/moment` subpackage; it keeps track of a pre-configured set of centralized `k`-th power sums of a stream; it can track either the global sums, or over a rolling window.
 
-To configure which raw moments to track, you'll need to instantiate a `CoreConfig` struct and provide it to `NewCore`:
+To configure which sums to track, you'll need to instantiate a `CoreConfig` struct and provide it to `NewCore`:
 
 ```go
 config := &moment.CoreConfig{
     Sums: SumsConfig{
-        1: true, // tracks the 1st raw moment, i.e. the sum
-        2: true, // tracks the 2nd raw moment, i.e. the sum of squares
+        2: true, // tracks the sum of squared differences
+        3: true, // tracks the sum of cubed differences
     },
-    Window: stream.IntPtr(0), // track global moments
+    Window: stream.IntPtr(0), // track global sums
 }
 core, err := NewCore(config)
 ```

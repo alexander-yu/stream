@@ -14,7 +14,7 @@ type CoreConfig struct {
 }
 
 var defaultConfig = &CoreConfig{
-	Sums:   map[int]bool{1: true},
+	Sums:   map[int]bool{},
 	Window: stream.IntPtr(0),
 }
 
@@ -63,6 +63,12 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 func validateConfig(config *CoreConfig) error {
 	if config.Window != nil && *config.Window < 0 {
 		return errors.Errorf("config has a negative window of %d", *config.Window)
+	}
+
+	for k := range config.Sums {
+		if k <= 0 {
+			return errors.Errorf("config has a nonpositive central moment of %d", k)
+		}
 	}
 
 	return nil

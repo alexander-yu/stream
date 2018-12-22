@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/alexander-yu/stream"
 	"github.com/alexander-yu/stream/testutil"
 )
 
@@ -16,19 +17,11 @@ func TestPush(t *testing.T) {
 		err := testData(m)
 		require.NoError(t, err)
 
-		expectedSums := map[int]float64{
-			-1: 17. / 24.,
-			0:  3.,
-			1:  15.,
-			2:  89.,
-			3:  603.,
-			4:  4433.,
-		}
+		expectedSums := []float64{0., 0., 14., 18., 98.}
 
 		assert.Equal(t, len(expectedSums), len(m.core.sums))
 		for k, expectedSum := range expectedSums {
-			actualSum, ok := m.core.sums[k]
-			require.True(t, ok)
+			actualSum := m.core.sums[k]
 			testutil.Approx(t, expectedSum, actualSum)
 		}
 
@@ -36,6 +29,36 @@ func TestPush(t *testing.T) {
 		expectedVals := []float64{1., 2., 3., 4., 8.}
 		for i := range expectedVals {
 			testutil.Approx(t, expectedVals[i], m.vals[i])
+		}
+	})
+
+	t.Run("pass: successfully pushes values for window of 1", func(t *testing.T) {
+		// this time, set a window of 1; the Core should really just keep the
+		// most recent value. This is to test the case where we should clear out
+		// any stats upon removing the last item from the queue, which only happens
+		// in the special case of the queue having a size of 1.
+		core, err := NewCore(&CoreConfig{
+			Sums: map[int]bool{
+				1: true,
+				2: true,
+				3: true,
+				4: true,
+			},
+			Window: stream.IntPtr(1),
+		})
+		require.NoError(t, err)
+
+		err = core.Push(1.)
+		require.NoError(t, err)
+
+		err = core.Push(2.)
+		require.NoError(t, err)
+
+		expectedSums := []float64{0., 0., 0., 0., 0.}
+		assert.Equal(t, len(expectedSums), len(core.sums))
+		for k, expectedSum := range expectedSums {
+			actualSum := core.sums[k]
+			testutil.Approx(t, expectedSum, actualSum)
 		}
 	})
 
@@ -68,14 +91,7 @@ func TestClear(t *testing.T) {
 
 	m.core.Clear()
 
-	expectedSums := map[int]float64{
-		-1: 0,
-		0:  0,
-		1:  0,
-		2:  0,
-		3:  0,
-		4:  0,
-	}
+	expectedSums := []float64{0, 0, 0, 0, 0}
 	assert.Equal(t, expectedSums, m.core.sums)
 }
 
@@ -87,22 +103,36 @@ func TestCount(t *testing.T) {
 	assert.Equal(t, 3, m.core.Count())
 }
 
+func TestMean(t *testing.T) {
+	t.Run("pass: Mean returns the correct mean", func(t *testing.T) {
+		m := newMockMetric()
+		err := testData(m)
+		require.NoError(t, err)
+
+		mean, err := m.core.Mean()
+		require.NoError(t, err)
+
+		testutil.Approx(t, 5., mean)
+	})
+
+	t.Run("fail: Mean fails if no elements consumed yet", func(t *testing.T) {
+		core, err := NewCore(&CoreConfig{})
+		require.NoError(t, err)
+
+		_, err = core.Mean()
+		assert.EqualError(t, err, "no values seen yet")
+	})
+}
+
 func TestSum(t *testing.T) {
 	t.Run("pass: Sum returns the correct sum", func(t *testing.T) {
 		m := newMockMetric()
 		err := testData(m)
 		require.NoError(t, err)
 
-		expectedSums := map[int]float64{
-			-1: 17. / 24.,
-			0:  3.,
-			1:  15.,
-			2:  89.,
-			3:  603.,
-			4:  4433.,
-		}
+		expectedSums := []float64{0., 0., 14., 18., 98.}
 
-		for i := -1; i <= 4; i++ {
+		for i := 1; i <= 4; i++ {
 			sum, err := m.core.Sum(i)
 			require.Nil(t, err)
 			testutil.Approx(t, expectedSums[i], sum)
@@ -148,16 +178,16 @@ func TestLock(t *testing.T) {
 
 	// Read the sum; note that Sum also uses the RLock/RUnlock of the lock internally,
 	// and this should not be blocked by the earlier RLock call
-	sum, err := m.core.Sum(1)
+	sum, err := m.core.Sum(2)
 	require.NoError(t, err)
-	testutil.Approx(t, 15, sum)
+	testutil.Approx(t, 14., sum)
 
 	// Undo RLock call
 	m.core.RUnlock()
 
 	// New Push call should now be unblocked
 	<-done
-	sum, err = m.core.Sum(1)
+	sum, err = m.core.Sum(2)
 	require.NoError(t, err)
-	testutil.Approx(t, 17, sum)
+	testutil.Approx(t, 26./3., sum)
 }

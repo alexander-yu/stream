@@ -28,7 +28,6 @@ func (m *Mean) Subscribe(c *Core) {
 // Config returns the CoreConfig needed.
 func (m *Mean) Config() *CoreConfig {
 	return &CoreConfig{
-		Sums:   SumsConfig{1: true},
 		Window: &m.window,
 	}
 }
@@ -47,14 +46,9 @@ func (m *Mean) Value() (float64, error) {
 	m.core.RLock()
 	defer m.core.RUnlock()
 
-	count := m.core.Count()
-	if count == 0 {
-		return 0, errors.New("no values seen yet")
-	}
-
-	sum, err := m.core.Sum(1)
+	mean, err := m.core.Mean()
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum")
 	}
-	return sum / float64(count), nil
+	return mean, nil
 }

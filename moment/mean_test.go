@@ -41,7 +41,7 @@ func TestMeanValue(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = mean.Value()
-		assert.EqualError(t, err, "no values seen yet")
+		testutil.ContainsError(t, err, "no values seen yet")
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {

@@ -31,12 +31,10 @@ func (m *mockMetric) Subscribe(c *Core) {
 func (m *mockMetric) Config() *CoreConfig {
 	return &CoreConfig{
 		Sums: map[int]bool{
-			-1: true,
-			0:  true,
-			1:  true,
-			2:  true,
-			3:  true,
-			4:  true,
+			1: true,
+			2: true,
+			3: true,
+			4: true,
 		},
 		Window: stream.IntPtr(3),
 	}

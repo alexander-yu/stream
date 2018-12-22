@@ -19,6 +19,14 @@ func TestValidateConfig(t *testing.T) {
 		assert.EqualError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
 	})
 
+	t.Run("fail: config with a nonpositive central moment is invalid", func(t *testing.T) {
+		config := &CoreConfig{
+			Sums: map[int]bool{-1: true},
+		}
+		err := validateConfig(config)
+		assert.EqualError(t, err, fmt.Sprintf("config has a nonpositive central moment of %d", -1))
+	})
+
 	t.Run("pass: empty config is valid", func(t *testing.T) {
 		config := &CoreConfig{}
 		err := validateConfig(config)

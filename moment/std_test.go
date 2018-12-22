@@ -42,7 +42,7 @@ func TestStd(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = std.Value()
-		assert.EqualError(t, err, "error retrieving 2nd moment: no values seen yet")
+		testutil.ContainsError(t, err, "no values seen yet")
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
