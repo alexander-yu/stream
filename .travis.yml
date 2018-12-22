@@ -33,8 +33,11 @@ script:
   # Ignore vendor/ when linting; golint does not automatically ignore vendor/
   - golint $(go list ./... | grep -v /vendor/)
   - go vet ./...
-  - go test -v -race -mod=vendor ./...
+  - go test -v -race -mod=vendor -coverprofile=coverage.txt -covermode=atomic ./...
   - go mod tidy
   - go mod vendor
   # Check for unused/missing packages
   - git diff --exit-code go.sum go.mod vendor/
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
