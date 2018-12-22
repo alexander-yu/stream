@@ -2,6 +2,8 @@
 
 [![GoDoc](http://godoc.org/github.com/alexander-yu/stream?status.svg)](http://godoc.org/github.com/alexander-yu/stream)
 [![Build Status](https://travis-ci.org/alexander-yu/stream.svg?branch=master)](https://travis-ci.org/alexander-yu/stream)
+[![codecov](https://codecov.io/gh/alexander-yu/stream/branch/master/graph/badge.svg)](https://codecov.io/gh/alexander-yu/stream)
+[![Go Report Card](https://goreportcard.com/badge/github.com/alexander-yu/stream)](https://goreportcard.com/report/github.com/alexander-yu/stream)
 
 Stream is a Go library for online statistical algorithms. Provided statistics can be computed globally over an entire stream, or over a rolling window.
 
