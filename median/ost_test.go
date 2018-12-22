@@ -1,7 +1,6 @@
 package median
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -47,7 +46,6 @@ func TestOrderStatisticTreeAdd(t *testing.T) {
 	tree.Add(6.25)
 	assert.Equal(t, 11, tree.Size())
 	assert.Equal(t, 3, tree.Height())
-	fmt.Println(tree.String())
 	assert.Equal(
 		t,
 		strings.Join([]string{
