@@ -89,6 +89,12 @@ func (c *Core) UnsafePush(x float64) error {
 	return nil
 }
 
+// add updates the mean, count, and centralized power sums in an efficient
+// and stable (numerically speaking) way, which allows for more accurate reporting
+// of moments. See the following paper for details on the algorithm used:
+// P. Pebay, T. B. Terriberry, H. Kolla, J. Bennett, Numerically stable, scalable
+// formulas for parallel and online computation of higher-order multivariate central
+// moments with arbitrary weights, Computational Statistics 31 (2016) 1305–1325.
 func (c *Core) add(x float64) {
 	c.count++
 	count := float64(c.count)
@@ -107,6 +113,9 @@ func (c *Core) add(x float64) {
 	}
 }
 
+// remove simply undoes the result of an add() call, and clears out the stats
+// if we remove the last item of a window (only needed in the case where the
+// window size is 1).
 func (c *Core) remove(x float64) {
 	c.count--
 	if c.count > 0 {

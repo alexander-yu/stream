@@ -184,7 +184,7 @@ Let `n` be the size of the window, or the stream if tracking the global minimum.
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Core
-Core is the struct powering all of the statistics in the `stream/moment` subpackage; it keeps track of a pre-configured set of centralized `k`-th power sums of a stream; it can track either the global sums, or over a rolling window.
+Core is the struct powering all of the statistics in the `stream/moment` subpackage; it keeps track of a pre-configured set of centralized `k`-th power sums of a stream in an efficient, numerically stable way; it can track either the global sums, or over a rolling window.
 
 To configure which sums to track, you'll need to instantiate a `CoreConfig` struct and provide it to `NewCore`:
 
