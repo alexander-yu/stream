@@ -18,10 +18,10 @@ matrix:
 git:
   depth: 1
 
-# Install latest versio of golint; don't vendor this, as
-# it's technically not a dependency of this repo
+# Install latest versio of golint; don't add this to the module,
+# since it's not a dependency of stream per se
 before_install:
-  - go get github.com/golang/lint/golint
+  - GO111MODULE=auto go get github.com/golang/lint/golint
 
 # Skip the install step. Don't `go get` dependencies. Only build with the code
 # in vendor/
