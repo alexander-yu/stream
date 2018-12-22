@@ -26,6 +26,8 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
         - [Skewness](#Skewness)
         - [Kurtosis](#Kurtosis)
         - [Core](#Core)
+    - [Joint Distribution Statistics](#Joint-Distribution-Statistics)
+        - [Covariance](#Covariance)
 
 ## Installation
 Use `go get`:
@@ -130,44 +132,56 @@ Let `n` be the size of the window, or the stream if tracking the global maximum.
 #### Mean
 Mean keeps track of the mean of a stream; it can track either the global mean, or over a rolling window.
 
-| Push (time) | Value (time) | Space  |
-| :---------: | :----------: | :----: |
-| `O(1)`      | `O(1)`       | `O(1)` |
+Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+
+| Push (time) | Value (time) | Space                         |
+| :---------: | :----------: | :---------------------------: |
+| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Moment
 Moment keeps track of the `k`-th sample [central moment](https://en.wikipedia.org/wiki/Central_moment); it can track either the global moment, or over a rolling window.
 
-| Push (time) | Value (time) | Space  |
-| :---------: | :----------: | :----: |
-| `O(1)`      | `O(1)`       | `O(1)` |
+Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+
+| Push (time) | Value (time) | Space                         |
+| :---------: | :----------: | :---------------------------: |
+| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Variance
 Variance keeps track of the sample [variance](https://en.wikipedia.org/wiki/Variance) of a stream; it can track either the global variance, or over a rolling window.
 
-| Push (time) | Value (time) | Space  |
-| :---------: | :----------: | :----: |
-| `O(1)`      | `O(1)`       | `O(1)` |
+Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+
+| Push (time) | Value (time) | Space                         |
+| :---------: | :----------: | :---------------------------: |
+| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Std
 Std keeps track of the sample [standard deviation](https://en.wikipedia.org/wiki/Standard_deviation) of a stream; it can track either the global standard deviation, or over a rolling window.
 
-| Push (time) | Value (time) | Space  |
-| :---------: | :----------: | :----: |
-| `O(1)`      | `O(1)`       | `O(1)` |
+Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+
+| Push (time) | Value (time) | Space                         |
+| :---------: | :----------: | :---------------------------: |
+| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Skewness
 Skewness keeps track of the sample [skewness](https://en.wikipedia.org/wiki/Skewness) of a stream (in particular, the [adjusted Fisher-Pearson standardized moment coefficient](https://en.wikipedia.org/wiki/Skewness#Sample_skewness)); it can track either the global skewness, or over a rolling window.
 
-| Push (time) | Value (time) | Space  |
-| :---------: | :----------: | :----: |
-| `O(1)`      | `O(1)`       | `O(1)` |
+Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+
+| Push (time) | Value (time) | Space                         |
+| :---------: | :----------: | :---------------------------: |
+| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Kurtosis
 Kurtosis keeps track of the sample [kurtosis](https://en.wikipedia.org/wiki/Kurtosis) of a stream (in particular, the [sample excess kurtosis](https://en.wikipedia.org/wiki/Kurtosis#Sample_kurtosis)); it can track either the global kurtosis, or over a rolling window.
 
-| Push (time) | Value (time) | Space  |
-| :---------: | :----------: | :----: |
-| `O(1)`      | `O(1)`       | `O(1)` |
+Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+
+| Push (time) | Value (time) | Space                         |
+| :---------: | :----------: | :---------------------------: |
+| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Core
 Core is the struct powering all of the statistics in the `stream/moment` subpackage; it keeps track of a pre-configured set of `k`-th raw moments of a stream; it can track either the global moments, or over a rolling window. This can be used to implement any custom moment-based statistic you desire that isn't part of this package.
@@ -187,6 +201,17 @@ core, err := NewCore(config)
 
 See the [godoc](https://godoc.org/github.com/alexander-yu/stream/moment#Core) entry for more details on Core's methods (note it does not satisfy the Metric interface, since it is capable of storing multiple values).
 
-| Push (time) | Sum (time) | Count (time) | Space  |
-| :---------: | :--------: | :----------: | :----: |
-| `O(1)`      | `O(1)`     | `O(1)`       | `O(1)` |
+Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+
+| Push (time) | Sum (time) | Count (time) | Space                         |
+| :---------: | :--------: | :----------: | :---------------------------: |
+| `O(1)`      | `O(1)`     | `O(1)`       | `O(1)` if global, else `O(n)` |
+
+### [Joint Distribution Statistics](https://godoc.org/github.com/alexander-yu/stream/joint)
+
+#### Covariance
+Covariance keeps track of the sample [covariance](https://en.wikipedia.org/wiki/Covariance) of a stream; it can track either the global covariance, or over a rolling window.
+
+| Push (time) | Value (time) | Space                         |
+| :---------: | :----------: | :---------------------------: |
+| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
