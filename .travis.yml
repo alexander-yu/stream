@@ -18,10 +18,8 @@ matrix:
 git:
   depth: 1
 
-# Install latest versio of golint; don't add this to the module,
-# since it's not a dependency of stream per se
 before_install:
-  - GO111MODULE=auto go get github.com/golang/lint/golint
+  - go get github.com/golang/lint/golint
 
 # Skip the install step. Don't `go get` dependencies. Only build with the code
 # in vendor/
@@ -36,6 +34,7 @@ script:
   - golint $(go list ./... | grep -v /vendor/)
   - go vet ./...
   - go test -v -race -mod=vendor ./...
+  - go mod tidy
   - go mod vendor
   # Check for unused/missing packages
   - git diff --exit-code go.sum go.mod vendor/
