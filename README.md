@@ -10,6 +10,8 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
 ## Table of Contents
 - [Installation](#Installation)
 - [Introduction](#Introduction)
+    - [Metric](#Metric)
+    - [JointMetric](#JointMetric)
 - [Example](#Example)
 - [Statistics](#Statistics)
     - [Median](#Median)
@@ -37,14 +39,23 @@ $ go get github.com/alexander-yu/stream
 ```
 
 ## Introduction
-Every metric satisfies the following interface:
+Every metric satisfies one of the following interfaces:
 ```go
 type Metric interface {
     Push(float64) error
     Value() (float64, error)
 }
+
+type JointMetric interface {
+	Push(float64, float64) error
+	Value() (float64, error)
+}
 ```
-The `Push` method consumes a numeric value (i.e. `float64`), and returns an error if one was encountered while pushing. The `Value` method returns the value of the metric at that given point in time, or an error if one was encountered when attempting to retrieve the value.
+### Metric
+Metric is the standard interface for most metrics; in particular for those that consume single numeric values at a time. The `Push` method consumes a numeric value (i.e. `float64`), and returns an error if one was encountered while pushing. The `Value` method returns the value of the metric at that given point in time, or an error if one was encountered when attempting to retrieve the value.
+
+### JointMetric
+JointMetric is the interface for metrics that track joint statistics. The `Push` method consumes a pair of numeric values (i.e. `float64`), and returns an error if one was encountered while pushing. The pair of values should represent the two variables that the metric is tracking joint statistics for. The `Value` method returns the value of the metric at that given point in time, or an error if one was encountered when attempting to retrieve the value.
 
 ## Example
 ```go
