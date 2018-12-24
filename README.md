@@ -30,6 +30,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
         - [Core](#Core)
     - [Joint Distribution Statistics](#Joint-Distribution-Statistics)
         - [Covariance](#Covariance)
+- [References](#References)
 
 ## Installation
 Use `go get`:
@@ -152,11 +153,13 @@ Let `n` be the size of the window, or the stream if tracking the global minimum.
 #### Moment
 Moment keeps track of the `k`-th sample [central moment](https://en.wikipedia.org/wiki/Central_moment); it can track either the global moment, or over a rolling window.
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global minimum; let `k` be the moment being tracked. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
-| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
+| `O(k^2)`    | `O(1)`       | `O(1)` if global, else `O(n)` |
+
+See [Core](#Core) for an explanation of why `Push` has a time complexity of `O(k^2)`, rather than `O(k)`.
 
 #### Variance
 Variance keeps track of the sample [variance](https://en.wikipedia.org/wiki/Variance) of a stream; it can track either the global variance, or over a rolling window.
@@ -212,11 +215,13 @@ core, err := NewCore(config)
 
 See the [godoc](https://godoc.org/github.com/alexander-yu/stream/moment#Core) entry for more details on Core's methods (note it does not satisfy the Metric interface, since it is capable of storing multiple values).
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global minimum; let `k` be the exponent of one of the power sums that is being tracked. Then we have the following complexities:
 
 | Push (time) | Sum (time) | Count (time) | Space                         |
 | :---------: | :--------: | :----------: | :---------------------------: |
-| `O(1)`      | `O(1)`     | `O(1)`       | `O(1)` if global, else `O(n)` |
+| `O(k^2)`    | `O(1)`     | `O(1)`       | `O(1)` if global, else `O(n)` |
+
+The reason that the `Push` method has a time complexity of `O(k^2)` is due to the algorithm being used to update the power sums; while the traditional `O(k)` method involves simply keeping track of raw power sums (i.e. non-centralized) and then representing the centralized power sum as a linear combination of the raw power sums and the mean (by doing binomial expansion), this is prone to underflow/overflow and as a result is much less numerically stable. See [1] for the paper whose algorithm this library uses, and a more in-depth explanation of the above.
 
 ### [Joint Distribution Statistics](https://godoc.org/github.com/alexander-yu/stream/joint)
 
@@ -226,3 +231,6 @@ Covariance keeps track of the sample [covariance](https://en.wikipedia.org/wiki/
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
+
+## References
+1: P. Pebay, T. B. Terriberry, H. Kolla, J. Bennett, Numerically stable, scalable formulas for parallel and online computation of higher-order multivariate central moments with arbitrary weights, Computational Statistics 31 (2016) 1305–1325.
