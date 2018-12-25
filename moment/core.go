@@ -6,6 +6,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/workiva/go-datastructures/queue"
+
+	"github.com/alexander-yu/stream/util/mathutil"
 )
 
 // Core is a struct that stores fundamental information for moments of a stream.
@@ -105,11 +107,15 @@ func (c *Core) add(x float64) {
 		case 2:
 			c.sums[k] += (count - 1) / count * math.Pow(delta, float64(k))
 		default:
-			coeff := (count - 1) / math.Pow(count, float64(k)) *
-				(math.Pow(count-1, float64(k-1)) + float64(sign(k)))
-			c.sums[k] += coeff * math.Pow(delta, float64(k))
+			c.sums[k] +=
+				(count - 1) / math.Pow(count, float64(k)) *
+					(math.Pow(count-1, float64(k-1)) + float64(mathutil.Sign(k))) *
+					math.Pow(delta, float64(k))
 			for i := 1; i <= k-2; i++ {
-				c.sums[k] += float64(binom(k, i)*sign(i)) * math.Pow(delta/count, float64(i)) * c.sums[k-i]
+				c.sums[k] +=
+					float64(mathutil.Binom(k, i)*mathutil.Sign(i)) *
+						math.Pow(delta/count, float64(i)) *
+						c.sums[k-i]
 			}
 		}
 	}
@@ -132,11 +138,15 @@ func (c *Core) remove(x float64) {
 			case 2:
 				c.sums[k] -= count / (count + 1) * math.Pow(delta, float64(k))
 			default:
-				coeff := count / math.Pow(count+1, float64(k)) *
-					(math.Pow(count, float64(k-1)) + float64(sign(k)))
-				c.sums[k] -= coeff * math.Pow(delta, float64(k))
+				c.sums[k] -=
+					count / math.Pow(count+1, float64(k)) *
+						(math.Pow(count, float64(k-1)) + float64(mathutil.Sign(k))) *
+						math.Pow(delta, float64(k))
 				for i := 1; i <= k-2; i++ {
-					c.sums[k] -= float64(binom(k, i)*sign(i)) * math.Pow(delta/(count+1), float64(i)) * c.sums[k-i]
+					c.sums[k] -=
+						float64(mathutil.Binom(k, i)*mathutil.Sign(i)) *
+							math.Pow(delta/(count+1), float64(i)) *
+							c.sums[k-i]
 				}
 			}
 		}

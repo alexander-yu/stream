@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/alexander-yu/stream/testutil"
+	"github.com/alexander-yu/stream/util/testutil"
 )
 
 func TestNewAVLMedian(t *testing.T) {

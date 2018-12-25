@@ -1,4 +1,4 @@
-package moment
+package mathutil
 
 var factorials = []int{1, 1, 2, 6, 24, 120, 720, 5040}
 
@@ -11,7 +11,8 @@ func factorial(n int) int {
 	return factorials[n]
 }
 
-func sign(n int) int {
+// Sign returns the sign of an integer (-1 if negative, 1 otherwise).
+func Sign(n int) int {
 	if n%2 == 0 {
 		return 1
 	}
@@ -19,7 +20,8 @@ func sign(n int) int {
 	return -1
 }
 
-func binom(n, k int) int {
+// Binom returns the binomial coefficient.
+func Binom(n, k int) int {
 	if k == 0 || k == n {
 		return 1
 	}

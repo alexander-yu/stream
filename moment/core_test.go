@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/alexander-yu/stream"
-	"github.com/alexander-yu/stream/testutil"
+	"github.com/alexander-yu/stream/util/testutil"
 )
 
 func TestPush(t *testing.T) {
