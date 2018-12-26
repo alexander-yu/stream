@@ -48,8 +48,8 @@ type Metric interface {
 }
 
 type JointMetric interface {
-	Push(...float64) error
-	Value() (float64, error)
+    Push(...float64) error
+    Value() (float64, error)
 }
 ```
 ### Metric
