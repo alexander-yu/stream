@@ -34,6 +34,22 @@ func (m Tuple) hash() int {
 	return result
 }
 
+func sub(m, n Tuple) (Tuple, error) {
+	if len(m) != len(n) {
+		return nil, errors.Errorf(
+			"Tuples have different lengths: %d != %d",
+			len(m),
+			len(n),
+		)
+	}
+
+	result := Tuple(make([]int, len(m)))
+	for i := range m {
+		result[i] = m[i] - n[i]
+	}
+	return result, nil
+}
+
 func multinom(m, n Tuple) (int, error) {
 	if len(m) != len(n) {
 		return 0, errors.Errorf(

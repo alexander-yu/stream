@@ -31,6 +31,36 @@ func TestHash(t *testing.T) {
 	assert.Equal(t, 31810, m.hash())
 }
 
+func TestSub(t *testing.T) {
+	t.Run("pass: returns difference of Tuples", func(t *testing.T) {
+		m := Tuple{4, 3, 7, 5}
+		n := Tuple{1, 3, 4, 0}
+		diff, err := sub(m, n)
+		require.NoError(t, err)
+		assert.Equal(t, Tuple{3, 0, 3, 5}, diff)
+	})
+
+	t.Run("fail: returns error if Tuples have different lengths", func(t *testing.T) {
+		m := Tuple{1, 2, 3}
+		n := Tuple{1, 2, 3, 4}
+		_, err := sub(m, n)
+		assert.EqualError(t, err, fmt.Sprintf(
+			"Tuples have different lengths: %d != %d",
+			len(m),
+			len(n),
+		))
+
+		m = Tuple{1, 2, 3, 4}
+		n = Tuple{1, 2, 3}
+		_, err = sub(m, n)
+		assert.EqualError(t, err, fmt.Sprintf(
+			"Tuples have different lengths: %d != %d",
+			len(m),
+			len(n),
+		))
+	})
+}
+
 func TestMultinom(t *testing.T) {
 	t.Run("pass: returns multinomial coefficient", func(t *testing.T) {
 		m := Tuple{4, 3, 7, 5}
