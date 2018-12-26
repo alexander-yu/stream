@@ -127,18 +127,37 @@ func TestPow(t *testing.T) {
 }
 
 func TestIter(t *testing.T) {
-	tuple := Tuple{2, 3}
-	expectedRuns := []int{}
-	for j := 0; j <= tuple[1]; j++ {
-		for i := 0; i <= tuple[0]; i++ {
-			expectedRuns = append(expectedRuns, Tuple{i, j}.hash())
+	t.Run("pass: executes callback over all tuples in increasing order", func(t *testing.T) {
+		tuple := Tuple{2, 3}
+		expectedRuns := []int{}
+		for j := 0; j <= tuple[1]; j++ {
+			for i := 0; i <= tuple[0]; i++ {
+				expectedRuns = append(expectedRuns, Tuple{i, j}.hash())
+			}
 		}
-	}
 
-	runs := []int{}
-	iter(tuple, func(xs ...int) {
-		runs = append(runs, Tuple(xs).hash())
+		runs := []int{}
+		iter(tuple, false, func(xs ...int) {
+			runs = append(runs, Tuple(xs).hash())
+		})
+
+		assert.Equal(t, expectedRuns, runs)
 	})
 
-	assert.Equal(t, expectedRuns, runs)
+	t.Run("pass: executes callback over all tuples in decreasing order", func(t *testing.T) {
+		tuple := Tuple{2, 3}
+		expectedRuns := []int{}
+		for j := tuple[1]; j >= 0; j++ {
+			for i := tuple[0]; i >= 0; i++ {
+				expectedRuns = append(expectedRuns, Tuple{i, j}.hash())
+			}
+		}
+
+		runs := []int{}
+		iter(tuple, true, func(xs ...int) {
+			runs = append(runs, Tuple(xs).hash())
+		})
+
+		assert.Equal(t, expectedRuns, runs)
+	})
 }
