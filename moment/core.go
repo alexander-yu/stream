@@ -34,14 +34,14 @@ func SetupMetric(metric Metric) error {
 
 // NewCore instantiates a Core struct based on a provided config.
 func NewCore(config *CoreConfig) (*Core, error) {
+	// set defaults for any remaining unset fields
+	config = setConfigDefaults(config)
+
 	// validate config
 	err := validateConfig(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "error validating config")
 	}
-
-	// set defaults for any remaining unset fields
-	config = setConfigDefaults(config)
 
 	// initialize and create core
 	c := &Core{}

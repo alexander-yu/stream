@@ -48,7 +48,7 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 
 			if config.Window != nil {
 				if window == nil {
-					window = stream.IntPtr(*config.Window)
+					window = config.Window
 				} else if *window != *config.Window {
 					return nil, errors.New("configs have differing windows")
 				}
@@ -61,7 +61,9 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 }
 
 func validateConfig(config *CoreConfig) error {
-	if config.Window != nil && *config.Window < 0 {
+	if config.Window == nil {
+		return errors.New("config Window is not set")
+	} else if *config.Window < 0 {
 		return errors.Errorf("config has a negative window of %d", *config.Window)
 	}
 

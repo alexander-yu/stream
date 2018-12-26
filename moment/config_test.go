@@ -21,16 +21,17 @@ func TestValidateConfig(t *testing.T) {
 
 	t.Run("fail: config with a nonpositive central moment is invalid", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums: map[int]bool{-1: true},
+			Sums:   map[int]bool{-1: true},
+			Window: stream.IntPtr(3),
 		}
 		err := validateConfig(config)
 		assert.EqualError(t, err, fmt.Sprintf("config has a nonpositive central moment of %d", -1))
 	})
 
-	t.Run("pass: empty config is valid", func(t *testing.T) {
+	t.Run("fail: config without Window is invalid", func(t *testing.T) {
 		config := &CoreConfig{}
 		err := validateConfig(config)
-		assert.NoError(t, err)
+		assert.EqualError(t, err, "config Window is not set")
 	})
 
 	t.Run("pass: config with positive window is valid", func(t *testing.T) {
