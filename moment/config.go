@@ -83,7 +83,5 @@ func setConfigDefaults(config *CoreConfig) *CoreConfig {
 		config.Window = defaultConfig.Window
 	}
 
-	// default Push is nil, no need to set
-
 	return config
 }
