@@ -67,3 +67,30 @@ func pow(x []float64, n Tuple) (float64, error) {
 
 	return result, nil
 }
+
+// iter executes a callback function over each Tuple that is less than
+// or equal than the provided Tuple. For two Tuples m and n, we define
+// m <= n iff m_i <= n_i for all i. The execution order is made by fixing
+// the last element of the tuple first, and then incrementing the others
+// until those options are exhausted. For example, for tuple = Tuple{2, 3},
+// this is equivalent to the following:
+//  for j := 0; j <= tuple[1], j++ {
+//	    for i := 0; i <= tuple[0]; i++ {
+//          cb(i, j)
+//      }
+//  }
+// This execution order (rather than the expected one of having i on the
+// outer loop) is due to the recursive nature of iter, and fact that it is
+// faster to append arguments at the end rather than insert them at the beginning.
+func iter(tuple Tuple, cb func(...int)) {
+	if len(tuple) == 0 {
+		cb()
+	} else {
+		for i := 0; i <= tuple[len(tuple)-1]; i++ {
+			iter(tuple[:len(tuple)-1], func(xs ...int) {
+				xs = append(xs, i)
+				cb(xs...)
+			})
+		}
+	}
+}

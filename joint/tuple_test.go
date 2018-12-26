@@ -95,3 +95,20 @@ func TestPow(t *testing.T) {
 		))
 	})
 }
+
+func TestIter(t *testing.T) {
+	tuple := Tuple{2, 3}
+	expectedRuns := []int{}
+	for j := 0; j <= tuple[1]; j++ {
+		for i := 0; i <= tuple[0]; i++ {
+			expectedRuns = append(expectedRuns, Tuple{i, j}.hash())
+		}
+	}
+
+	runs := []int{}
+	iter(tuple, func(xs ...int) {
+		runs = append(runs, Tuple(xs).hash())
+	})
+
+	assert.Equal(t, expectedRuns, runs)
+}
