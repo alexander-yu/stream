@@ -165,7 +165,7 @@ func (c *Core) Count() int {
 	return c.count
 }
 
-// Mean returns the mean of values seem.
+// Mean returns the mean of values seen.
 func (c *Core) Mean() (float64, error) {
 	c.mux.RLock()
 	defer c.mux.RUnlock()
@@ -205,6 +205,7 @@ func (c *Core) Clear() {
 	}
 
 	c.count = 0
+	c.mean = 0
 	c.queue.Dispose()
 	c.queue = queue.NewRingBuffer(c.window)
 }
