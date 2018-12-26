@@ -130,11 +130,8 @@ func (c *Core) remove(x float64) {
 		count := float64(c.count)
 		c.mean -= (x - c.mean) / count
 		delta := x - c.mean
-		for k := range c.sums {
+		for k := 2; k <= len(c.sums)-1; k++ {
 			switch k {
-			case 0:
-			case 1:
-				continue
 			case 2:
 				c.sums[k] -= count / (count + 1) * math.Pow(delta, float64(k))
 			default:
