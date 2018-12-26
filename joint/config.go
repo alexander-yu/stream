@@ -21,11 +21,13 @@ func (s1 *SumsConfig) add(s2 SumsConfig) {
 type CoreConfig struct {
 	Sums   SumsConfig
 	Window *int
+	Vars   *int
 }
 
 var defaultConfig = &CoreConfig{
 	Sums:   SumsConfig{},
 	Window: stream.IntPtr(0),
+	Vars:   nil,
 }
 
 // MergeConfigs merges CoreConfig objects.
@@ -37,6 +39,7 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 		return configs[0], nil
 	default:
 		var window *int
+		var vars *int
 		mergedConfig := &CoreConfig{
 			Sums: SumsConfig{},
 		}
@@ -48,24 +51,50 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 
 			if config.Window != nil {
 				if window == nil {
-					window = stream.IntPtr(*config.Window)
+					window = config.Window
 				} else if *window != *config.Window {
 					return nil, errors.New("configs have differing windows")
+				}
+			}
+
+			if config.Vars != nil {
+				if vars == nil {
+					vars = config.Vars
+				} else if *vars != *config.Vars {
+					return nil, errors.New("configs have differing vars")
 				}
 			}
 		}
 
 		mergedConfig.Window = window
+		mergedConfig.Vars = vars
 		return mergedConfig, nil
 	}
 }
 
 func validateConfig(config *CoreConfig) error {
-	if config.Window != nil && *config.Window < 0 {
+	if config.Window == nil {
+		return errors.New("config Window is not set")
+	} else if *config.Window < 0 {
 		return errors.Errorf("config has a negative window of %d", *config.Window)
 	}
 
+	if config.Vars == nil {
+		return errors.New("config Vars is not set")
+	} else if *config.Vars < 2 {
+		return errors.Errorf("config has less than 2 vars: %d < 2", *config.Vars)
+	}
+
 	for _, tuple := range config.Sums {
+		if len(tuple) != *config.Vars {
+			return errors.Errorf(
+				"config has a Tuple (%v) with length %d but Vars = %d",
+				tuple,
+				len(tuple),
+				*config.Vars,
+			)
+		}
+
 		for _, k := range tuple {
 			if k < 0 {
 				// The reason we allow for k = 0 here (even though there is no such
@@ -94,6 +123,10 @@ func setConfigDefaults(config *CoreConfig) *CoreConfig {
 
 	if config.Window == nil {
 		config.Window = defaultConfig.Window
+	}
+
+	if config.Vars == nil {
+		config.Vars = defaultConfig.Vars
 	}
 
 	return config

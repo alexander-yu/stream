@@ -14,37 +14,80 @@ func TestValidateConfig(t *testing.T) {
 	t.Run("fail: config with a negative window is invalid", func(t *testing.T) {
 		config := &CoreConfig{
 			Window: stream.IntPtr(-1),
+			Vars:   stream.IntPtr(2),
 		}
 		err := validateConfig(config)
 		assert.EqualError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
 	})
 
+	t.Run("fail: config with less than 2 vars is invalid", func(t *testing.T) {
+		config := &CoreConfig{
+			Window: stream.IntPtr(3),
+			Vars:   stream.IntPtr(1),
+		}
+		err := validateConfig(config)
+		assert.EqualError(t, err, fmt.Sprintf("config has less than 2 vars: %d < 2", 1))
+	})
+
 	t.Run("fail: Tuple with a negative exponent is invalid", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums: SumsConfig{Tuple{0, -1, 3, 4}},
+			Sums:   SumsConfig{Tuple{0, -1, 3, 4}},
+			Window: stream.IntPtr(3),
+			Vars:   stream.IntPtr(4),
 		}
 		err := validateConfig(config)
 		assert.EqualError(t, err, fmt.Sprintf("config has a Tuple with a negative exponent of %d", -1))
 	})
 
+	t.Run("fail: Tuple with length != Vars is invalid", func(t *testing.T) {
+		tuple := Tuple{0, 2, 3}
+		config := &CoreConfig{
+			Sums:   SumsConfig{tuple},
+			Window: stream.IntPtr(3),
+			Vars:   stream.IntPtr(4),
+		}
+		err := validateConfig(config)
+		assert.EqualError(t, err, fmt.Sprintf(
+			"config has a Tuple (%v) with length %d but Vars = %d",
+			tuple,
+			len(tuple),
+			4,
+		))
+	})
+
 	t.Run("fail: Tuple with all 0s is invalid", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums: SumsConfig{Tuple{0, 0, 0}},
+			Sums:   SumsConfig{Tuple{0, 0, 0}},
+			Window: stream.IntPtr(3),
+			Vars:   stream.IntPtr(3),
 		}
 		err := validateConfig(config)
 		assert.EqualError(t, err, "config has a Tuple that is all 0s (i.e. skips all variables)")
 	})
 
-	t.Run("pass: empty config is valid", func(t *testing.T) {
-		config := &CoreConfig{}
+	t.Run("fail: config without Window is invalid", func(t *testing.T) {
+		config := &CoreConfig{
+			Sums: SumsConfig{Tuple{1, 1, 3}},
+			Vars: stream.IntPtr(3),
+		}
 		err := validateConfig(config)
-		assert.NoError(t, err)
+		assert.EqualError(t, err, "config Window is not set")
 	})
 
-	t.Run("pass: config with positive window is valid", func(t *testing.T) {
+	t.Run("fail: config without Vars is invalid", func(t *testing.T) {
 		config := &CoreConfig{
 			Sums:   SumsConfig{Tuple{1, 1, 3}},
 			Window: stream.IntPtr(3),
+		}
+		err := validateConfig(config)
+		assert.EqualError(t, err, "config Vars is not set")
+	})
+
+	t.Run("pass: valid config is valid", func(t *testing.T) {
+		config := &CoreConfig{
+			Sums:   SumsConfig{Tuple{1, 1, 3}},
+			Window: stream.IntPtr(3),
+			Vars:   stream.IntPtr(3),
 		}
 		err := validateConfig(config)
 		assert.NoError(t, err)
@@ -64,12 +107,14 @@ func TestSetConfigDefaults(t *testing.T) {
 	t.Run("pass: provided fields are kept", func(t *testing.T) {
 		config := &CoreConfig{
 			Sums:   SumsConfig{Tuple{1, 1, 3}},
+			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
 		config = setConfigDefaults(config)
 
 		expectedConfig := &CoreConfig{
 			Sums:   SumsConfig{Tuple{1, 1, 3}},
+			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
 
@@ -86,6 +131,7 @@ func TestMergeConfigs(t *testing.T) {
 	t.Run("pass: single config passed returns itself", func(t *testing.T) {
 		config := &CoreConfig{
 			Sums:   SumsConfig{Tuple{3, 0, 0}},
+			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
 		mergedConfig, err := MergeConfigs(config)
@@ -97,10 +143,12 @@ func TestMergeConfigs(t *testing.T) {
 	t.Run("pass: multiple configs passed returns union of sums and windows if all are compatible", func(t *testing.T) {
 		config1 := &CoreConfig{
 			Sums:   SumsConfig{Tuple{1, 2, 3}, Tuple{2, 0, 0}},
+			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
 		config2 := &CoreConfig{
 			Sums:   SumsConfig{Tuple{0, 2, 0}, Tuple{1, 2, 3}},
+			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
 		config3 := &CoreConfig{}
@@ -110,6 +158,7 @@ func TestMergeConfigs(t *testing.T) {
 
 		expectedConfig := &CoreConfig{
 			Sums:   SumsConfig{Tuple{1, 2, 3}, Tuple{2, 0, 0}, Tuple{0, 2, 0}, Tuple{1, 2, 3}},
+			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
 
@@ -119,14 +168,32 @@ func TestMergeConfigs(t *testing.T) {
 	t.Run("fail: multiple configs passed fails if windows are not compatible", func(t *testing.T) {
 		config1 := &CoreConfig{
 			Sums:   SumsConfig{Tuple{1, 2}, Tuple{2, 1}},
+			Vars:   stream.IntPtr(2),
 			Window: stream.IntPtr(3),
 		}
 		config2 := &CoreConfig{
 			Sums:   SumsConfig{Tuple{0, 1}, Tuple{1, 1}},
+			Vars:   stream.IntPtr(2),
 			Window: stream.IntPtr(2),
 		}
 
 		_, err := MergeConfigs(config1, config2)
 		assert.EqualError(t, err, "configs have differing windows")
+	})
+
+	t.Run("fail: multiple configs passed fails if vars are not compatible", func(t *testing.T) {
+		config1 := &CoreConfig{
+			Sums:   SumsConfig{Tuple{1, 2}, Tuple{2, 1}},
+			Vars:   stream.IntPtr(2),
+			Window: stream.IntPtr(3),
+		}
+		config2 := &CoreConfig{
+			Sums:   SumsConfig{Tuple{0, 1, 1}, Tuple{1, 1, 2}},
+			Vars:   stream.IntPtr(3),
+			Window: stream.IntPtr(3),
+		}
+
+		_, err := MergeConfigs(config1, config2)
+		assert.EqualError(t, err, "configs have differing vars")
 	})
 }
