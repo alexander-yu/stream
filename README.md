@@ -48,7 +48,7 @@ type Metric interface {
 }
 
 type JointMetric interface {
-	Push(float64, float64) error
+	Push(...float64) error
 	Value() (float64, error)
 }
 ```
@@ -56,7 +56,7 @@ type JointMetric interface {
 Metric is the standard interface for most metrics; in particular for those that consume single numeric values at a time. The `Push` method consumes a numeric value (i.e. `float64`), and returns an error if one was encountered while pushing. The `Value` method returns the value of the metric at that given point in time, or an error if one was encountered when attempting to retrieve the value.
 
 ### JointMetric
-JointMetric is the interface for metrics that track joint statistics. The `Push` method consumes a pair of numeric values (i.e. `float64`), and returns an error if one was encountered while pushing. The pair of values should represent the two variables that the metric is tracking joint statistics for. The `Value` method returns the value of the metric at that given point in time, or an error if one was encountered when attempting to retrieve the value.
+JointMetric is the interface for metrics that track joint statistics. The `Push` method consumes numeric values (i.e. `float64`), and returns an error if one was encountered while pushing. The values should represent the variables that the metric is tracking joint statistics for. The `Value` method returns the value of the metric at that given point in time, or an error if one was encountered when attempting to retrieve the value.
 
 ## Example
 ```go
