@@ -9,7 +9,6 @@ import (
 )
 
 type mockMetric struct {
-	id   int
 	vals []float64
 	core *Core
 }
