@@ -31,6 +31,18 @@ func TestHash(t *testing.T) {
 	assert.Equal(t, 31810, m.hash())
 }
 
+func TestEq(t *testing.T) {
+	m := Tuple{1, 2, 3}
+	n := Tuple{1, 2, 3}
+	assert.True(t, m.eq(n))
+
+	n = Tuple{2, 1, 3}
+	assert.False(t, m.eq(n))
+
+	n = Tuple{1, 2, 3, 4}
+	assert.False(t, m.eq(n))
+}
+
 func TestSub(t *testing.T) {
 	t.Run("pass: returns difference of Tuples", func(t *testing.T) {
 		m := Tuple{4, 3, 7, 5}

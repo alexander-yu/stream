@@ -34,6 +34,20 @@ func (m Tuple) hash() int {
 	return result
 }
 
+func (m Tuple) eq(n Tuple) bool {
+	if len(m) != len(n) {
+		return false
+	}
+
+	for i := range m {
+		if m[i] != n[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
 func sub(m, n Tuple) (Tuple, error) {
 	if len(m) != len(n) {
 		return nil, errors.Errorf(
