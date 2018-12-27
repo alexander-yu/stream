@@ -20,9 +20,13 @@ func TestPush(t *testing.T) {
 		expectedSums := map[int]float64{
 			0:  0.,
 			1:  0.,
+			2:  5378. / 3.,
 			31: 0.,
 			32: 158.,
+			33: 7486. / 3.,
 			62: 14.,
+			63: 638. / 3.,
+			64: 112538. / 9.,
 		}
 
 		assert.Equal(t, len(expectedSums), len(m.core.sums))
@@ -52,7 +56,7 @@ func TestPush(t *testing.T) {
 		// any stats upon removing the last item from the queue, which only happens
 		// in the special case of the queue having a size of 1.
 		core, err := NewCore(&CoreConfig{
-			Sums:   SumsConfig{{1, 1}, {2, 0}},
+			Sums:   SumsConfig{{2, 2}},
 			Vars:   stream.IntPtr(2),
 			Window: stream.IntPtr(1),
 		})
@@ -67,9 +71,13 @@ func TestPush(t *testing.T) {
 		expectedSums := map[int]float64{
 			0:  0.,
 			1:  0.,
+			2:  0.,
 			31: 0.,
 			32: 0.,
+			33: 0.,
 			62: 0.,
+			63: 0.,
+			64: 0.,
 		}
 
 		assert.Equal(t, len(expectedSums), len(core.sums))
@@ -123,9 +131,13 @@ func TestClear(t *testing.T) {
 	expectedSums := map[int]float64{
 		0:  0.,
 		1:  0.,
+		2:  0.,
 		31: 0.,
 		32: 0.,
+		33: 0.,
 		62: 0.,
+		63: 0.,
+		64: 0.,
 	}
 	assert.Equal(t, expectedSums, m.core.sums)
 }
@@ -182,15 +194,21 @@ func TestSum(t *testing.T) {
 		expectedSums := map[int]float64{
 			0:  0.,
 			1:  0.,
+			2:  5378. / 3.,
 			31: 0.,
 			32: 158.,
+			33: 7486. / 3.,
 			62: 14.,
+			63: 638. / 3.,
+			64: 112538. / 9.,
 		}
 
-		tuple := Tuple{1, 1}
-		sum, err := m.core.Sum(tuple...)
-		require.Nil(t, err)
-		testutil.Approx(t, expectedSums[tuple.hash()], sum)
+		iter(Tuple{2, 2}, false, func(xs ...int) {
+			tuple := Tuple(xs)
+			sum, err := m.core.Sum(tuple...)
+			require.NoError(t, err)
+			testutil.Approx(t, expectedSums[tuple.hash()], sum)
+		})
 	})
 
 	t.Run("fail: Sum fails if no elements consumed yet", func(t *testing.T) {
@@ -208,7 +226,7 @@ func TestSum(t *testing.T) {
 		err := testData(m)
 		require.NoError(t, err)
 
-		tuple := Tuple{0, 2}
+		tuple := Tuple{3, 2}
 		_, err = m.core.Sum(tuple...)
 		assert.EqualError(t, err, fmt.Sprintf("%v is not a tracked power sum", tuple))
 	})

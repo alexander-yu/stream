@@ -132,46 +132,49 @@ func (c *Core) add(xs ...float64) error {
 		c.means[i] += delta[i] / count
 	}
 
-	for _, a := range c.tuples {
+	for _, tuple := range c.tuples {
 		var err error
-		hash := a.hash()
-		c.newSums[hash] = 0
-		iter(a, true, func(xs ...int) {
-			b := Tuple(xs)
+		iter(tuple, true, func(xs ...int) {
+			a := Tuple(xs)
+			hash := a.hash()
+			c.newSums[hash] = 0
+			iter(a, false, func(xs ...int) {
+				b := Tuple(xs)
 
-			var deltaPow float64
-			deltaPow, err = pow(delta, b)
-			if err != nil {
-				return
-			}
-
-			abs := b.abs()
-			if abs == 0 {
-				c.newSums[hash] += c.sums[hash]
-			} else if b.eq(a) {
-				coeff := (count - 1) / math.Pow(count, float64(abs)) *
-					(math.Pow(count-1, float64(abs-1)) + float64(mathutil.Sign(abs)))
-				c.newSums[hash] += coeff * deltaPow
-			} else {
-				var multinomial int
-				multinomial, err = multinom(a, b)
+				var deltaPow float64
+				deltaPow, err = pow(delta, b)
 				if err != nil {
 					return
 				}
 
-				var diff Tuple
-				diff, err = sub(a, b)
-				if err != nil {
-					return
-				}
+				abs := b.abs()
+				if abs == 0 {
+					c.newSums[hash] += c.sums[hash]
+				} else if b.eq(a) {
+					coeff := (count - 1) / math.Pow(count, float64(abs)) *
+						(math.Pow(count-1, float64(abs-1)) + float64(mathutil.Sign(abs)))
+					c.newSums[hash] += coeff * deltaPow
+				} else {
+					var multinomial int
+					multinomial, err = multinom(a, b)
+					if err != nil {
+						return
+					}
 
-				c.newSums[hash] += float64(multinomial*mathutil.Sign(abs)) /
-					math.Pow(count, float64(abs)) * deltaPow * c.sums[diff.hash()]
-			}
+					var diff Tuple
+					diff, err = sub(a, b)
+					if err != nil {
+						return
+					}
+
+					c.newSums[hash] += float64(multinomial*mathutil.Sign(abs)) /
+						math.Pow(count, float64(abs)) * deltaPow * c.sums[diff.hash()]
+				}
+			})
 		})
 
 		if err != nil {
-			return errors.Wrapf(err, "error adding %v to sums for tuple %v", xs, a)
+			return errors.Wrapf(err, "error adding %v to sums for tuple %v", xs, tuple)
 		}
 	}
 
@@ -196,46 +199,49 @@ func (c *Core) remove(xs ...float64) error {
 			delta[i] = x - c.means[i]
 		}
 
-		for _, a := range c.tuples {
+		for _, tuple := range c.tuples {
 			var err error
-			hash := a.hash()
-			c.newSums[hash] = 0
-			iter(a, true, func(xs ...int) {
-				b := Tuple(xs)
+			iter(tuple, false, func(xs ...int) {
+				a := Tuple(xs)
+				hash := a.hash()
+				c.newSums[hash] = 0
+				iter(a, false, func(xs ...int) {
+					b := Tuple(xs)
 
-				var deltaPow float64
-				deltaPow, err = pow(delta, b)
-				if err != nil {
-					return
-				}
-
-				abs := b.abs()
-				if abs == 0 {
-					c.newSums[hash] += c.sums[hash]
-				} else if b.eq(a) {
-					coeff := count / math.Pow(count+1, float64(abs)) *
-						(math.Pow(count, float64(abs-1)) + float64(mathutil.Sign(abs)))
-					c.newSums[hash] -= coeff * deltaPow
-				} else {
-					var multinomial int
-					multinomial, err = multinom(a, b)
+					var deltaPow float64
+					deltaPow, err = pow(delta, b)
 					if err != nil {
 						return
 					}
 
-					var diff Tuple
-					diff, err = sub(a, b)
-					if err != nil {
-						return
-					}
+					abs := b.abs()
+					if abs == 0 {
+						c.newSums[hash] += c.sums[hash]
+					} else if b.eq(a) {
+						coeff := count / math.Pow(count+1, float64(abs)) *
+							(math.Pow(count, float64(abs-1)) + float64(mathutil.Sign(abs)))
+						c.newSums[hash] -= coeff * deltaPow
+					} else {
+						var multinomial int
+						multinomial, err = multinom(a, b)
+						if err != nil {
+							return
+						}
 
-					c.newSums[hash] -= float64(multinomial*mathutil.Sign(abs)) /
-						math.Pow(count+1, float64(abs)) * deltaPow * c.newSums[diff.hash()]
-				}
+						var diff Tuple
+						diff, err = sub(a, b)
+						if err != nil {
+							return
+						}
+
+						c.newSums[hash] -= float64(multinomial*mathutil.Sign(abs)) /
+							math.Pow(count+1, float64(abs)) * deltaPow * c.newSums[diff.hash()]
+					}
+				})
 			})
 
 			if err != nil {
-				return errors.Wrapf(err, "error removing %v from sums for tuple %v", xs, a)
+				return errors.Wrapf(err, "error removing %v from sums for tuple %v", xs, tuple)
 			}
 
 			for hash, sum := range c.newSums {

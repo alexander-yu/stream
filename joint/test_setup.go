@@ -29,7 +29,9 @@ func (m *mockMetric) Subscribe(c *Core) {
 
 func (m *mockMetric) Config() *CoreConfig {
 	return &CoreConfig{
-		Sums:   SumsConfig{{1, 1}, {2, 0}},
+		Sums: SumsConfig{
+			{2, 2},
+		},
 		Vars:   stream.IntPtr(2),
 		Window: stream.IntPtr(3),
 	}
