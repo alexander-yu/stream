@@ -232,5 +232,34 @@ Covariance keeps track of the sample [covariance](https://en.wikipedia.org/wiki/
 | :---------: | :----------: | :---------------------------: |
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
+#### Core
+Core is the struct powering all of the statistics in the `stream/joint` subpackage; it keeps track of a pre-configured set of joint centralized power sums of a stream in an efficient, numerically stable way; it can track either the global sums, or over a rolling window.
+
+To configure which sums to track, you'll need to instantiate a `CoreConfig` struct and provide it to `NewCore`:
+
+```go
+config := &joint.CoreConfig{
+    Sums: SumsConfig{
+        {1, 1}, // tracks the joint sum of differences
+        {2, 0}, // tracks the sum of squared differences of variable 1
+    },
+    Vars: stream.IntPtr(2), // declares that there are 2 variables to track (optional if Sums is set)
+    Window: stream.IntPtr(0), // track global sums
+}
+core, err := NewCore(config)
+```
+
+See the [godoc](https://godoc.org/github.com/alexander-yu/stream/joint#Core) entry for more details on Core's methods (note it does not satisfy the Metric interface, since it is capable of storing multiple values).
+
+Let `n` be the size of the window, or the stream if tracking the global minimum. Moreover, let `t` be the number of tuples that are configured, let `d` be the number of variables being tracked. Now for a given tuple `m`, define
+```
+p(m) = (m_1 + 1) * ... * (m_k + 1)
+```
+ and let `a` be the maximum such `p(m)` over all tuples `m` that are configured. Then we have the following complexities:
+
+| Push (time)  | Sum (time) | Count (time) | Space                                                 |
+| :----------: | :--------: | :----------: | :---------------------------------------------------: |
+| `O(tda^2)` | `O(d)`     | `O(1)`       | `O(d + ta^2)` if global, else `O(d + ta^2 + n)` |
+
 ## References
 1: P. Pebay, T. B. Terriberry, H. Kolla, J. Bennett, Numerically stable, scalable formulas for parallel and online computation of higher-order multivariate central moments with arbitrary weights, Computational Statistics 31 (2016) 1305–1325.
