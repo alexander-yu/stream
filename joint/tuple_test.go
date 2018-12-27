@@ -147,8 +147,8 @@ func TestIter(t *testing.T) {
 	t.Run("pass: executes callback over all tuples in decreasing order", func(t *testing.T) {
 		tuple := Tuple{2, 3}
 		expectedRuns := []int{}
-		for j := tuple[1]; j >= 0; j++ {
-			for i := tuple[0]; i >= 0; i++ {
+		for j := tuple[1]; j >= 0; j-- {
+			for i := tuple[0]; i >= 0; i-- {
 				expectedRuns = append(expectedRuns, Tuple{i, j}.hash())
 			}
 		}
