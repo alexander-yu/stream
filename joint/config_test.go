@@ -31,7 +31,7 @@ func TestValidateConfig(t *testing.T) {
 
 	t.Run("fail: Tuple with a negative exponent is invalid", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums:   SumsConfig{Tuple{0, -1, 3, 4}},
+			Sums:   SumsConfig{{0, -1, 3, 4}},
 			Window: stream.IntPtr(3),
 			Vars:   stream.IntPtr(4),
 		}
@@ -57,7 +57,7 @@ func TestValidateConfig(t *testing.T) {
 
 	t.Run("fail: Tuple with all 0s is invalid", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums:   SumsConfig{Tuple{0, 0, 0}},
+			Sums:   SumsConfig{{0, 0, 0}},
 			Window: stream.IntPtr(3),
 			Vars:   stream.IntPtr(3),
 		}
@@ -67,7 +67,7 @@ func TestValidateConfig(t *testing.T) {
 
 	t.Run("fail: config without Window is invalid", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums: SumsConfig{Tuple{1, 1, 3}},
+			Sums: SumsConfig{{1, 1, 3}},
 			Vars: stream.IntPtr(3),
 		}
 		err := validateConfig(config)
@@ -76,7 +76,7 @@ func TestValidateConfig(t *testing.T) {
 
 	t.Run("fail: config without Vars is invalid", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums:   SumsConfig{Tuple{1, 1, 3}},
+			Sums:   SumsConfig{{1, 1, 3}},
 			Window: stream.IntPtr(3),
 		}
 		err := validateConfig(config)
@@ -85,7 +85,7 @@ func TestValidateConfig(t *testing.T) {
 
 	t.Run("pass: valid config is valid", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums:   SumsConfig{Tuple{1, 1, 3}},
+			Sums:   SumsConfig{{1, 1, 3}},
 			Window: stream.IntPtr(3),
 			Vars:   stream.IntPtr(3),
 		}
@@ -106,14 +106,14 @@ func TestSetConfigDefaults(t *testing.T) {
 
 	t.Run("pass: provided fields are kept", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums:   SumsConfig{Tuple{1, 1, 3}},
+			Sums:   SumsConfig{{1, 1, 3}},
 			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
 		config = setConfigDefaults(config)
 
 		expectedConfig := &CoreConfig{
-			Sums:   SumsConfig{Tuple{1, 1, 3}},
+			Sums:   SumsConfig{{1, 1, 3}},
 			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
@@ -130,7 +130,7 @@ func TestMergeConfigs(t *testing.T) {
 
 	t.Run("pass: single config passed returns itself", func(t *testing.T) {
 		config := &CoreConfig{
-			Sums:   SumsConfig{Tuple{3, 0, 0}},
+			Sums:   SumsConfig{{3, 0, 0}},
 			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
@@ -142,18 +142,18 @@ func TestMergeConfigs(t *testing.T) {
 
 	t.Run("pass: multiple configs passed returns merged config", func(t *testing.T) {
 		config1 := &CoreConfig{
-			Sums:   SumsConfig{Tuple{1, 2, 3}, Tuple{2, 0, 0}},
+			Sums:   SumsConfig{{1, 2, 3}, {2, 0, 0}},
 			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
 		config2 := &CoreConfig{
-			Sums:   SumsConfig{Tuple{0, 2, 0}, Tuple{1, 2, 3}},
+			Sums:   SumsConfig{{0, 2, 0}, {1, 2, 3}},
 			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
 		config3 := &CoreConfig{}
 		config4 := &CoreConfig{
-			Sums:   SumsConfig{Tuple{1, 2, 2}, Tuple{1, 1, 1}},
+			Sums:   SumsConfig{{1, 2, 2}, {1, 1, 1}},
 			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
@@ -162,7 +162,7 @@ func TestMergeConfigs(t *testing.T) {
 		require.NoError(t, err)
 
 		expectedConfig := &CoreConfig{
-			Sums:   SumsConfig{Tuple{1, 2, 3}, Tuple{2, 0, 0}},
+			Sums:   SumsConfig{{1, 2, 3}, {2, 0, 0}},
 			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
@@ -172,12 +172,12 @@ func TestMergeConfigs(t *testing.T) {
 
 	t.Run("fail: multiple configs passed fails if windows are not compatible", func(t *testing.T) {
 		config1 := &CoreConfig{
-			Sums:   SumsConfig{Tuple{1, 2}, Tuple{2, 1}},
+			Sums:   SumsConfig{{1, 2}, {2, 1}},
 			Vars:   stream.IntPtr(2),
 			Window: stream.IntPtr(3),
 		}
 		config2 := &CoreConfig{
-			Sums:   SumsConfig{Tuple{0, 1}, Tuple{1, 1}},
+			Sums:   SumsConfig{{0, 1}, {1, 1}},
 			Vars:   stream.IntPtr(2),
 			Window: stream.IntPtr(2),
 		}
@@ -188,12 +188,12 @@ func TestMergeConfigs(t *testing.T) {
 
 	t.Run("fail: multiple configs passed fails if vars are not compatible", func(t *testing.T) {
 		config1 := &CoreConfig{
-			Sums:   SumsConfig{Tuple{1, 2}, Tuple{2, 1}},
+			Sums:   SumsConfig{{1, 2}, {2, 1}},
 			Vars:   stream.IntPtr(2),
 			Window: stream.IntPtr(3),
 		}
 		config2 := &CoreConfig{
-			Sums:   SumsConfig{Tuple{0, 1, 1}, Tuple{1, 1, 2}},
+			Sums:   SumsConfig{{0, 1, 1}, {1, 1, 2}},
 			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
