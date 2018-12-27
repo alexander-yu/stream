@@ -140,7 +140,7 @@ func TestMergeConfigs(t *testing.T) {
 		assert.Equal(t, config, mergedConfig)
 	})
 
-	t.Run("pass: multiple configs passed returns union of sums and windows if all are compatible", func(t *testing.T) {
+	t.Run("pass: multiple configs passed returns merged config", func(t *testing.T) {
 		config1 := &CoreConfig{
 			Sums:   SumsConfig{Tuple{1, 2, 3}, Tuple{2, 0, 0}},
 			Vars:   stream.IntPtr(3),
@@ -152,12 +152,17 @@ func TestMergeConfigs(t *testing.T) {
 			Window: stream.IntPtr(3),
 		}
 		config3 := &CoreConfig{}
+		config4 := &CoreConfig{
+			Sums:   SumsConfig{Tuple{1, 2, 2}, Tuple{1, 1, 1}},
+			Vars:   stream.IntPtr(3),
+			Window: stream.IntPtr(3),
+		}
 
-		mergedConfig, err := MergeConfigs(config1, config2, config3)
+		mergedConfig, err := MergeConfigs(config1, config2, config3, config4)
 		require.NoError(t, err)
 
 		expectedConfig := &CoreConfig{
-			Sums:   SumsConfig{Tuple{1, 2, 3}, Tuple{2, 0, 0}, Tuple{0, 2, 0}, Tuple{1, 2, 3}},
+			Sums:   SumsConfig{Tuple{1, 2, 3}, Tuple{2, 0, 0}},
 			Vars:   stream.IntPtr(3),
 			Window: stream.IntPtr(3),
 		}
