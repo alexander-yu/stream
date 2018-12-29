@@ -223,7 +223,7 @@ Let `n` be the size of the window, or the stream if tracking the global minimum;
 
 | Push (time) | Sum (time) | Count (time) | Space                                     |
 | :---------: | :--------: | :----------: | :---------------------------------------: |
-| `O(k^2)`    | `O(1)`     | `O(1)`       | `O(k)` if global, else `O(k + n))` |
+| `O(k^2)`    | `O(1)`     | `O(1)`       | `O(k)` if global, else `O(k + n)` |
 
 The reason that the `Push` method has a time complexity of `O(k^2)` is due to the algorithm being used to update the power sums; while the traditional `O(k)` method involves simply keeping track of raw power sums (i.e. non-centralized) and then representing the centralized power sum as a linear combination of the raw power sums and the mean (by doing binomial expansion), this is prone to underflow/overflow and as a result is much less numerically stable. See [1] for the paper whose algorithm this library uses, and a more in-depth explanation of the above.
 
