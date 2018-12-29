@@ -32,7 +32,6 @@ func (m *mockMetric) Config() *CoreConfig {
 		Sums: SumsConfig{
 			{2, 2},
 		},
-		Vars:   stream.IntPtr(2),
 		Window: stream.IntPtr(3),
 	}
 }

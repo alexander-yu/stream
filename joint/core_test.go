@@ -57,7 +57,6 @@ func TestPush(t *testing.T) {
 		// in the special case of the queue having a size of 1.
 		core, err := NewCore(&CoreConfig{
 			Sums:   SumsConfig{{2, 2}},
-			Vars:   stream.IntPtr(2),
 			Window: stream.IntPtr(1),
 		})
 		require.NoError(t, err)

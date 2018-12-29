@@ -118,14 +118,12 @@ func validateConfig(config *CoreConfig) error {
 		return errors.Errorf("config has a negative window of %d", *config.Window)
 	}
 
-	if config.Vars == nil {
-		return errors.New("config Vars is not set")
-	} else if *config.Vars < 2 {
+	if config.Vars != nil && *config.Vars < 2 {
 		return errors.Errorf("config has less than 2 vars: %d < 2", *config.Vars)
 	}
 
 	for _, tuple := range config.Sums {
-		if len(tuple) != *config.Vars {
+		if config.Vars != nil && len(tuple) != *config.Vars {
 			return errors.Errorf(
 				"config has a Tuple (%v) with length %d but Vars = %d",
 				tuple,
@@ -150,6 +148,10 @@ func validateConfig(config *CoreConfig) error {
 		if tuple.abs() == 0 {
 			return errors.New("config has a Tuple that is all 0s (i.e. skips all variables)")
 		}
+	}
+
+	if config.Vars == nil && len(config.Sums) == 0 {
+		return errors.New("config Vars is not set and cannot be inferred from empty Sums")
 	}
 
 	return nil

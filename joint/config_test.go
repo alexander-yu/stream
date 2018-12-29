@@ -74,13 +74,21 @@ func TestValidateConfig(t *testing.T) {
 		assert.EqualError(t, err, "config Window is not set")
 	})
 
-	t.Run("fail: config without Vars is invalid", func(t *testing.T) {
+	t.Run("fail: config without Vars (and no Sums) is invalid", func(t *testing.T) {
+		config := &CoreConfig{
+			Window: stream.IntPtr(3),
+		}
+		err := validateConfig(config)
+		assert.EqualError(t, err, "config Vars is not set and cannot be inferred from empty Sums")
+	})
+
+	t.Run("pass: config without Vars infers it from Sums", func(t *testing.T) {
 		config := &CoreConfig{
 			Sums:   SumsConfig{{1, 1, 3}},
 			Window: stream.IntPtr(3),
 		}
 		err := validateConfig(config)
-		assert.EqualError(t, err, "config Vars is not set")
+		assert.NoError(t, err)
 	})
 
 	t.Run("pass: valid config is valid", func(t *testing.T) {

@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/workiva/go-datastructures/queue"
 
+	"github.com/alexander-yu/stream"
 	"github.com/alexander-yu/stream/util/mathutil"
 )
 
@@ -43,6 +44,10 @@ func NewCore(config *CoreConfig) (*Core, error) {
 	err := validateConfig(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "error validating config")
+	}
+
+	if config.Vars == nil && len(config.Sums) > 0 {
+		config.Vars = stream.IntPtr(len(config.Sums[0]))
 	}
 
 	// initialize and create Core
