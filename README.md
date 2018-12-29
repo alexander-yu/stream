@@ -30,6 +30,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
         - [Core](#Core)
     - [Joint Distribution Statistics](#Joint-Distribution-Statistics)
         - [Covariance](#Covariance)
+        - [Core](#Core-1)
 - [References](#References)
 
 ## Installation
