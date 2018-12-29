@@ -2,7 +2,7 @@ package joint
 
 import "github.com/pkg/errors"
 
-// Covariance is a metric that tracks the covariance.
+// Covariance is a metric that tracks the sample covariance.
 type Covariance struct {
 	window int
 	core   *Core

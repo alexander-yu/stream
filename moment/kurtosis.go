@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Kurtosis is a metric that tracks the kurtosis.
+// Kurtosis is a metric that tracks the sample excess kurtosis.
 type Kurtosis struct {
 	variance *Moment
 	moment4  *Moment
