@@ -25,24 +25,24 @@ func NewCorrelation(window int) (*Correlation, error) {
 }
 
 // Subscribe subscribes the Correlation to a Core object.
-func (cov *Correlation) Subscribe(c *Core) {
-	cov.core = c
+func (corr *Correlation) Subscribe(c *Core) {
+	corr.core = c
 }
 
 // Config returns the CoreConfig needed.
-func (cov *Correlation) Config() *CoreConfig {
+func (corr *Correlation) Config() *CoreConfig {
 	return &CoreConfig{
 		Sums: SumsConfig{
 			{1, 1},
 			{2, 0},
 			{0, 2},
 		},
-		Window: &cov.window,
+		Window: &corr.window,
 	}
 }
 
 // Push adds a new pair of values for Correlation to consume.
-func (cov *Correlation) Push(xs ...float64) error {
+func (corr *Correlation) Push(xs ...float64) error {
 	if len(xs) != 2 {
 		return errors.Errorf(
 			"Correlation expected 2 arguments: got %d (%v)",
@@ -51,7 +51,7 @@ func (cov *Correlation) Push(xs ...float64) error {
 		)
 	}
 
-	err := cov.core.Push(xs...)
+	err := corr.core.Push(xs...)
 	if err != nil {
 		return errors.Wrap(err, "error pushing to core")
 	}
@@ -59,24 +59,24 @@ func (cov *Correlation) Push(xs ...float64) error {
 }
 
 // Value returns the value of the sample Pearson correlation coefficient.
-func (cov *Correlation) Value() (float64, error) {
-	cov.core.RLock()
-	defer cov.core.RUnlock()
+func (corr *Correlation) Value() (float64, error) {
+	corr.core.RLock()
+	defer corr.core.RUnlock()
 
-	covariance, err := cov.core.Sum(1, 1)
+	corrariance, err := corr.core.Sum(1, 1)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum for {1, 1}")
 	}
 
-	xVar, err := cov.core.Sum(2, 0)
+	xVar, err := corr.core.Sum(2, 0)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum for {2, 0}")
 	}
 
-	yVar, err := cov.core.Sum(0, 2)
+	yVar, err := corr.core.Sum(0, 2)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum for {0, 2}")
 	}
 
-	return covariance / math.Sqrt(xVar*yVar), nil
+	return corrariance / math.Sqrt(xVar*yVar), nil
 }
