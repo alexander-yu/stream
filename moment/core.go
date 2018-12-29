@@ -159,6 +159,13 @@ func (c *Core) remove(x float64) {
 func (c *Core) Count() int {
 	c.mux.RLock()
 	defer c.mux.RUnlock()
+	return c.UnsafeCount()
+}
+
+// UnsafeCount returns the number of values seen seen globally,
+// but does not lock. This should only be used if the user
+// plans to make use of the [R]Lock()/[R]Unlock() Core methods.
+func (c *Core) UnsafeCount() int {
 	return c.count
 }
 
@@ -166,7 +173,13 @@ func (c *Core) Count() int {
 func (c *Core) Mean() (float64, error) {
 	c.mux.RLock()
 	defer c.mux.RUnlock()
+	return c.UnsafeMean()
+}
 
+// UnsafeMean returns the mean of values seen,
+// but does not lock. This should only be used if the user
+// plans to make use of the [R]Lock()/[R]Unlock() Core methods.
+func (c *Core) UnsafeMean() (float64, error) {
 	if c.count == 0 {
 		return 0, errors.New("no values seen yet")
 	}
@@ -180,7 +193,13 @@ func (c *Core) Mean() (float64, error) {
 func (c *Core) Sum(k int) (float64, error) {
 	c.mux.RLock()
 	defer c.mux.RUnlock()
+	return c.UnsafeSum(k)
+}
 
+// UnsafeSum returns the kth-power centralized sum of values seen,
+// but does not lock. This should only be used if the user
+// plans to make use of the [R]Lock()/[R]Unlock() Core methods.
+func (c *Core) UnsafeSum(k int) (float64, error) {
 	if c.count == 0 {
 		return 0, errors.New("no values seen yet")
 	}
@@ -195,8 +214,14 @@ func (c *Core) Sum(k int) (float64, error) {
 // Clear clears all stats being tracked.
 func (c *Core) Clear() {
 	c.mux.Lock()
-	defer c.mux.Unlock()
+	c.UnsafeClear()
+	c.mux.Unlock()
+}
 
+// UnsafeClear clears all stats being tracked,
+// but does not lock. This should only be used if the user
+// plans to make use of the Lock()/Unlock() Core methods.
+func (c *Core) UnsafeClear() {
 	for k := range c.sums {
 		c.sums[k] = 0
 	}
