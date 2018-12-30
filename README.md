@@ -17,7 +17,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
 - [Example](#Example)
 - [Statistics](#Statistics)
     - [Median](#Median)
-        - [AVLMedian](#AVLMedian)
+        - [OSTMedian](#OSTMedian)
         - [HeapMedian](#HeapMedian)
     - [Min/Max](#Min/Max)
         - [Min](#Min)
@@ -102,8 +102,8 @@ func main() {
 
 ### [Median](https://godoc.org/github.com/alexander-yu/stream/median)
 
-#### AVLMedian
-AVLMedian keeps track of the median of a stream with an [AVL tree](https://en.wikipedia.org/wiki/AVL_tree) as the underlying data structure; more specifically, it uses an AVL tree that is also an [order statistic tree](https://en.wikipedia.org/wiki/Order_statistic_tree). AVLMedian can calculate the global median of a stream, or over a rolling window.
+#### OSTMedian
+OSTMedian keeps track of the median of a stream with an [order statistic tree](https://en.wikipedia.org/wiki/Order_statistic_tree) as the underlying data structure. OSTMedian can calculate the global median of a stream, or over a rolling window. You can also configure which implementation to use for the underlying order statistic tree (see the [godoc](https://godoc.org/github.com/alexander-yu/stream/median#NewOSTMedian) entry for details). For now only [AVL trees](https://en.wikipedia.org/wiki/AVL_tree) are supported.
 
 Let `n` be the size of the window, or the stream if tracking the global median. Then we have the following complexities:
 

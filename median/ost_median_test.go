@@ -11,26 +11,31 @@ import (
 	"github.com/alexander-yu/stream/util/testutil"
 )
 
-func TestNewAVLMedian(t *testing.T) {
+func TestNewOSTMedian(t *testing.T) {
 	t.Run("pass: nonnegative window is valid", func(t *testing.T) {
-		median, err := NewAVLMedian(0)
+		median, err := NewOSTMedian(0, AVL)
 		require.NoError(t, err)
 		assert.Equal(t, 0, median.window)
 
-		median, err = NewAVLMedian(5)
+		median, err = NewOSTMedian(5, AVL)
 		require.NoError(t, err)
 		assert.Equal(t, 5, median.window)
 	})
 
 	t.Run("fail: negative window is invalid", func(t *testing.T) {
-		_, err := NewAVLMedian(-1)
+		_, err := NewOSTMedian(-1, AVL)
 		assert.EqualError(t, err, "-1 is a negative window")
+	})
+
+	t.Run("fail: unsupported OST implementation is invalid", func(t *testing.T) {
+		_, err := NewOSTMedian(3, OSTImpl(-1))
+		testutil.ContainsError(t, err, "error instantiating empty OrderStatisticTree")
 	})
 }
 
-func TestAVLMedianPush(t *testing.T) {
+func TestOSTMedianPush(t *testing.T) {
 	t.Run("pass: successfully pushes values", func(t *testing.T) {
-		median, err := NewAVLMedian(3)
+		median, err := NewOSTMedian(3, AVL)
 		require.NoError(t, err)
 		for i := 0.; i < 5; i++ {
 			err := median.Push(i)
@@ -58,7 +63,7 @@ func TestAVLMedianPush(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		median, err := NewAVLMedian(3)
+		median, err := NewOSTMedian(3, AVL)
 		require.NoError(t, err)
 
 		for i := 0.; i < 3; i++ {
@@ -73,7 +78,7 @@ func TestAVLMedianPush(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		median, err := NewAVLMedian(3)
+		median, err := NewOSTMedian(3, AVL)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -84,9 +89,9 @@ func TestAVLMedianPush(t *testing.T) {
 	})
 }
 
-func TestAVLMedianValue(t *testing.T) {
+func TestOSTMedianValue(t *testing.T) {
 	t.Run("pass: if number of values is even, return average of middle two", func(t *testing.T) {
-		median, err := NewAVLMedian(4)
+		median, err := NewOSTMedian(4, AVL)
 		require.NoError(t, err)
 		for i := 0.; i < 6; i++ {
 			err := median.Push(i)
@@ -100,7 +105,7 @@ func TestAVLMedianValue(t *testing.T) {
 	})
 
 	t.Run("pass: if number of values is odd, return middle value", func(t *testing.T) {
-		median, err := NewAVLMedian(3)
+		median, err := NewOSTMedian(3, AVL)
 		require.NoError(t, err)
 		for i := 0.; i < 5; i++ {
 			err := median.Push(i)
@@ -114,7 +119,7 @@ func TestAVLMedianValue(t *testing.T) {
 	})
 
 	t.Run("fail: if no values seen, return error", func(t *testing.T) {
-		median, err := NewAVLMedian(3)
+		median, err := NewOSTMedian(3, AVL)
 		require.NoError(t, err)
 
 		_, err = median.Value()

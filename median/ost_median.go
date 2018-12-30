@@ -7,29 +7,34 @@ import (
 	"github.com/workiva/go-datastructures/queue"
 )
 
-// AVLMedian keeps track of the median of a stream using AVL trees.
-type AVLMedian struct {
+// OSTMedian keeps track of the median of a stream using order statistic trees.
+type OSTMedian struct {
 	queue  *queue.RingBuffer
 	tree   OrderStatisticTree
 	window int
 	mux    sync.Mutex
 }
 
-// NewAVLMedian instantiates an AVLMedian struct.
-func NewAVLMedian(window int) (*AVLMedian, error) {
+// NewOSTMedian instantiates an OSTMedian struct.
+func NewOSTMedian(window int, impl OSTImpl) (*OSTMedian, error) {
 	if window < 0 {
 		return nil, errors.Errorf("%d is a negative window", window)
 	}
 
-	return &AVLMedian{
+	tree, err := impl.EmptyTree()
+	if err != nil {
+		return nil, errors.Wrap(err, "error instantiating empty OrderStatisticTree")
+	}
+
+	return &OSTMedian{
 		queue:  queue.NewRingBuffer(uint64(window)),
-		tree:   &AVLTree{},
+		tree:   tree,
 		window: window,
 	}, nil
 }
 
 // Push adds a number for calculating the median.
-func (m *AVLMedian) Push(x float64) error {
+func (m *OSTMedian) Push(x float64) error {
 	m.mux.Lock()
 	defer m.mux.Unlock()
 
@@ -55,7 +60,7 @@ func (m *AVLMedian) Push(x float64) error {
 }
 
 // Value returns the value of the median.
-func (m *AVLMedian) Value() (float64, error) {
+func (m *OSTMedian) Value() (float64, error) {
 	m.mux.Lock()
 	defer m.mux.Unlock()
 
