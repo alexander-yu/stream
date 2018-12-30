@@ -33,6 +33,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
     - [Joint Distribution Statistics](#Joint-Distribution-Statistics)
         - [Covariance](#Covariance)
         - [Correlation](#Correlation)
+        - [Autocorrelation](#Autocorrelation)
         - [Core](#Core-1)
 - [References](#References)
 
@@ -237,13 +238,22 @@ Covariance keeps track of the sample [covariance](https://en.wikipedia.org/wiki/
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Correlation
-Correlation keeps track of the sample [correlation](https://en.wikipedia.org/wiki/Correlation) of a stream (in particular, the [sample Pearson correlation coefficient](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient#/For_a_sample)); it can track either the global correlation, or over a rolling window.
+Correlation keeps track of the sample [correlation](https://en.wikipedia.org/wiki/Correlation) of a stream (in particular, the [sample Pearson correlation coefficient](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient#For_a_sample)); it can track either the global correlation, or over a rolling window.
 
 Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
+
+#### Autocorrelation
+Autocorrelation keeps track of the sample [autocorrelation](https://en.wikipedia.org/wiki/Autocorrelation) of a stream (in particular, the [sample autocorrelation](https://en.wikipedia.org/wiki/Autocorrelation#Estimation)) for a given lag; it can track either the global autocorrelation, or over a rolling window.
+
+Let `n` be the size of the window, or the stream if tracking the global minimum; let `l` be the lag of the autocorrelation. Then we have the following complexities:
+
+| Push (time) | Value (time) | Space                             |
+| :---------: | :----------: | :-------------------------------: |
+| `O(1)`      | `O(1)`       | `O(l)` if global, else `O(l + n)` |
 
 #### Core
 Core is the struct powering all of the statistics in the `stream/joint` subpackage; it keeps track of a pre-configured set of joint centralized power sums of a stream in an efficient, numerically stable way; it can track either the global sums, or over a rolling window.
