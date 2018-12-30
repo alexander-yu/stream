@@ -10,7 +10,7 @@ import (
 // AVLMedian keeps track of the median of a stream using AVL trees.
 type AVLMedian struct {
 	queue  *queue.RingBuffer
-	tree   *OrderStatisticTree
+	tree   OrderStatisticTree
 	window int
 	mux    sync.Mutex
 }
@@ -23,7 +23,7 @@ func NewAVLMedian(window int) (*AVLMedian, error) {
 
 	return &AVLMedian{
 		queue:  queue.NewRingBuffer(uint64(window)),
-		tree:   &OrderStatisticTree{},
+		tree:   &AVLTree{},
 		window: window,
 	}, nil
 }
@@ -63,10 +63,10 @@ func (m *AVLMedian) Value() (float64, error) {
 	if size == 0 {
 		return 0, errors.New("no values seen yet")
 	} else if size%2 == 0 {
-		left := m.tree.Select(size/2 - 1).val
-		right := m.tree.Select(size / 2).val
+		left := m.tree.Select(size/2 - 1).Value()
+		right := m.tree.Select(size / 2).Value()
 		return float64(left+right) / float64(2), nil
 	}
 
-	return m.tree.Select(size / 2).val, nil
+	return m.tree.Select(size / 2).Value(), nil
 }

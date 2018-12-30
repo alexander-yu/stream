@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func testData() *OrderStatisticTree {
-	tree := &OrderStatisticTree{}
+func testData() *AVLTree {
+	tree := &AVLTree{}
 	tree.Add(5)
 	tree.Add(6)
 	tree.Add(7)
@@ -20,7 +20,7 @@ func testData() *OrderStatisticTree {
 	return tree
 }
 
-func TestOrderStatisticTreeAdd(t *testing.T) {
+func TestAVLTreeAdd(t *testing.T) {
 	tree := testData()
 
 	assert.Equal(t, 8, tree.Size())
@@ -66,7 +66,7 @@ func TestOrderStatisticTreeAdd(t *testing.T) {
 	)
 }
 
-func TestOrderStatisticTreeRemove(t *testing.T) {
+func TestAVLTreeRemove(t *testing.T) {
 	tree := testData()
 	tree.Remove(5)
 	tree.Remove(7)
@@ -119,7 +119,7 @@ func TestOrderStatisticTreeRemove(t *testing.T) {
 	)
 }
 
-func TestOrderStatisticTreeRank(t *testing.T) {
+func TestAVLTreeRank(t *testing.T) {
 	tree := testData()
 	rank := tree.Rank(3)
 	assert.Equal(t, 3, rank)
@@ -131,10 +131,10 @@ func TestOrderStatisticTreeRank(t *testing.T) {
 	assert.Equal(t, 0, rank)
 }
 
-func TestOrderStatisticTreeSelect(t *testing.T) {
+func TestAVLTreeSelect(t *testing.T) {
 	tree := testData()
 	node := tree.Select(5)
-	assert.Equal(t, float64(5), node.val)
+	assert.Equal(t, float64(5), node.Value())
 
 	node = tree.Select(-1)
 	assert.Nil(t, node)

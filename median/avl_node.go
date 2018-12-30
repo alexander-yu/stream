@@ -6,10 +6,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Node represents a node in an order statistic tree.
-type Node struct {
-	left    *Node
-	right   *Node
+// AVLNode represents a node in an AVL tree.
+type AVLNode struct {
+	left    *AVLNode
+	right   *AVLNode
 	val     float64
 	_height int
 	_size   int
@@ -22,9 +22,9 @@ func max(x int, y int) int {
 	return y
 }
 
-// NewNode instantiates a Node struct with a a provided value.
-func NewNode(val float64) *Node {
-	return &Node{
+// NewAVLNode instantiates a AVLNode struct with a a provided value.
+func NewAVLNode(val float64) *AVLNode {
+	return &AVLNode{
 		val:     val,
 		_height: 0,
 		_size:   1,
@@ -32,7 +32,7 @@ func NewNode(val float64) *Node {
 }
 
 // Left returns the left child of the node.
-func (n *Node) Left() (*Node, error) {
+func (n *AVLNode) Left() (*AVLNode, error) {
 	if n == nil {
 		return nil, errors.New("tried to retrieve child of nil node")
 	}
@@ -40,7 +40,7 @@ func (n *Node) Left() (*Node, error) {
 }
 
 // Right returns the right child of the node.
-func (n *Node) Right() (*Node, error) {
+func (n *AVLNode) Right() (*AVLNode, error) {
 	if n == nil {
 		return nil, errors.New("tried to retrieve child of nil node")
 	}
@@ -48,7 +48,7 @@ func (n *Node) Right() (*Node, error) {
 }
 
 // Height returns the height of the subtree rooted at the node.
-func (n *Node) Height() int {
+func (n *AVLNode) Height() int {
 	if n == nil {
 		return -1
 	}
@@ -56,24 +56,29 @@ func (n *Node) Height() int {
 }
 
 // Size returns the size of the subtree rooted at the node.
-func (n *Node) Size() int {
+func (n *AVLNode) Size() int {
 	if n == nil {
 		return 0
 	}
 	return n._size
 }
 
+// Value returns the value stored at the node.
+func (n *AVLNode) Value() float64 {
+	return n.val
+}
+
 // TreeString returns the string representation of the subtree rooted at the node.
-func (n *Node) TreeString() string {
+func (n *AVLNode) TreeString() string {
 	if n == nil {
 		return ""
 	}
 	return n.treeString("", "", true)
 }
 
-func (n *Node) add(val float64) *Node {
+func (n *AVLNode) add(val float64) *AVLNode {
 	if n == nil {
-		return NewNode(val)
+		return NewAVLNode(val)
 	} else if val < n.val {
 		n.left = n.left.add(val)
 	} else {
@@ -85,7 +90,7 @@ func (n *Node) add(val float64) *Node {
 	return n.balance()
 }
 
-func (n *Node) remove(val float64) *Node {
+func (n *AVLNode) remove(val float64) *AVLNode {
 	root := n
 	if val < root.val {
 		root.left = root.left.remove(val)
@@ -107,7 +112,7 @@ func (n *Node) remove(val float64) *Node {
 	return root.balance()
 }
 
-func (n *Node) min() *Node {
+func (n *AVLNode) min() *AVLNode {
 	if n.left == nil {
 		return n
 	}
@@ -115,7 +120,7 @@ func (n *Node) min() *Node {
 	return n.left.min()
 }
 
-func (n *Node) removeMin() *Node {
+func (n *AVLNode) removeMin() *AVLNode {
 	if n.left == nil {
 		return n.right
 	}
@@ -130,7 +135,7 @@ func (n *Node) removeMin() *Node {
  * Rotations
  *****************/
 
-func (n *Node) balance() *Node {
+func (n *AVLNode) balance() *AVLNode {
 	if n.heightDiff() < -1 {
 		// Since we've entered this block, we already
 		// know that the right child is not nil
@@ -150,11 +155,11 @@ func (n *Node) balance() *Node {
 	return n
 }
 
-func (n *Node) heightDiff() int {
+func (n *AVLNode) heightDiff() int {
 	return n.left.Height() - n.right.Height()
 }
 
-func (n *Node) rotateLeft() *Node {
+func (n *AVLNode) rotateLeft() *AVLNode {
 	m := n.right
 	n.right = m.left
 	m.left = n
@@ -170,7 +175,7 @@ func (n *Node) rotateLeft() *Node {
 	return m
 }
 
-func (n *Node) rotateRight() *Node {
+func (n *AVLNode) rotateRight() *AVLNode {
 	m := n.left
 	n.left = m.right
 	m.right = n
@@ -190,7 +195,7 @@ func (n *Node) rotateRight() *Node {
  * Order Statistics
  *******************/
 
-func (n *Node) get(i int) *Node {
+func (n *AVLNode) get(i int) Node {
 	if n == nil {
 		return nil
 	}
@@ -205,7 +210,7 @@ func (n *Node) get(i int) *Node {
 	return n
 }
 
-func (n *Node) rank(val float64) int {
+func (n *AVLNode) rank(val float64) int {
 	if n == nil {
 		return 0
 	} else if val < n.val {
@@ -220,7 +225,7 @@ func (n *Node) rank(val float64) int {
  * Pretty-printing
  *******************/
 
-func (n *Node) treeString(prefix string, result string, isTail bool) string {
+func (n *AVLNode) treeString(prefix string, result string, isTail bool) string {
 	if n.right != nil {
 		if isTail {
 			result = n.right.treeString(fmt.Sprintf("%s│   ", prefix), result, false)
