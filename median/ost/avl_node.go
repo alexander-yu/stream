@@ -1,4 +1,4 @@
-package median
+package ost
 
 import (
 	"fmt"

@@ -1,7 +1,7 @@
-package median
+package ost
 
 // AVLTree implements an AVL tree data structure,
-// and also satisfies the OrderStatisticTree interface.
+// and also satisfies the Tree interface.
 type AVLTree struct {
 	root *AVLNode
 }

@@ -5,25 +5,27 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/workiva/go-datastructures/queue"
+
+	"github.com/alexander-yu/stream/median/ost"
 )
 
 // OSTMedian keeps track of the median of a stream using order statistic trees.
 type OSTMedian struct {
 	queue  *queue.RingBuffer
-	tree   OrderStatisticTree
+	tree   ost.Tree
 	window int
 	mux    sync.Mutex
 }
 
 // NewOSTMedian instantiates an OSTMedian struct.
-func NewOSTMedian(window int, impl OSTImpl) (*OSTMedian, error) {
+func NewOSTMedian(window int, impl ost.Impl) (*OSTMedian, error) {
 	if window < 0 {
 		return nil, errors.Errorf("%d is a negative window", window)
 	}
 
 	tree, err := impl.EmptyTree()
 	if err != nil {
-		return nil, errors.Wrap(err, "error instantiating empty OrderStatisticTree")
+		return nil, errors.Wrap(err, "error instantiating empty ost.Tree")
 	}
 
 	return &OSTMedian{
