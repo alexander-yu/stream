@@ -17,7 +17,7 @@ func TestAVLNodeLeft(t *testing.T) {
 		left, err := node.Left()
 		require.NoError(t, err)
 
-		testutil.Approx(t, float64(4), left.val)
+		testutil.Approx(t, float64(4), left.Value())
 	})
 
 	t.Run("fail: return error if node is nil", func(t *testing.T) {
@@ -34,7 +34,7 @@ func TestAVLNodeRight(t *testing.T) {
 		right, err := node.Right()
 		require.NoError(t, err)
 
-		testutil.Approx(t, float64(4), right.val)
+		testutil.Approx(t, float64(4), right.Value())
 	})
 
 	t.Run("fail: return error if node is nil", func(t *testing.T) {

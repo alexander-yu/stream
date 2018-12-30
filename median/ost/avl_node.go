@@ -32,7 +32,7 @@ func NewAVLNode(val float64) *AVLNode {
 }
 
 // Left returns the left child of the node.
-func (n *AVLNode) Left() (*AVLNode, error) {
+func (n *AVLNode) Left() (Node, error) {
 	if n == nil {
 		return nil, errors.New("tried to retrieve child of nil node")
 	}
@@ -40,7 +40,7 @@ func (n *AVLNode) Left() (*AVLNode, error) {
 }
 
 // Right returns the right child of the node.
-func (n *AVLNode) Right() (*AVLNode, error) {
+func (n *AVLNode) Right() (Node, error) {
 	if n == nil {
 		return nil, errors.New("tried to retrieve child of nil node")
 	}
@@ -195,28 +195,32 @@ func (n *AVLNode) rotateRight() *AVLNode {
  * Order Statistics
  *******************/
 
-func (n *AVLNode) get(i int) Node {
+// Select returns the node with the ith smallest value in the
+// subtree rooted at the node..
+func (n *AVLNode) Select(i int) Node {
 	if n == nil {
 		return nil
 	}
 
 	size := n.left.Size()
 	if i < size {
-		return n.left.get(i)
+		return n.left.Select(i)
 	} else if i > size {
-		return n.right.get(i - size - 1)
+		return n.right.Select(i - size - 1)
 	}
 
 	return n
 }
 
-func (n *AVLNode) rank(val float64) int {
+// Rank returns the number of nodes strictly less than the value that
+// are contained in the subtree rooted at the node.
+func (n *AVLNode) Rank(val float64) int {
 	if n == nil {
 		return 0
 	} else if val < n.val {
-		return n.left.rank(val)
+		return n.left.Rank(val)
 	} else if val > n.val {
-		return 1 + n.left.Size() + n.right.rank(val)
+		return 1 + n.left.Size() + n.right.Rank(val)
 	}
 	return n.left.Size()
 }

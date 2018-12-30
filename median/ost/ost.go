@@ -17,11 +17,14 @@ type Tree interface {
 
 // Node is the interface for any node struct within an Tree.
 type Node interface {
+	Left() (Node, error)
+	Right() (Node, error)
 	Height() int
 	Size() int
 	Value() float64
-	get(int) Node
-	rank(float64) int
+	Select(int) Node
+	Rank(float64) int
+	TreeString() string
 }
 
 // Impl represents an enum that enumerates the currently supported implementations
