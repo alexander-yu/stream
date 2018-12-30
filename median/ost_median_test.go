@@ -30,7 +30,7 @@ func TestNewOSTMedian(t *testing.T) {
 
 	t.Run("fail: unsupported OST implementation is invalid", func(t *testing.T) {
 		_, err := NewOSTMedian(3, ost.Impl(-1))
-		testutil.ContainsError(t, err, "error instantiating empty Tree")
+		testutil.ContainsError(t, err, "error instantiating empty ost.Tree")
 	})
 }
 
