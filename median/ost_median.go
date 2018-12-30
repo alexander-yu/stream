@@ -17,7 +17,9 @@ type OSTMedian struct {
 	mux    sync.Mutex
 }
 
-// NewOSTMedian instantiates an OSTMedian struct.
+// NewOSTMedian instantiates an OSTMedian struct. The implementation of the
+// underlying order statistic tree can be configured by passing in a constant
+// of type `ost.Impl`.
 func NewOSTMedian(window int, impl ost.Impl) (*OSTMedian, error) {
 	if window < 0 {
 		return nil, errors.Errorf("%d is a negative window", window)
