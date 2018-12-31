@@ -79,7 +79,7 @@ func (n *AVLNode) TreeString() string {
 func (n *AVLNode) add(val float64) *AVLNode {
 	if n == nil {
 		return NewAVLNode(val)
-	} else if val < n.val {
+	} else if val <= n.val {
 		n.left = n.left.add(val)
 	} else {
 		n.right = n.right.add(val)
