@@ -7,7 +7,6 @@ import "github.com/pkg/errors"
 // in the tree, and Rank(x), which finds the rank of element x in the tree.
 type Tree interface {
 	Size() int
-	Height() int
 	Add(val float64)
 	Remove(val float64)
 	Select(int) Node
@@ -19,7 +18,6 @@ type Tree interface {
 type Node interface {
 	Left() (Node, error)
 	Right() (Node, error)
-	Height() int
 	Size() int
 	Value() float64
 	Select(int) Node
