@@ -8,11 +8,11 @@ import (
 
 // AVLNode represents a node in an AVL tree.
 type AVLNode struct {
-	left    *AVLNode
-	right   *AVLNode
-	val     float64
-	_height int
-	_size   int
+	left   *AVLNode
+	right  *AVLNode
+	val    float64
+	height int
+	size   int
 }
 
 func max(x int, y int) int {
@@ -25,9 +25,9 @@ func max(x int, y int) int {
 // NewAVLNode instantiates a AVLNode struct with a a provided value.
 func NewAVLNode(val float64) *AVLNode {
 	return &AVLNode{
-		val:     val,
-		_height: 0,
-		_size:   1,
+		val:    val,
+		height: 0,
+		size:   1,
 	}
 }
 
@@ -52,7 +52,7 @@ func (n *AVLNode) Height() int {
 	if n == nil {
 		return -1
 	}
-	return n._height
+	return n.height
 }
 
 // Size returns the size of the subtree rooted at the node.
@@ -60,7 +60,7 @@ func (n *AVLNode) Size() int {
 	if n == nil {
 		return 0
 	}
-	return n._size
+	return n.size
 }
 
 // Value returns the value stored at the node.
@@ -85,8 +85,8 @@ func (n *AVLNode) add(val float64) *AVLNode {
 		n.right = n.right.add(val)
 	}
 
-	n._size = n.left.Size() + n.right.Size() + 1
-	n._height = max(n.left.Height(), n.right.Height()) + 1
+	n.size = n.left.Size() + n.right.Size() + 1
+	n.height = max(n.left.Height(), n.right.Height()) + 1
 	return n.balance()
 }
 
@@ -107,8 +107,8 @@ func (n *AVLNode) remove(val float64) *AVLNode {
 		root.left = n.left
 	}
 
-	root._size = root.left.Size() + root.right.Size() + 1
-	root._height = max(root.left.Height(), root.right.Height()) + 1
+	root.size = root.left.Size() + root.right.Size() + 1
+	root.height = max(root.left.Height(), root.right.Height()) + 1
 	return root.balance()
 }
 
@@ -126,8 +126,8 @@ func (n *AVLNode) removeMin() *AVLNode {
 	}
 
 	n.left = n.left.removeMin()
-	n._size = n.left.Size() + n.right.Size() + 1
-	n._height = max(n.left.Height(), n.right.Height()) + 1
+	n.size = n.left.Size() + n.right.Size() + 1
+	n.height = max(n.left.Height(), n.right.Height()) + 1
 	return n.balance()
 }
 
@@ -166,11 +166,11 @@ func (n *AVLNode) rotateLeft() *AVLNode {
 
 	// No need to call size() here; we already know that n is not nil, since
 	// rotations are only called for non-leaf nodes
-	m._size = n._size
-	n._size = n.left.Size() + n.right.Size() + 1
+	m.size = n.size
+	n.size = n.left.Size() + n.right.Size() + 1
 
-	n._height = max(n.left.Height(), n.right.Height()) + 1
-	m._height = max(m.left.Height(), m.right.Height()) + 1
+	n.height = max(n.left.Height(), n.right.Height()) + 1
+	m.height = max(m.left.Height(), m.right.Height()) + 1
 
 	return m
 }
@@ -182,11 +182,11 @@ func (n *AVLNode) rotateRight() *AVLNode {
 
 	// No need to call size() here; we already know that n is not nil, since
 	// rotations are only called for non-leaf nodes
-	m._size = n._size
-	n._size = n.left.Size() + n.right.Size() + 1
+	m.size = n.size
+	n.size = n.left.Size() + n.right.Size() + 1
 
-	n._height = max(n.left.Height(), n.right.Height()) + 1
-	m._height = max(m.left.Height(), m.right.Height()) + 1
+	n.height = max(n.left.Height(), n.right.Height()) + 1
+	m.height = max(m.left.Height(), m.right.Height()) + 1
 
 	return m
 }
