@@ -14,6 +14,12 @@ func TestImplEmptyTree(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("pass: red black implementation is supported", func(t *testing.T) {
+		i := RB
+		_, err := i.EmptyTree()
+		assert.NoError(t, err)
+	})
+
 	t.Run("fail: unsupported implementations return an error", func(t *testing.T) {
 		i := Impl(-1)
 		_, err := i.EmptyTree()
