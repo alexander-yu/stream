@@ -67,56 +67,81 @@ func TestAVLTreeAdd(t *testing.T) {
 }
 
 func TestAVLTreeRemove(t *testing.T) {
-	tree := testData()
-	tree.Remove(5)
-	tree.Remove(7)
+	t.Run("pass: successfully removes values", func(t *testing.T) {
+		tree := testData()
+		tree.Remove(5)
+		tree.Remove(7)
 
-	assert.Equal(t, 6, tree.Size())
-	assert.Equal(t, 2, tree.Height())
-	assert.Equal(
-		t,
-		strings.Join([]string{
-			"│       ┌── 6.000000",
-			"│   ┌── 4.000000",
-			"│   │   └── 3.000000",
-			"└── 2.000000",
-			"    └── 1.000000",
-			"        └── 1.000000",
-			"",
-		}, "\n"),
-		tree.String(),
-	)
+		assert.Equal(t, 6, tree.Size())
+		assert.Equal(t, 2, tree.Height())
+		assert.Equal(
+			t,
+			strings.Join([]string{
+				"│       ┌── 6.000000",
+				"│   ┌── 4.000000",
+				"│   │   └── 3.000000",
+				"└── 2.000000",
+				"    └── 1.000000",
+				"        └── 1.000000",
+				"",
+			}, "\n"),
+			tree.String(),
+		)
 
-	tree.Remove(2)
-	assert.Equal(t, 5, tree.Size())
-	assert.Equal(t, 2, tree.Height())
-	assert.Equal(
-		t,
-		strings.Join([]string{
-			"│       ┌── 6.000000",
-			"│   ┌── 4.000000",
-			"└── 3.000000",
-			"    └── 1.000000",
-			"        └── 1.000000",
-			"",
-		}, "\n"),
-		tree.String(),
-	)
+		tree.Remove(2)
+		assert.Equal(t, 5, tree.Size())
+		assert.Equal(t, 2, tree.Height())
+		assert.Equal(
+			t,
+			strings.Join([]string{
+				"│       ┌── 6.000000",
+				"│   ┌── 4.000000",
+				"└── 3.000000",
+				"    └── 1.000000",
+				"        └── 1.000000",
+				"",
+			}, "\n"),
+			tree.String(),
+		)
 
-	tree.Remove(1)
-	tree.Remove(6)
-	tree.Remove(4)
-	tree.Remove(3)
-	assert.Equal(t, 1, tree.Size())
-	assert.Equal(t, 0, tree.Height())
-	assert.Equal(
-		t,
-		strings.Join([]string{
-			"└── 1.000000",
-			"",
-		}, "\n"),
-		tree.String(),
-	)
+		tree.Remove(1)
+		tree.Remove(6)
+		tree.Remove(4)
+		tree.Remove(3)
+		assert.Equal(t, 1, tree.Size())
+		assert.Equal(t, 0, tree.Height())
+		assert.Equal(
+			t,
+			strings.Join([]string{
+				"└── 1.000000",
+				"",
+			}, "\n"),
+			tree.String(),
+		)
+	})
+
+	t.Run("pass: removing non-existent value is a no-op", func(t *testing.T) {
+		tree := testData()
+		tree.Remove(8)
+
+		assert.Equal(t, 8, tree.Size())
+		assert.Equal(t, 3, tree.Height())
+		assert.Equal(
+			t,
+			strings.Join([]string{
+				"│       ┌── 7.000000",
+				"│   ┌── 6.000000",
+				"│   │   └── 5.000000",
+				"└── 4.000000",
+				"    │   ┌── 3.000000",
+				"    └── 2.000000",
+				"        └── 1.000000",
+				"            └── 1.000000",
+				"",
+			}, "\n"),
+			tree.String(),
+		)
+	})
 }
 
 func TestAVLTreeRank(t *testing.T) {

@@ -91,6 +91,13 @@ func (n *AVLNode) add(val float64) *AVLNode {
 }
 
 func (n *AVLNode) remove(val float64) *AVLNode {
+	// this case occurs if we attempt to remove a value
+	// that does not exist in the subtree; this will
+	// result in remove() being a no-op
+	if n == nil {
+		return n
+	}
+
 	root := n
 	if val < root.val {
 		root.left = root.left.remove(val)
