@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func testData() *AVLTree {
+func avlTestData() *AVLTree {
 	tree := &AVLTree{}
 	tree.Add(5)
 	tree.Add(6)
@@ -21,7 +21,7 @@ func testData() *AVLTree {
 }
 
 func TestAVLTreeAdd(t *testing.T) {
-	tree := testData()
+	tree := avlTestData()
 
 	assert.Equal(t, 8, tree.Size())
 	assert.Equal(t, 3, tree.Height())
@@ -68,7 +68,7 @@ func TestAVLTreeAdd(t *testing.T) {
 
 func TestAVLTreeRemove(t *testing.T) {
 	t.Run("pass: successfully removes values", func(t *testing.T) {
-		tree := testData()
+		tree := avlTestData()
 		tree.Remove(5)
 		tree.Remove(7)
 
@@ -121,7 +121,7 @@ func TestAVLTreeRemove(t *testing.T) {
 	})
 
 	t.Run("pass: removing non-existent value is a no-op", func(t *testing.T) {
-		tree := testData()
+		tree := avlTestData()
 		tree.Remove(8)
 
 		assert.Equal(t, 8, tree.Size())
@@ -145,7 +145,7 @@ func TestAVLTreeRemove(t *testing.T) {
 }
 
 func TestAVLTreeRank(t *testing.T) {
-	tree := testData()
+	tree := avlTestData()
 	rank := tree.Rank(3)
 	assert.Equal(t, 3, rank)
 
@@ -157,7 +157,7 @@ func TestAVLTreeRank(t *testing.T) {
 }
 
 func TestAVLTreeSelect(t *testing.T) {
-	tree := testData()
+	tree := avlTestData()
 	node := tree.Select(5)
 	assert.Equal(t, float64(5), node.Value())
 

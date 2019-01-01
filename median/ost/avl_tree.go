@@ -38,5 +38,5 @@ func (t *AVLTree) Rank(val float64) int {
 
 // String returns the string representation of the tree.
 func (t *AVLTree) String() string {
-	return t.root.treeString("", "", true)
+	return t.root.TreeString()
 }
