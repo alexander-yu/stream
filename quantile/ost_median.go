@@ -1,10 +1,10 @@
-package median
+package quantile
 
 import (
 	"github.com/pkg/errors"
 
 	"github.com/alexander-yu/stream"
-	"github.com/alexander-yu/stream/median/ost"
+	"github.com/alexander-yu/stream/quantile/ost"
 )
 
 // OSTMedian keeps track of the median of a stream using order statistic trees.

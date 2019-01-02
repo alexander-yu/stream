@@ -1,4 +1,4 @@
-package median
+package quantile
 
 import (
 	"math"
@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/workiva/go-datastructures/queue"
 
-	"github.com/alexander-yu/stream/median/ost"
+	"github.com/alexander-yu/stream/quantile/ost"
 )
 
 // OSTQuantile keeps track of the quantile of a stream using order statistic trees.

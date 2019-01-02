@@ -1,4 +1,4 @@
-package median
+package quantile
 
 import (
 	heapops "container/heap"

@@ -1,4 +1,4 @@
-package median
+package quantile
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/alexander-yu/stream/median/ost"
+	"github.com/alexander-yu/stream/quantile/ost"
 	"github.com/alexander-yu/stream/util/testutil"
 )
 

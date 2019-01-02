@@ -16,7 +16,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
     - [JointMetric](#JointMetric)
 - [Example](#Example)
 - [Statistics](#Statistics)
-    - [Median](#Median)
+    - [Quantile](#Quantile)
         - [OSTQuantile](#OSTQuantile)
         - [OSTMedian](#OSTMedian)
         - [HeapMedian](#HeapMedian)
@@ -101,10 +101,10 @@ func main() {
 
 ## Statistics
 
-### [Median](https://godoc.org/github.com/alexander-yu/stream/median)
+### [Quantile](https://godoc.org/github.com/alexander-yu/stream/quantile)
 
 #### OSTQuantile
-OSTQuantile keeps track of a given quantile of a stream with an [order statistic tree](https://en.wikipedia.org/wiki/Order_statistic_tree) as the underlying data structure. OSTQuantile can calculate the global quantile of a stream, or over a rolling window. You can also configure which implementation to use for the underlying order statistic tree (see the [godoc](https://godoc.org/github.com/alexander-yu/stream/median#NewOSTQuantile) entry for details), as well as which interpolation method to use in the case that the quantile actually lies in between two elements. For now only [AVL trees](https://en.wikipedia.org/wiki/AVL_tree) and [red black trees](https://en.wikipedia.org/wiki/Red-black_tree) are supported.
+OSTQuantile keeps track of a given quantile of a stream with an [order statistic tree](https://en.wikipedia.org/wiki/Order_statistic_tree) as the underlying data structure. OSTQuantile can calculate the global quantile of a stream, or over a rolling window. You can also configure which implementation to use for the underlying order statistic tree (see the [godoc](https://godoc.org/github.com/alexander-yu/stream/quantile#NewOSTQuantile) entry for details), as well as which interpolation method to use in the case that the quantile actually lies in between two elements. For now only [AVL trees](https://en.wikipedia.org/wiki/AVL_tree) and [red black trees](https://en.wikipedia.org/wiki/Red-black_tree) are supported.
 
 Let `n` be the size of the window, or the stream if tracking the global quantile. Then we have the following complexities:
 
