@@ -2,7 +2,6 @@ package median
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,21 +15,21 @@ func TestNewOSTMedian(t *testing.T) {
 	t.Run("pass: nonnegative window is valid", func(t *testing.T) {
 		median, err := NewOSTMedian(0, ost.AVL)
 		require.NoError(t, err)
-		assert.Equal(t, 0, median.window)
+		assert.Equal(t, 0, median.quantile.window)
 
 		median, err = NewOSTMedian(5, ost.AVL)
 		require.NoError(t, err)
-		assert.Equal(t, 5, median.window)
+		assert.Equal(t, 5, median.quantile.window)
 	})
 
 	t.Run("fail: negative window is invalid", func(t *testing.T) {
 		_, err := NewOSTMedian(-1, ost.AVL)
-		assert.EqualError(t, err, "-1 is a negative window")
+		testutil.ContainsError(t, err, "error creating OSTQuantile")
 	})
 
 	t.Run("fail: unsupported OST implementation is invalid", func(t *testing.T) {
 		_, err := NewOSTMedian(3, ost.Impl(-1))
-		testutil.ContainsError(t, err, "error instantiating empty ost.Tree")
+		testutil.ContainsError(t, err, "error creating OSTQuantile")
 	})
 }
 
@@ -42,25 +41,6 @@ func TestOSTMedianPush(t *testing.T) {
 			err := median.Push(i)
 			require.NoError(t, err)
 		}
-
-		assert.Equal(t, uint64(3), median.queue.Len())
-		for i := 2.; i < 5; i++ {
-			val, err := median.queue.Get()
-			y := val.(float64)
-			require.NoError(t, err)
-			testutil.Approx(t, i, y)
-		}
-
-		assert.Equal(
-			t,
-			strings.Join([]string{
-				"│   ┌── 4.000000",
-				"└── 3.000000",
-				"    └── 2.000000",
-				"",
-			}, "\n"),
-			median.tree.String(),
-		)
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
@@ -73,7 +53,7 @@ func TestOSTMedianPush(t *testing.T) {
 		}
 
 		// dispose the queue to simulate an error when we try to retrieve from the queue
-		median.queue.Dispose()
+		median.quantile.queue.Dispose()
 		err = median.Push(3.)
 		testutil.ContainsError(t, err, "error popping item from queue")
 	})
@@ -83,7 +63,7 @@ func TestOSTMedianPush(t *testing.T) {
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
-		median.queue.Dispose()
+		median.quantile.queue.Dispose()
 		val := 3.
 		err = median.Push(val)
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing %f to queue", val))
@@ -124,6 +104,6 @@ func TestOSTMedianValue(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = median.Value()
-		assert.EqualError(t, err, "no values seen yet")
+		testutil.ContainsError(t, err, "no values seen yet")
 	})
 }
