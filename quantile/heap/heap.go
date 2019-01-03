@@ -42,18 +42,23 @@ func (h *Heap) Less(i, j int) bool {
 
 func (h *Heap) Swap(i, j int) {
 	h.items[i], h.items[j] = h.items[j], h.items[i]
+	h.items[i].index = i
+	h.items[j].index = j
 }
 
 // Push adds an element to the heap.
 // This satisfies heapops.Interface.
 func (h *Heap) Push(x interface{}) {
-	h.items = append(h.items, x.(*Item))
+	item := x.(*Item)
+	item.index = len(h.items)
+	h.items = append(h.items, item)
 }
 
 // Pop removes element Len() - 1 from the heap.
 // This satisfies heapops.Interface.
 func (h *Heap) Pop() interface{} {
 	x := h.items[len(h.items)-1]
+	x.index = -1
 	h.items = h.items[:len(h.items)-1]
 	return x
 }
@@ -72,4 +77,13 @@ func (h *Heap) Values() []float64 {
 		vals = append(vals, item.Val)
 	}
 	return vals
+}
+
+// Update modifies the value of an item and fixes any
+// violations of the heap invariant. This is equivalent
+// to manually removing the item and pushing a new one in,
+// but is less expensive.
+func (h *Heap) Update(item *Item, val float64) {
+	item.Val = val
+	heapops.Fix(h, item.index)
 }

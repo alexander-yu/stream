@@ -36,3 +36,14 @@ func TestValues(t *testing.T) {
 	heapops.Push(heap, &Item{Val: 4})
 	assert.Equal(t, []float64{5, 4, 4, 1, 2, 3}, heap.Values())
 }
+
+func TestUpdate(t *testing.T) {
+	heap := NewHeap([]float64{1, 2, 3, 4}, fmax)
+	item := &Item{Val: 5}
+
+	heapops.Push(heap, item)
+	assert.Equal(t, []float64{5, 4, 3, 1, 2}, heap.Values())
+
+	heap.Update(item, 2)
+	assert.Equal(t, []float64{4, 2, 3, 1, 2}, heap.Values())
+}
