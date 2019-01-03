@@ -7,32 +7,32 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func imax(x interface{}, y interface{}) bool {
-	return x.(int) > y.(int)
+func fmax(x float64, y float64) bool {
+	return x > y
 }
 
-func imin(x interface{}, y interface{}) bool {
-	return x.(int) < y.(int)
+func fmin(x float64, y float64) bool {
+	return x < y
 }
 
 func TestHeap(t *testing.T) {
-	heap := NewHeap([]interface{}{1, 2, 3, 4}, imax)
-	assert.Equal(t, 4, heapops.Pop(heap))
+	heap := NewHeap([]float64{1, 2, 3, 4}, fmax)
+	assert.Equal(t, 4., heapops.Pop(heap).(*Item).Val)
 
-	heap = NewHeap([]interface{}{1, 2, 3, 4}, imin)
-	assert.Equal(t, 1, heapops.Pop(heap))
+	heap = NewHeap([]float64{1, 2, 3, 4}, fmin)
+	assert.Equal(t, 1., heapops.Pop(heap).(*Item).Val)
 }
 
 func TestPeek(t *testing.T) {
-	heap := NewHeap([]interface{}{1, 2, 3, 4}, imax)
-	heapops.Push(heap, 5)
-	heapops.Push(heap, 4)
-	assert.Equal(t, 5, heap.Peek())
+	heap := NewHeap([]float64{1, 2, 3, 4}, fmax)
+	heapops.Push(heap, &Item{Val: 5})
+	heapops.Push(heap, &Item{Val: 4})
+	assert.Equal(t, 5., heap.Peek())
 }
 
 func TestValues(t *testing.T) {
-	heap := NewHeap([]interface{}{1, 2, 3, 4}, imax)
-	heapops.Push(heap, 5)
-	heapops.Push(heap, 4)
-	assert.Equal(t, []interface{}{5, 4, 4, 1, 2, 3}, heap.Values())
+	heap := NewHeap([]float64{1, 2, 3, 4}, fmax)
+	heapops.Push(heap, &Item{Val: 5})
+	heapops.Push(heap, &Item{Val: 4})
+	assert.Equal(t, []float64{5, 4, 4, 1, 2, 3}, heap.Values())
 }

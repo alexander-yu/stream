@@ -15,19 +15,19 @@ type HeapMedian struct {
 	mux      sync.Mutex
 }
 
-func fmax(x interface{}, y interface{}) bool {
-	return x.(float64) > y.(float64)
+func fmax(x float64, y float64) bool {
+	return x > y
 }
 
-func fmin(x interface{}, y interface{}) bool {
-	return x.(float64) < y.(float64)
+func fmin(x float64, y float64) bool {
+	return x < y
 }
 
 // NewHeapMedian instantiates a HeapMedian struct.
 func NewHeapMedian() *HeapMedian {
 	return &HeapMedian{
-		lowHeap:  heap.NewHeap([]interface{}{}, fmax),
-		highHeap: heap.NewHeap([]interface{}{}, fmin),
+		lowHeap:  heap.NewHeap([]float64{}, fmax),
+		highHeap: heap.NewHeap([]float64{}, fmin),
 	}
 }
 
@@ -36,10 +36,11 @@ func (m *HeapMedian) Push(x float64) error {
 	m.mux.Lock()
 	defer m.mux.Unlock()
 
-	if m.lowHeap.Len() == 0 || x <= m.lowHeap.Peek().(float64) {
-		heapops.Push(m.lowHeap, x)
+	item := &heap.Item{Val: x}
+	if m.lowHeap.Len() == 0 || x <= m.lowHeap.Peek() {
+		heapops.Push(m.lowHeap, item)
 	} else {
-		heapops.Push(m.highHeap, x)
+		heapops.Push(m.highHeap, item)
 	}
 
 	if m.lowHeap.Len()+1 < m.highHeap.Len() {
@@ -61,12 +62,12 @@ func (m *HeapMedian) Value() (float64, error) {
 	}
 
 	if m.lowHeap.Len() < m.highHeap.Len() {
-		return m.highHeap.Peek().(float64), nil
+		return m.highHeap.Peek(), nil
 	} else if m.lowHeap.Len() > m.highHeap.Len() {
-		return m.lowHeap.Peek().(float64), nil
+		return m.lowHeap.Peek(), nil
 	} else {
-		low := m.lowHeap.Peek().(float64)
-		high := m.highHeap.Peek().(float64)
+		low := m.lowHeap.Peek()
+		high := m.highHeap.Peek()
 		return (low + high) / 2, nil
 	}
 }
