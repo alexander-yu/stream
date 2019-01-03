@@ -4,12 +4,14 @@ import (
 	heapops "container/heap"
 	"errors"
 	"sync"
+
+	"github.com/alexander-yu/stream/quantile/heap"
 )
 
 // HeapMedian keeps track of the median of an entire stream using heaps.
 type HeapMedian struct {
-	lowHeap  *heap
-	highHeap *heap
+	lowHeap  *heap.Heap
+	highHeap *heap.Heap
 	mux      sync.Mutex
 }
 
@@ -24,8 +26,8 @@ func fmin(x interface{}, y interface{}) bool {
 // NewHeapMedian instantiates a HeapMedian struct.
 func NewHeapMedian() *HeapMedian {
 	return &HeapMedian{
-		lowHeap:  newHeap([]interface{}{}, fmax),
-		highHeap: newHeap([]interface{}{}, fmin),
+		lowHeap:  heap.NewHeap([]interface{}{}, fmax),
+		highHeap: heap.NewHeap([]interface{}{}, fmin),
 	}
 }
 
@@ -34,7 +36,7 @@ func (m *HeapMedian) Push(x float64) error {
 	m.mux.Lock()
 	defer m.mux.Unlock()
 
-	if m.lowHeap.Len() == 0 || x <= m.lowHeap.peek().(float64) {
+	if m.lowHeap.Len() == 0 || x <= m.lowHeap.Peek().(float64) {
 		heapops.Push(m.lowHeap, x)
 	} else {
 		heapops.Push(m.highHeap, x)
@@ -59,12 +61,12 @@ func (m *HeapMedian) Value() (float64, error) {
 	}
 
 	if m.lowHeap.Len() < m.highHeap.Len() {
-		return m.highHeap.peek().(float64), nil
+		return m.highHeap.Peek().(float64), nil
 	} else if m.lowHeap.Len() > m.highHeap.Len() {
-		return m.lowHeap.peek().(float64), nil
+		return m.lowHeap.Peek().(float64), nil
 	} else {
-		low := m.lowHeap.peek().(float64)
-		high := m.highHeap.peek().(float64)
+		low := m.lowHeap.Peek().(float64)
+		high := m.highHeap.Peek().(float64)
 		return (low + high) / 2, nil
 	}
 }
