@@ -53,13 +53,26 @@ type Metric interface {
     Value() (float64, error)
 }
 
+type HashableMetric interface {
+    Metric
+    Hash() uint64
+}
+
+type AggregateMetric interface {
+    Push(float64) error
+    Values() (map[uint64]float64, error)
+}
+
 type JointMetric interface {
     Push(...float64) error
     Value() (float64, error)
 }
 ```
-### Metric
-Metric is the standard interface for most metrics; in particular for those that consume single numeric values at a time. The `Push` method consumes a numeric value (i.e. `float64`), and returns an error if one was encountered while pushing. The `Value` method returns the value of the metric at that given point in time, or an error if one was encountered when attempting to retrieve the value.
+### Metric/HashableMetric
+Metric is the standard interface for most metrics; in particular for those that consume single numeric values at a time. The `Push` method consumes a numeric value (i.e. `float64`), and returns an error if one was encountered while pushing. The `Value` method returns the value of the metric at that given point in time, or an error if one was encountered when attempting to retrieve the value. A HashableMetric is simply a Metric that has a `Hash()` method, to identify the metric that is being tracked.
+
+### AggregateMetric
+AggregateMetric is the interface for metrics that track multiple sub-metrics. The `Push` method consumes a numeric value (i.e. `float64`), and returns an error if one was encountered while pushing. The `Value` method returns a map of integers (which represent hashes of its sub-metrics) to the sub-metric values, or an error if one was encountered when attempting to retrieve the values. An AggregateMetric's sub-metrics must be HashableMetrics, in order to distinguish between the metric values and store them in a map.
 
 ### JointMetric
 JointMetric is the interface for metrics that track joint statistics. The `Push` method consumes numeric values (i.e. `float64`), and returns an error if one was encountered while pushing. The values should represent the variables that the metric is tracking joint statistics for. The `Value` method returns the value of the metric at that given point in time, or an error if one was encountered when attempting to retrieve the value.
