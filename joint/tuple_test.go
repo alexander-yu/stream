@@ -17,18 +17,18 @@ func TestAbs(t *testing.T) {
 
 func TestHash(t *testing.T) {
 	m := Tuple{}
-	assert.Equal(t, 0, m.hash())
+	assert.Equal(t, uint64(0), m.hash())
 
 	m = Tuple{1, 4, 2, 3}
-	assert.Equal(t, 33700, m.hash())
+	assert.Equal(t, uint64(33700), m.hash())
 
 	// different order should guarantee a different hash
 	m = Tuple{1, 2, 3, 4}
-	assert.Equal(t, 31810, m.hash())
+	assert.Equal(t, uint64(31810), m.hash())
 
 	// different object but same contents should guarantee the same hash
 	m = Tuple{1, 2, 3, 4}
-	assert.Equal(t, 31810, m.hash())
+	assert.Equal(t, uint64(31810), m.hash())
 }
 
 func TestEq(t *testing.T) {
@@ -141,14 +141,14 @@ func TestPow(t *testing.T) {
 func TestIter(t *testing.T) {
 	t.Run("pass: executes callback over all tuples in increasing order", func(t *testing.T) {
 		tuple := Tuple{2, 3}
-		expectedRuns := []int{}
+		expectedRuns := []uint64{}
 		for j := 0; j <= tuple[1]; j++ {
 			for i := 0; i <= tuple[0]; i++ {
 				expectedRuns = append(expectedRuns, Tuple{i, j}.hash())
 			}
 		}
 
-		runs := []int{}
+		runs := []uint64{}
 		iter(tuple, false, func(xs ...int) {
 			runs = append(runs, Tuple(xs).hash())
 		})
@@ -158,14 +158,14 @@ func TestIter(t *testing.T) {
 
 	t.Run("pass: executes callback over all tuples in decreasing order", func(t *testing.T) {
 		tuple := Tuple{2, 3}
-		expectedRuns := []int{}
+		expectedRuns := []uint64{}
 		for j := tuple[1]; j >= 0; j-- {
 			for i := tuple[0]; i >= 0; i-- {
 				expectedRuns = append(expectedRuns, Tuple{i, j}.hash())
 			}
 		}
 
-		runs := []int{}
+		runs := []uint64{}
 		iter(tuple, true, func(xs ...int) {
 			runs = append(runs, Tuple(xs).hash())
 		})

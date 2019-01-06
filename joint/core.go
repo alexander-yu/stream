@@ -16,8 +16,8 @@ type Core struct {
 	mux     sync.RWMutex
 	means   []float64
 	tuples  []Tuple
-	sums    map[int]float64
-	newSums map[int]float64
+	sums    map[uint64]float64
+	newSums map[uint64]float64
 	count   int
 	window  uint64
 	queue   *queue.RingBuffer
@@ -54,14 +54,14 @@ func NewCore(config *CoreConfig) (*Core, error) {
 	c := &Core{}
 	c.window = uint64(*config.Window)
 
-	c.sums = map[int]float64{}
+	c.sums = map[uint64]float64{}
 	for _, tuple := range config.Sums {
 		iter(tuple, false, func(xs ...int) {
 			c.sums[Tuple(xs).hash()] = 0
 		})
 	}
 
-	c.newSums = map[int]float64{}
+	c.newSums = map[uint64]float64{}
 	for _, tuple := range config.Sums {
 		iter(tuple, false, func(xs ...int) {
 			c.newSums[Tuple(xs).hash()] = 0

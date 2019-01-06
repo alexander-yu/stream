@@ -68,7 +68,7 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 
 		// remove any duplicate Tuples, or Tuples that are less than or equal
 		// to other Tuples, since they'll get tracked automatically
-		tupleMap := map[int]bool{}
+		tupleMap := map[uint64]bool{}
 		sums := SumsConfig{}
 		for i, m := range mergedConfig.Sums {
 			// remove dupes

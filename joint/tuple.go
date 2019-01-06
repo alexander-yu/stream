@@ -21,7 +21,7 @@ func (m Tuple) abs() int {
 	return sum
 }
 
-func (m Tuple) hash() int {
+func (m Tuple) hash() uint64 {
 	result := 0
 	// for practical purposes, the chance of collision is effectively
 	// 0, since any joint moments are extremely unlikely to have individual
@@ -31,7 +31,7 @@ func (m Tuple) hash() int {
 	for i := range m {
 		result = 31*result + m[i]
 	}
-	return result
+	return uint64(result)
 }
 
 func (m Tuple) eq(n Tuple) bool {

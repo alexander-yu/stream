@@ -17,7 +17,7 @@ func TestPush(t *testing.T) {
 		err := testData(m)
 		require.NoError(t, err)
 
-		expectedSums := map[int]float64{
+		expectedSums := map[uint64]float64{
 			0:  0.,
 			1:  0.,
 			2:  5378. / 3.,
@@ -67,7 +67,7 @@ func TestPush(t *testing.T) {
 		err = core.Push(2., 2.)
 		require.NoError(t, err)
 
-		expectedSums := map[int]float64{
+		expectedSums := map[uint64]float64{
 			0:  0.,
 			1:  0.,
 			2:  0.,
@@ -127,7 +127,7 @@ func TestClear(t *testing.T) {
 
 	m.core.Clear()
 
-	expectedSums := map[int]float64{
+	expectedSums := map[uint64]float64{
 		0:  0.,
 		1:  0.,
 		2:  0.,
@@ -190,7 +190,7 @@ func TestSum(t *testing.T) {
 		err := testData(m)
 		require.NoError(t, err)
 
-		expectedSums := map[int]float64{
+		expectedSums := map[uint64]float64{
 			0:  0.,
 			1:  0.,
 			2:  5378. / 3.,
