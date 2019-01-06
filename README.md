@@ -116,11 +116,9 @@ Let `n` be the size of the window, or the stream if tracking the global quantile
 OSTMedian keeps track of the median of a stream; this is simply a convenient wrapper over [OSTQuantile](#OSTQuantile), that automatically sets the quantile to be 0.5 and the interpolation method to be the midpoint method.
 
 #### HeapMedian
-HeapMedian keeps track of the global median of a stream with a pair of [heaps](https://en.wikipedia.org/wiki/Heap_(data_structure)). In particular, it uses a max-heap and a min-heap to keep track of elements below and above the median, respectively.
+HeapMedian keeps track of the median of a stream with a pair of [heaps](https://en.wikipedia.org/wiki/Heap_(data_structure)). In particular, it uses a max-heap and a min-heap to keep track of elements below and above the median, respectively. HeapMedian can calculate the global median of a stream, or over a rolling window.
 
-**Note:** HeapMedian does not support calculating medians over a rolling window, due to the non-constant time complexity required to remove expired values from the heaps as they leave the window.
-
-Let `n` be the size of the stream. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global quantile. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space  |
 | :---------: | :----------: | :----: |

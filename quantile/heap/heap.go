@@ -4,6 +4,7 @@ import heapops "container/heap"
 
 // Heap implements a heap data structure.
 type Heap struct {
+	ID    string
 	items []*Item
 	cmp   func(float64, float64) bool
 }
@@ -16,18 +17,27 @@ type Heap struct {
 // the index of the item that possibly violates the heap
 // invariant.
 type Item struct {
-	Val   float64
-	index int
+	Val float64
+	// field that can be used for bookkeeping (i.e.
+	// keeping track of the item as it gets moved
+	// between multiple heaps; this is useful for
+	// HeapMedian)
+	HeapID string
+	index  int
 }
 
 // NewHeap initializes a new Heap.
-func NewHeap(vals []float64, cmp func(float64, float64) bool) *Heap {
+func NewHeap(id string, vals []float64, cmp func(float64, float64) bool) *Heap {
 	items := []*Item{}
 	for i, val := range vals {
-		items = append(items, &Item{Val: val, index: i})
+		items = append(items, &Item{
+			Val:    val,
+			HeapID: id,
+			index:  i,
+		})
 	}
 
-	h := &Heap{items: items, cmp: cmp}
+	h := &Heap{ID: id, items: items, cmp: cmp}
 	heapops.Init(h)
 	return h
 }
@@ -50,6 +60,7 @@ func (h *Heap) Swap(i, j int) {
 // This satisfies heapops.Interface.
 func (h *Heap) Push(x interface{}) {
 	item := x.(*Item)
+	item.HeapID = h.ID
 	item.index = len(h.items)
 	h.items = append(h.items, item)
 }
@@ -86,4 +97,9 @@ func (h *Heap) Values() []float64 {
 func (h *Heap) Update(item *Item, val float64) {
 	item.Val = val
 	heapops.Fix(h, item.index)
+}
+
+// Remove removes an item from the heap.
+func (h *Heap) Remove(item *Item) {
+	heapops.Remove(h, item.index)
 }
