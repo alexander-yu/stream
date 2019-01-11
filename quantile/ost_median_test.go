@@ -33,6 +33,14 @@ func TestNewOSTMedian(t *testing.T) {
 	})
 }
 
+func TestOSTMedianString(t *testing.T) {
+	expectedString := "quantile.OSTMedian_{quantile:quantile.OSTQuantile_{quantile:0.5,window:3,interpolation:5}}"
+	median, err := NewOSTMedian(3, ost.AVL)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedString, median.String())
+}
+
 func TestOSTMedianPush(t *testing.T) {
 	t.Run("pass: successfully pushes values", func(t *testing.T) {
 		median, err := NewOSTMedian(3, ost.AVL)

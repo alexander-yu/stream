@@ -2,6 +2,7 @@ package quantile
 
 import (
 	heapops "container/heap"
+	"fmt"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -39,6 +40,13 @@ func NewHeapMedian(window int) (*HeapMedian, error) {
 		highHeap: heap.NewHeap("high", []float64{}, fmin),
 		queue:    queue.NewRingBuffer(uint64(window)),
 	}, nil
+}
+
+// String returns a string representation of the metric.
+func (m *HeapMedian) String() string {
+	name := "quantile.HeapMedian"
+	window := fmt.Sprintf("window:%v", m.window)
+	return fmt.Sprintf("%s_{%s}", name, window)
 }
 
 // Push adds a number for calculating the median.

@@ -23,6 +23,14 @@ func TestNewHeapMedian(t *testing.T) {
 	})
 }
 
+func TestHeapMedianString(t *testing.T) {
+	expectedString := "quantile.HeapMedian_{window:3}"
+	median, err := NewHeapMedian(3)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedString, median.String())
+}
+
 func TestHeapMedianPush(t *testing.T) {
 	t.Run("pass: maintains heaps properly", func(t *testing.T) {
 		median, err := NewHeapMedian(10)

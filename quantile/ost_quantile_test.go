@@ -24,6 +24,19 @@ func TestNewOSTQuantile(t *testing.T) {
 	})
 }
 
+func TestOSTQuantileString(t *testing.T) {
+	expectedString := "quantile.OSTQuantile_{quantile:0.25,window:3,interpolation:1}"
+	config := &Config{
+		Quantile:      stream.FloatPtr(0.25),
+		Window:        stream.IntPtr(3),
+		Interpolation: Linear.Ptr(),
+	}
+	quantile, err := NewOSTQuantile(config, ost.AVL)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedString, quantile.String())
+}
+
 func TestOSTQuantilePush(t *testing.T) {
 	t.Run("pass: successfully pushes values", func(t *testing.T) {
 		config := &Config{

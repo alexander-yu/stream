@@ -1,7 +1,9 @@
 package quantile
 
 import (
+	"fmt"
 	"math"
+	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -45,6 +47,17 @@ func NewOSTQuantile(config *Config, impl ost.Impl) (*OSTQuantile, error) {
 		queue:         queue.NewRingBuffer(uint64(*config.Window)),
 		tree:          tree,
 	}, nil
+}
+
+// String returns a string representation of the metric.
+func (q *OSTQuantile) String() string {
+	name := "quantile.OSTQuantile"
+	params := []string{
+		fmt.Sprintf("quantile:%v", q.quantile),
+		fmt.Sprintf("window:%v", q.window),
+		fmt.Sprintf("interpolation:%v", q.interpolation),
+	}
+	return fmt.Sprintf("%s_{%s}", name, strings.Join(params, ","))
 }
 
 // Push adds a number for calculating the quantile.

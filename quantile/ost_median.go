@@ -1,6 +1,8 @@
 package quantile
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 
 	"github.com/alexander-yu/stream"
@@ -26,6 +28,13 @@ func NewOSTMedian(window int, impl ost.Impl) (*OSTMedian, error) {
 	}
 
 	return &OSTMedian{quantile: quantile}, nil
+}
+
+// String returns a string representation of the metric.
+func (m *OSTMedian) String() string {
+	name := "quantile.OSTMedian"
+	quantile := fmt.Sprintf("quantile:%v", m.quantile.String())
+	return fmt.Sprintf("%s_{%s}", name, quantile)
 }
 
 // Push adds a number for calculating the median.
