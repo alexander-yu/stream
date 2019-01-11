@@ -1,9 +1,5 @@
 package stream
 
-import (
-	"github.com/alexander-yu/stream/util/hashutil"
-)
-
 // Every metric satisfies one of the following interfaces below.
 
 // Metric is the interface for a metric that consumes from a stream.
@@ -12,23 +8,15 @@ import (
 type Metric interface {
 	Push(float64) error
 	Value() (float64, error)
-}
-
-// MappableMetric is the interface for a metric that can be stored in
-// a map. It is effectively a Metric that also implements the Mappable
-// interface.
-type MappableMetric interface {
-	Metric
-	hashutil.Mappable
+	String() string
 }
 
 // AggregateMetric is the interface for a metric that tracks multiple metrics simultaneously.
 // Values() returns a map of metrics to their corresponding values at that given
-// time. The sub-metrics tracked are MappableMetrics, in order to distinguish the
-// different metric values.
+// time. The keys are the string representations of the metrics (by calling the String() method).
 type AggregateMetric interface {
 	Push(float64) error
-	Values() (hashutil.Map, error)
+	Values() (map[string]interface{}, error)
 }
 
 // JointMetric is the interface for a metric that tracks joint statistics from a stream.
