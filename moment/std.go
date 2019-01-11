@@ -1,6 +1,7 @@
 package moment
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/pkg/errors"
@@ -36,6 +37,13 @@ func (s *Std) Subscribe(c *Core) {
 // Config returns the CoreConfig needed.
 func (s *Std) Config() *CoreConfig {
 	return s.variance.Config()
+}
+
+// String returns a string representation of the metric.
+func (s *Std) String() string {
+	name := "moment.Std"
+	window := fmt.Sprintf("window:%v", *s.variance.Config().Window)
+	return fmt.Sprintf("%s_{%s}", name, window)
 }
 
 // Push adds a new value for Std to consume.

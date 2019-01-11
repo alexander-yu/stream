@@ -1,6 +1,9 @@
 package moment
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/pkg/errors"
 )
 
@@ -38,6 +41,16 @@ func (m *Moment) Config() *CoreConfig {
 		Sums:   SumsConfig{m.k: true},
 		Window: &m.window,
 	}
+}
+
+// String returns a string representation of the metric.
+func (m *Moment) String() string {
+	name := "moment.Moment"
+	params := []string{
+		fmt.Sprintf("k:%v", m.k),
+		fmt.Sprintf("window:%v", m.window),
+	}
+	return fmt.Sprintf("%s_{%s}", name, strings.Join(params, ","))
 }
 
 // Push adds a new value for Moment to consume.

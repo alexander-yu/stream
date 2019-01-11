@@ -1,6 +1,7 @@
 package moment
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/pkg/errors"
@@ -55,6 +56,13 @@ func (k *Kurtosis) Subscribe(c *Core) {
 // Config returns the CoreConfig needed.
 func (k *Kurtosis) Config() *CoreConfig {
 	return k.config
+}
+
+// String returns a string representation of the metric.
+func (k *Kurtosis) String() string {
+	name := "moment.Kurtosis"
+	window := fmt.Sprintf("window:%v", *k.config.Window)
+	return fmt.Sprintf("%s_{%s}", name, window)
 }
 
 // Push adds a new value for Kurtosis to consume.

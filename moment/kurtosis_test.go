@@ -23,6 +23,14 @@ func TestNewKurtosis(t *testing.T) {
 	})
 }
 
+func TestKurtosisString(t *testing.T) {
+	expectedString := "moment.Kurtosis_{window:3}"
+	kurtosis, err := NewKurtosis(3)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedString, kurtosis.String())
+}
+
 func TestKurtosisValue(t *testing.T) {
 	t.Run("pass: returns the excess kurtosis", func(t *testing.T) {
 		kurtosis, err := NewKurtosis(3)

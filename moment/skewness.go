@@ -1,6 +1,7 @@
 package moment
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/pkg/errors"
@@ -55,6 +56,13 @@ func (s *Skewness) Subscribe(c *Core) {
 // Config returns the CoreConfig needed.
 func (s *Skewness) Config() *CoreConfig {
 	return s.config
+}
+
+// String returns a string representation of the metric.
+func (s *Skewness) String() string {
+	name := "moment.Skewness"
+	window := fmt.Sprintf("window:%v", *s.config.Window)
+	return fmt.Sprintf("%s_{%s}", name, window)
 }
 
 // Push adds a new value for Skewness to consume.

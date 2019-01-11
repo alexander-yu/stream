@@ -23,7 +23,15 @@ func TestNewStd(t *testing.T) {
 	})
 }
 
-func TestStd(t *testing.T) {
+func TestStdString(t *testing.T) {
+	expectedString := "moment.Std_{window:3}"
+	std, err := NewStd(3)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedString, std.String())
+}
+
+func TestStdValue(t *testing.T) {
 	t.Run("pass: returns the standard deviation", func(t *testing.T) {
 		std, err := NewStd(3)
 		require.NoError(t, err)

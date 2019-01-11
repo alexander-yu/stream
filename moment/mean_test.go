@@ -22,6 +22,14 @@ func TestNewMean(t *testing.T) {
 	})
 }
 
+func TestMeanString(t *testing.T) {
+	expectedString := "moment.Mean_{window:3}"
+	mean, err := NewMean(3)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedString, mean.String())
+}
+
 func TestMeanValue(t *testing.T) {
 	t.Run("pass: returns the mean", func(t *testing.T) {
 		mean, err := NewMean(3)

@@ -23,7 +23,15 @@ func TestNewSkewness(t *testing.T) {
 	})
 }
 
-func TestSkewness(t *testing.T) {
+func TestSkewnessString(t *testing.T) {
+	expectedString := "moment.Skewness_{window:3}"
+	skewness, err := NewSkewness(3)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedString, skewness.String())
+}
+
+func TestSkewnessValue(t *testing.T) {
 	t.Run("pass: returns the skewness", func(t *testing.T) {
 		skewness, err := NewSkewness(3)
 		require.NoError(t, err)

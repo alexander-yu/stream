@@ -1,6 +1,8 @@
 package moment
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 )
 
@@ -30,6 +32,13 @@ func (m *Mean) Config() *CoreConfig {
 	return &CoreConfig{
 		Window: &m.window,
 	}
+}
+
+// String returns a string representation of the metric.
+func (m *Mean) String() string {
+	name := "moment.Mean"
+	window := fmt.Sprintf("window:%v", m.window)
+	return fmt.Sprintf("%s_{%s}", name, window)
 }
 
 // Push adds a new value for Mean to consume.

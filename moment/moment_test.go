@@ -32,7 +32,15 @@ func TestNewMoment(t *testing.T) {
 	})
 }
 
-func TestMoment(t *testing.T) {
+func TestMomentString(t *testing.T) {
+	expectedString := "moment.Moment_{k:2,window:3}"
+	moment, err := NewMoment(2, 3)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedString, moment.String())
+}
+
+func TestMomentValue(t *testing.T) {
 	t.Run("pass: returns the kth moment", func(t *testing.T) {
 		moment, err := NewMoment(2, 3)
 		require.NoError(t, err)
