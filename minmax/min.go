@@ -1,6 +1,7 @@
 package minmax
 
 import (
+	"fmt"
 	"math"
 	"sync"
 
@@ -13,12 +14,12 @@ import (
 type Min struct {
 	window int
 	mux    sync.Mutex
+	count  int
 	// Used if window > 0
 	queue *queue.RingBuffer
 	deque *deque.Deque
 	// Used if window == 0
-	min   float64
-	count int
+	min float64
 }
 
 // NewMin instantiates a Min struct.
@@ -33,6 +34,13 @@ func NewMin(window int) (*Min, error) {
 		min:    math.Inf(1),
 		window: window,
 	}, nil
+}
+
+// String returns a string representation of the metric.
+func (m *Min) String() string {
+	name := "minmax.Min"
+	window := fmt.Sprintf("window:%v", m.window)
+	return fmt.Sprintf("%s_{%s}", name, window)
 }
 
 // Push adds a number for calculating the minimum.

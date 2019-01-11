@@ -22,7 +22,15 @@ func TestNewMax(t *testing.T) {
 	})
 }
 
-func TestMax(t *testing.T) {
+func TestMaxString(t *testing.T) {
+	expectedString := "minmax.Max_{window:3}"
+	max, err := NewMax(3)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedString, max.String())
+}
+
+func TestMaxValue(t *testing.T) {
 	t.Run("pass: returns global maximum for a window of 0", func(t *testing.T) {
 		max, err := NewMax(0)
 		require.NoError(t, err)

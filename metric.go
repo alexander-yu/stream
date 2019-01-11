@@ -11,7 +11,7 @@ type Metric interface {
 	String() string
 }
 
-// AggregateMetric is the interface for a metric that tracks multiple metrics simultaneously.
+// AggregateMetric is the interface for a metric that tracks multiple single-value metrics simultaneously.
 // Values() returns a map of metrics to their corresponding values at that given
 // time. The keys are the string representations of the metrics (by calling the String() method).
 type AggregateMetric interface {

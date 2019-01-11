@@ -1,6 +1,7 @@
 package minmax
 
 import (
+	"fmt"
 	"math"
 	"sync"
 
@@ -33,6 +34,13 @@ func NewMax(window int) (*Max, error) {
 		max:    math.Inf(-1),
 		window: window,
 	}, nil
+}
+
+// String returns a string representation of the metric.
+func (m *Max) String() string {
+	name := "minmax.Max"
+	window := fmt.Sprintf("window:%v", m.window)
+	return fmt.Sprintf("%s_{%s}", name, window)
 }
 
 // Push adds a number for calculating the maximum.
