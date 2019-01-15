@@ -266,5 +266,10 @@ p(m) = (m_1 + 1) * ... * (m_k + 1)
 | :----------: | :--------: | :----------: | :---------------------------------------------------: |
 | `O(tda^2)` | `O(d)`     | `O(1)`       | `O(d + ta^2)` if global, else `O(d + ta^2 + n)` |
 
+### [AggregateStatistics](https://godoc.org/github.com/alexander-yu/stream/aggregate)
+
+#### SimpleAggregateMetric
+SimpleAggregateMetric is a convenience wrapper that stores multiple metrics and will push a value to all metrics simultaneously; instead of returning a single scalar, it returns a map of metrics to their corresponding values.
+
 ## References
 1: P. Pebay, T. B. Terriberry, H. Kolla, J. Bennett, Numerically stable, scalable formulas for parallel and online computation of higher-order multivariate central moments with arbitrary weights, Computational Statistics 31 (2016) 1305–1325.

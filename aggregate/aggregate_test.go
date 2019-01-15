@@ -1,4 +1,4 @@
-package stream
+package aggregate
 
 import (
 	"fmt"
@@ -7,6 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/alexander-yu/stream"
 )
 
 type mockMetric struct {
@@ -41,7 +43,7 @@ func TestNewSimpleAggregateMetric(t *testing.T) {
 	metric1 := &mockMetric{}
 	metric2 := &mockMetric{}
 	metric := NewSimpleAggregateMetric(metric1, metric2)
-	assert.Equal(t, []Metric{metric1, metric2}, metric.metrics)
+	assert.Equal(t, []stream.Metric{metric1, metric2}, metric.metrics)
 }
 
 func TestSimpleAggregateMetricPush(t *testing.T) {

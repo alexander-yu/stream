@@ -1,22 +1,24 @@
-package stream
+package aggregate
 
 import (
 	"sync"
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
+
+	"github.com/alexander-yu/stream"
 )
 
 // SimpleAggregateMetric is a wrapper metric that tracks multiple single-value metrics simultaneously.
 // Note that it simply stores multiple metrics and pushes to all of them; this can be inefficient
 // for metrics that could make use of shared data.
 type SimpleAggregateMetric struct {
-	metrics []Metric
+	metrics []stream.Metric
 	mux     sync.Mutex
 }
 
 // NewSimpleAggregateMetric instantiates an SimpleAggregateMetric struct.
-func NewSimpleAggregateMetric(metrics ...Metric) *SimpleAggregateMetric {
+func NewSimpleAggregateMetric(metrics ...stream.Metric) *SimpleAggregateMetric {
 	return &SimpleAggregateMetric{metrics: metrics}
 }
 
@@ -30,7 +32,7 @@ func (s *SimpleAggregateMetric) Push(x float64) error {
 
 	for _, metric := range s.metrics {
 		wg.Add(1)
-		go func(metric Metric) {
+		go func(metric stream.Metric) {
 			defer wg.Done()
 			err := metric.Push(x)
 			if err != nil {
@@ -67,7 +69,7 @@ func (s *SimpleAggregateMetric) Values() (map[string]float64, error) {
 
 	for _, metric := range s.metrics {
 		wg.Add(1)
-		go func(metric Metric) {
+		go func(metric stream.Metric) {
 			defer wg.Done()
 			val, err := metric.Value()
 
