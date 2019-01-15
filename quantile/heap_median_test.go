@@ -170,3 +170,18 @@ func TestHeapMedianValue(t *testing.T) {
 		assert.EqualError(t, err, "no values seen yet")
 	})
 }
+
+func TestHeapMedianClear(t *testing.T) {
+	median, err := NewHeapMedian(10)
+	require.NoError(t, err)
+
+	for i := 0.; i < 10; i++ {
+		err = median.Push(i)
+		require.NoError(t, err)
+	}
+
+	median.Clear()
+	assert.Equal(t, 0, median.lowHeap.Len())
+	assert.Equal(t, 0, median.highHeap.Len())
+	assert.Equal(t, uint64(0), median.queue.Len())
+}

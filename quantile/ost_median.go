@@ -54,3 +54,8 @@ func (m *OSTMedian) Value() (float64, error) {
 	}
 	return value, nil
 }
+
+// Clear resets the metric.
+func (m *OSTMedian) Clear() {
+	m.quantile.Clear()
+}

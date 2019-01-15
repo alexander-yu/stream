@@ -271,3 +271,22 @@ func TestOSTQuantileValue(t *testing.T) {
 		testutil.Approx(t, 30.5, value)
 	})
 }
+
+func TestOSTQuantileClear(t *testing.T) {
+	config := &Config{
+		Quantile:      stream.FloatPtr(0.25),
+		Window:        stream.IntPtr(3),
+		Interpolation: Linear.Ptr(),
+	}
+	quantile, err := NewOSTQuantile(config, ost.AVL)
+	require.NoError(t, err)
+
+	for i := 0.; i < 10; i++ {
+		err = quantile.Push(i * i)
+		require.NoError(t, err)
+	}
+
+	quantile.Clear()
+	assert.Equal(t, uint64(0), quantile.queue.Len())
+	assert.Equal(t, 0, quantile.tree.Size())
+}

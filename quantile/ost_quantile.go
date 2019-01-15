@@ -15,7 +15,7 @@ import (
 // OSTQuantile keeps track of the quantile of a stream using order statistic trees.
 type OSTQuantile struct {
 	quantile      float64
-	window        int
+	window        uint64
 	interpolation Interpolation
 	queue         *queue.RingBuffer
 	tree          ost.Tree
@@ -42,7 +42,7 @@ func NewOSTQuantile(config *Config, impl ost.Impl) (*OSTQuantile, error) {
 
 	return &OSTQuantile{
 		quantile:      *config.Quantile,
-		window:        *config.Window,
+		window:        uint64(*config.Window),
 		interpolation: *config.Interpolation,
 		queue:         queue.NewRingBuffer(uint64(*config.Window)),
 		tree:          tree,
@@ -132,4 +132,13 @@ func (q *OSTQuantile) Value() (float64, error) {
 		hi := q.tree.Select(idx + 1).Value()
 		return (lo + hi) / 2., nil
 	}
+}
+
+// Clear resets the metric.
+func (q *OSTQuantile) Clear() {
+	q.mux.Lock()
+	defer q.mux.Unlock()
+	q.queue.Dispose()
+	q.queue = queue.NewRingBuffer(q.window)
+	q.tree.Clear()
 }

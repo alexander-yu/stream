@@ -13,7 +13,7 @@ import (
 
 // HeapMedian keeps track of the median of an entire stream using heaps.
 type HeapMedian struct {
-	window   int
+	window   uint64
 	lowHeap  *heap.Heap
 	highHeap *heap.Heap
 	queue    *queue.RingBuffer
@@ -35,7 +35,7 @@ func NewHeapMedian(window int) (*HeapMedian, error) {
 	}
 
 	return &HeapMedian{
-		window:   window,
+		window:   uint64(window),
 		lowHeap:  heap.NewHeap("low", []float64{}, fmax),
 		highHeap: heap.NewHeap("high", []float64{}, fmin),
 		queue:    queue.NewRingBuffer(uint64(window)),
@@ -130,4 +130,14 @@ func (m *HeapMedian) Value() (float64, error) {
 		high := m.highHeap.Peek()
 		return (low + high) / 2, nil
 	}
+}
+
+// Clear resets the metric.
+func (m *HeapMedian) Clear() {
+	m.mux.Lock()
+	defer m.mux.Unlock()
+	m.queue.Dispose()
+	m.queue = queue.NewRingBuffer(m.window)
+	m.lowHeap = heap.NewHeap("low", []float64{}, fmax)
+	m.highHeap = heap.NewHeap("high", []float64{}, fmin)
 }

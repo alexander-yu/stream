@@ -115,3 +115,17 @@ func TestOSTMedianValue(t *testing.T) {
 		testutil.ContainsError(t, err, "no values seen yet")
 	})
 }
+
+func TestOSTMedianClear(t *testing.T) {
+	median, err := NewOSTMedian(3, ost.AVL)
+	require.NoError(t, err)
+
+	for i := 0.; i < 10; i++ {
+		err = median.Push(i * i)
+		require.NoError(t, err)
+	}
+
+	median.Clear()
+	assert.Equal(t, uint64(0), median.quantile.queue.Len())
+	assert.Equal(t, 0, median.quantile.tree.Size())
+}
