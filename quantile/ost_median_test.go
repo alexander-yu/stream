@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/alexander-yu/stream/quantile/ost"
-	"github.com/alexander-yu/stream/util/testutil"
+	testutil "github.com/alexander-yu/stream/util/test"
 )
 
 func TestNewOSTMedian(t *testing.T) {

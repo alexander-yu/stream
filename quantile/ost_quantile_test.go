@@ -9,7 +9,7 @@ import (
 
 	"github.com/alexander-yu/stream"
 	"github.com/alexander-yu/stream/quantile/ost"
-	"github.com/alexander-yu/stream/util/testutil"
+	testutil "github.com/alexander-yu/stream/util/test"
 )
 
 func TestNewOSTQuantile(t *testing.T) {

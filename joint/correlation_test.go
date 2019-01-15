@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/alexander-yu/stream/util/testutil"
+	testutil "github.com/alexander-yu/stream/util/test"
 )
 
 func TestNewCorrelation(t *testing.T) {
