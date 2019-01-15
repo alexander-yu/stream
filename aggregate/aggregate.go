@@ -95,3 +95,20 @@ func (s *SimpleAggregateMetric) Values() (map[string]float64, error) {
 
 	return values, nil
 }
+
+// Clear resets all metrics.
+func (s *SimpleAggregateMetric) Clear() {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	var wg sync.WaitGroup
+
+	for _, metric := range s.metrics {
+		wg.Add(1)
+		go func(metric stream.Metric) {
+			defer wg.Done()
+			metric.Clear()
+		}(metric)
+	}
+
+	wg.Wait()
+}

@@ -18,6 +18,7 @@ type Metric interface {
 type AggregateMetric interface {
 	Push(float64) error
 	Values() (map[string]interface{}, error)
+	Clear()
 }
 
 // JointMetric is the interface for a metric that tracks joint statistics from a stream.

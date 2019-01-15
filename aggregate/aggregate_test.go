@@ -39,6 +39,10 @@ func (m *mockMetric) Value() (float64, error) {
 	return m.val, nil
 }
 
+func (m *mockMetric) Clear() {
+	m.vals = []float64{}
+}
+
 func TestNewSimpleAggregateMetric(t *testing.T) {
 	metric1 := &mockMetric{}
 	metric2 := &mockMetric{}
@@ -105,4 +109,19 @@ func TestSimpleAggregateMetricValue(t *testing.T) {
 		assert.EqualError(t, err, "error retrieving values from metrics: 2 errors occurred:\n\t* error retrieving value\n\t* error retrieving value\n\n")
 
 	})
+}
+
+func TestSimpleAggregateMetricClear(t *testing.T) {
+	metric1 := &mockMetric{}
+	metric2 := &mockMetric{}
+	metric := NewSimpleAggregateMetric(metric1, metric2)
+
+	for i := 0.; i < 5; i++ {
+		err := metric.Push(i)
+		require.NoError(t, err)
+	}
+
+	metric.Clear()
+	assert.Equal(t, 0, len(metric1.vals))
+	assert.Equal(t, 0, len(metric2.vals))
 }
