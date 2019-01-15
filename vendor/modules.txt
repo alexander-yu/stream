@@ -2,6 +2,10 @@
 github.com/davecgh/go-spew/spew
 # github.com/gammazero/deque v0.0.0-20180920172122-f6adf94963e4
 github.com/gammazero/deque
+# github.com/hashicorp/errwrap v1.0.0
+github.com/hashicorp/errwrap
+# github.com/hashicorp/go-multierror v1.0.0
+github.com/hashicorp/go-multierror
 # github.com/pkg/errors v0.8.0
 github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
