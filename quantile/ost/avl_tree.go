@@ -40,3 +40,8 @@ func (t *AVLTree) Rank(val float64) int {
 func (t *AVLTree) String() string {
 	return t.root.TreeString()
 }
+
+// Clear resets the tree.
+func (t *AVLTree) Clear() {
+	*t = AVLTree{}
+}

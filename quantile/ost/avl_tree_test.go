@@ -167,3 +167,9 @@ func TestAVLTreeSelect(t *testing.T) {
 	node = tree.Select(9)
 	assert.Nil(t, node)
 }
+
+func TestAVLTreeClear(t *testing.T) {
+	tree := avlTestData()
+	tree.Clear()
+	assert.Equal(t, &AVLTree{}, tree)
+}

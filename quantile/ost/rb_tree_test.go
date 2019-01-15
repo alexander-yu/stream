@@ -171,3 +171,9 @@ func TestRBTreeSelect(t *testing.T) {
 	node = tree.Select(9)
 	assert.Nil(t, node)
 }
+
+func TestRBTreeClear(t *testing.T) {
+	tree := rbTestData()
+	tree.Clear()
+	assert.Equal(t, &RBTree{}, tree)
+}

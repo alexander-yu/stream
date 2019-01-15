@@ -35,3 +35,8 @@ func (t *RBTree) Rank(val float64) int {
 func (t *RBTree) String() string {
 	return t.root.TreeString()
 }
+
+// Clear resets the tree.
+func (t *RBTree) Clear() {
+	*t = RBTree{}
+}

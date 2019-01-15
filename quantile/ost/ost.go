@@ -12,6 +12,7 @@ type Tree interface {
 	Select(int) Node
 	Rank(float64) int
 	String() string
+	Clear()
 }
 
 // Node is the interface for any node struct within an Tree.
@@ -31,9 +32,9 @@ type Impl int
 
 const (
 	// AVL represents the AVL tree implementation for the Tree interface
-	AVL Impl = 1
+	AVL Impl = iota
 	// RB represents the red black tree implementation for the Tree interface
-	RB Impl = 2
+	RB
 )
 
 // EmptyTree returns an empty Tree struct, depending on which implementation
