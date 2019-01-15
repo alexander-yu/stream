@@ -2,6 +2,7 @@ package minmax
 
 import (
 	"fmt"
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -94,4 +95,20 @@ func TestMinValue(t *testing.T) {
 		err = min.Push(val)
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing %f to queue", val))
 	})
+}
+
+func TestMinClear(t *testing.T) {
+	min, err := NewMin(3)
+	require.NoError(t, err)
+
+	for i := 0.; i < 3; i++ {
+		err = min.Push(i)
+		require.NoError(t, err)
+	}
+
+	min.Clear()
+	assert.Equal(t, 0, min.count)
+	assert.Equal(t, math.Inf(1), min.min)
+	assert.Equal(t, uint64(0), min.queue.Len())
+	assert.Equal(t, 0, min.deque.Len())
 }

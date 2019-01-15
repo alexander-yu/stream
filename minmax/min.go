@@ -12,7 +12,7 @@ import (
 
 // Min keeps track of the minimum of a stream.
 type Min struct {
-	window int
+	window uint64
 	mux    sync.Mutex
 	count  int
 	// Used if window > 0
@@ -32,7 +32,7 @@ func NewMin(window int) (*Min, error) {
 		queue:  queue.NewRingBuffer(uint64(window)),
 		deque:  &deque.Deque{},
 		min:    math.Inf(1),
-		window: window,
+		window: uint64(window),
 	}, nil
 }
 
@@ -94,4 +94,15 @@ func (m *Min) Value() (float64, error) {
 	}
 
 	return *m.deque.Front().(*float64), nil
+}
+
+// Clear resets the metric.
+func (m *Min) Clear() {
+	m.mux.Lock()
+	defer m.mux.Unlock()
+	m.count = 0
+	m.min = math.Inf(1)
+	m.queue.Dispose()
+	m.queue = queue.NewRingBuffer(m.window)
+	m.deque = &deque.Deque{}
 }

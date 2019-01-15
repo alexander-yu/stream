@@ -12,7 +12,7 @@ import (
 
 // Max keeps track of the maximum of a stream.
 type Max struct {
-	window int
+	window uint64
 	mux    sync.Mutex
 	// Used if window > 0
 	queue *queue.RingBuffer
@@ -32,7 +32,7 @@ func NewMax(window int) (*Max, error) {
 		queue:  queue.NewRingBuffer(uint64(window)),
 		deque:  &deque.Deque{},
 		max:    math.Inf(-1),
-		window: window,
+		window: uint64(window),
 	}, nil
 }
 
@@ -94,4 +94,15 @@ func (m *Max) Value() (float64, error) {
 	}
 
 	return *m.deque.Front().(*float64), nil
+}
+
+// Clear resets the metric.
+func (m *Max) Clear() {
+	m.mux.Lock()
+	defer m.mux.Unlock()
+	m.count = 0
+	m.max = math.Inf(-1)
+	m.queue.Dispose()
+	m.queue = queue.NewRingBuffer(m.window)
+	m.deque = &deque.Deque{}
 }
