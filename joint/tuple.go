@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/alexander-yu/stream/util/mathutil"
+	mathutil "github.com/alexander-yu/stream/util/math"
 )
 
 // Tuple represents a vector of integers, which

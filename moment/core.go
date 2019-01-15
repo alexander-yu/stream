@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/workiva/go-datastructures/queue"
 
-	"github.com/alexander-yu/stream/util/mathutil"
+	mathutil "github.com/alexander-yu/stream/util/math"
 )
 
 // Core is a struct that stores fundamental information for moments of a stream.
