@@ -99,3 +99,8 @@ func (k *Kurtosis) Value() (float64, error) {
 
 	return moment/math.Pow(variance, 2) - 3, nil
 }
+
+// Clear resets the metric.
+func (k *Kurtosis) Clear() {
+	k.core.Clear()
+}

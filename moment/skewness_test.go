@@ -81,3 +81,17 @@ func TestSkewnessValue(t *testing.T) {
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
 }
+
+func TestSkewnessClear(t *testing.T) {
+	skewness, err := NewSkewness(3)
+	require.NoError(t, err)
+
+	err = testData(skewness)
+	require.NoError(t, err)
+
+	skewness.Clear()
+	expectedSums := []float64{0, 0, 0, 0}
+	assert.Equal(t, expectedSums, skewness.core.sums)
+	assert.Equal(t, int(0), skewness.core.count)
+	assert.Equal(t, uint64(0), skewness.core.queue.Len())
+}

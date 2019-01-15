@@ -77,3 +77,8 @@ func (m *Moment) Value() (float64, error) {
 
 	return moment, nil
 }
+
+// Clear resets the metric.
+func (m *Moment) Clear() {
+	m.core.Clear()
+}

@@ -57,6 +57,11 @@ func (m *mockMetric) Value() (float64, error) {
 	return 0, nil
 }
 
+func (m *mockMetric) Clear() {
+	m.vals = nil
+	m.core.Clear()
+}
+
 func testData(metric Metric) error {
 	for i := 1.; i < 5; i++ {
 		err := metric.Push(i)

@@ -77,3 +77,17 @@ func TestStdValue(t *testing.T) {
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
 }
+
+func TestStdClear(t *testing.T) {
+	std, err := NewStd(3)
+	require.NoError(t, err)
+
+	err = testData(std)
+	require.NoError(t, err)
+
+	std.Clear()
+	expectedSums := []float64{0, 0, 0}
+	assert.Equal(t, expectedSums, std.variance.core.sums)
+	assert.Equal(t, int(0), std.variance.core.count)
+	assert.Equal(t, uint64(0), std.variance.core.queue.Len())
+}

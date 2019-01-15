@@ -76,3 +76,15 @@ func TestMeanValue(t *testing.T) {
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
 }
+
+func TestMeanClear(t *testing.T) {
+	mean, err := NewMean(3)
+	require.NoError(t, err)
+
+	err = testData(mean)
+	require.NoError(t, err)
+
+	mean.Clear()
+	assert.Equal(t, float64(0), mean.core.mean)
+	assert.Equal(t, uint64(0), mean.core.queue.Len())
+}

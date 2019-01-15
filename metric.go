@@ -9,6 +9,7 @@ type Metric interface {
 	Push(float64) error
 	Value() (float64, error)
 	String() string
+	Clear()
 }
 
 // AggregateMetric is the interface for a metric that tracks multiple single-value metrics simultaneously.

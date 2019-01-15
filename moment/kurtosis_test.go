@@ -80,3 +80,17 @@ func TestKurtosisValue(t *testing.T) {
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
 }
+
+func TestKurtosisClear(t *testing.T) {
+	kurtosis, err := NewKurtosis(3)
+	require.NoError(t, err)
+
+	err = testData(kurtosis)
+	require.NoError(t, err)
+
+	kurtosis.Clear()
+	expectedSums := []float64{0, 0, 0, 0, 0}
+	assert.Equal(t, expectedSums, kurtosis.core.sums)
+	assert.Equal(t, int(0), kurtosis.core.count)
+	assert.Equal(t, uint64(0), kurtosis.core.queue.Len())
+}

@@ -86,3 +86,17 @@ func TestMomentValue(t *testing.T) {
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
 }
+
+func TestMomentClear(t *testing.T) {
+	moment, err := NewMoment(1, 3)
+	require.NoError(t, err)
+
+	err = testData(moment)
+	require.NoError(t, err)
+
+	moment.Clear()
+	expectedSums := []float64{0, 0}
+	assert.Equal(t, expectedSums, moment.core.sums)
+	assert.Equal(t, int(0), moment.core.count)
+	assert.Equal(t, uint64(0), moment.core.queue.Len())
+}

@@ -63,3 +63,8 @@ func (s *Std) Value() (float64, error) {
 	}
 	return math.Sqrt(variance), nil
 }
+
+// Clear resets the metric.
+func (s *Std) Clear() {
+	s.variance.Clear()
+}

@@ -99,3 +99,8 @@ func (s *Skewness) Value() (float64, error) {
 	adjust := math.Sqrt(count*(count-1)) / (count - 2)
 	return adjust * moment / math.Pow(variance, 1.5), nil
 }
+
+// Clear resets the metric.
+func (s *Skewness) Clear() {
+	s.core.Clear()
+}

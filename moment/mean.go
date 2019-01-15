@@ -61,3 +61,8 @@ func (m *Mean) Value() (float64, error) {
 	}
 	return mean, nil
 }
+
+// Clear resets the metric.
+func (m *Mean) Clear() {
+	m.core.Clear()
+}
