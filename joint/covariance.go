@@ -65,3 +65,8 @@ func (cov *Covariance) Value() (float64, error) {
 
 	return covariance, nil
 }
+
+// Clear resets the metric.
+func (cov *Covariance) Clear() {
+	cov.core.Clear()
+}

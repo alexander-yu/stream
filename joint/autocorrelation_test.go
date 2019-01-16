@@ -134,4 +134,28 @@ func TestAutocorrelation(t *testing.T) {
 			64.,
 		))
 	})
+
+	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+
+		err = testData(autocorrelation)
+		require.NoError(t, err)
+
+		autocorrelation.Clear()
+
+		expectedSums := map[uint64]float64{
+			0:  0.,
+			1:  0.,
+			2:  0.,
+			31: 0.,
+			32: 0.,
+			62: 0.,
+		}
+		assert.Equal(t, expectedSums, autocorrelation.core.sums)
+		assert.Equal(t, expectedSums, autocorrelation.core.newSums)
+		assert.Equal(t, 0, autocorrelation.core.count)
+		assert.Equal(t, uint64(0), autocorrelation.core.queue.Len())
+		assert.Equal(t, uint64(0), autocorrelation.queue.Len())
+	})
 }

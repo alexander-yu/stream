@@ -139,6 +139,12 @@ func TestClear(t *testing.T) {
 		64: 0.,
 	}
 	assert.Equal(t, expectedSums, m.core.sums)
+	assert.Equal(t, expectedSums, m.core.newSums)
+
+	expectedMeans := []float64{0, 0}
+	assert.Equal(t, expectedMeans, m.core.means)
+	assert.Equal(t, 0, m.core.count)
+	assert.Equal(t, uint64(0), m.core.queue.Len())
 }
 
 func TestCount(t *testing.T) {

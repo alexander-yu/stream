@@ -5,6 +5,7 @@ import (
 	"math"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	testutil "github.com/alexander-yu/stream/util/test"
@@ -87,5 +88,28 @@ func TestCorrelation(t *testing.T) {
 		vals := []float64{3., 9.}
 		err = correlation.Push(vals...)
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %v to queue", vals))
+	})
+
+	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
+		correlation, err := NewCorrelation(3)
+		require.NoError(t, err)
+
+		err = testData(correlation)
+		require.NoError(t, err)
+
+		correlation.Clear()
+
+		expectedSums := map[uint64]float64{
+			0:  0.,
+			1:  0.,
+			2:  0.,
+			31: 0.,
+			32: 0.,
+			62: 0.,
+		}
+		assert.Equal(t, expectedSums, correlation.core.sums)
+		assert.Equal(t, expectedSums, correlation.core.newSums)
+		assert.Equal(t, 0, correlation.core.count)
+		assert.Equal(t, uint64(0), correlation.core.queue.Len())
 	})
 }

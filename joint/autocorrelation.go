@@ -89,3 +89,12 @@ func (a *Autocorrelation) Push(xs ...float64) error {
 func (a *Autocorrelation) Value() (float64, error) {
 	return a.correlation.Value()
 }
+
+// Clear resets the metric.
+func (a *Autocorrelation) Clear() {
+	a.correlation.core.Lock()
+	defer a.correlation.core.Unlock()
+	a.correlation.core.UnsafeClear()
+	a.queue.Dispose()
+	a.queue = queue.NewRingBuffer(a.lag)
+}

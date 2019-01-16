@@ -80,3 +80,8 @@ func (corr *Correlation) Value() (float64, error) {
 
 	return corrariance / math.Sqrt(xVar*yVar), nil
 }
+
+// Clear resets the metric.
+func (corr *Correlation) Clear() {
+	corr.core.Clear()
+}

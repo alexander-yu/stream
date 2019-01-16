@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	testutil "github.com/alexander-yu/stream/util/test"
@@ -21,7 +22,7 @@ func TestNewCovariance(t *testing.T) {
 	})
 }
 
-func TestCovariance(t *testing.T) {
+func TestCovarianceValue(t *testing.T) {
 	t.Run("pass: returns the covariance", func(t *testing.T) {
 		covariance, err := NewCovariance(3)
 		require.NoError(t, err)
@@ -86,5 +87,26 @@ func TestCovariance(t *testing.T) {
 		vals := []float64{3., 9.}
 		err = covariance.Push(vals...)
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %v to queue", vals))
+	})
+
+	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
+		covariance, err := NewCovariance(3)
+		require.NoError(t, err)
+
+		err = testData(covariance)
+		require.NoError(t, err)
+
+		covariance.Clear()
+
+		expectedSums := map[uint64]float64{
+			0:  0.,
+			1:  0.,
+			31: 0.,
+			32: 0.,
+		}
+		assert.Equal(t, expectedSums, covariance.core.sums)
+		assert.Equal(t, expectedSums, covariance.core.newSums)
+		assert.Equal(t, 0, covariance.core.count)
+		assert.Equal(t, uint64(0), covariance.core.queue.Len())
 	})
 }

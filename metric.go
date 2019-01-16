@@ -25,4 +25,5 @@ type AggregateMetric interface {
 type JointMetric interface {
 	Push(...float64) error
 	Value() (float64, error)
+	Clear()
 }
