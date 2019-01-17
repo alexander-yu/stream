@@ -200,7 +200,7 @@ config := &moment.CoreConfig{
 core, err := NewCore(config)
 ```
 
-See the [godoc](https://godoc.org/github.com/alexander-yu/stream/moment#Core) entry for more details on Core's methods (note it does not satisfy the Metric interface, since it is capable of storing multiple values).
+See the [godoc](https://godoc.org/github.com/alexander-yu/stream/moment#Core) entry for more details on Core's methods.
 
 Let `n` be the size of the window, or the stream if tracking the global minimum; let `k` be the maximum exponent of the power sums that is being tracked. Then we have the following complexities:
 
@@ -254,7 +254,7 @@ config := &joint.CoreConfig{
 core, err := NewCore(config)
 ```
 
-See the [godoc](https://godoc.org/github.com/alexander-yu/stream/joint#Core) entry for more details on Core's methods (note it does not satisfy the Metric interface, since it is capable of storing multiple values).
+See the [godoc](https://godoc.org/github.com/alexander-yu/stream/joint#Core) entry for more details on Core's methods.
 
 Let `n` be the size of the window, or the stream if tracking the global minimum. Moreover, let `t` be the number of tuples that are configured, let `d` be the number of variables being tracked. Now for a given tuple `m`, define
 ```
