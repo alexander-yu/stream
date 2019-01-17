@@ -256,6 +256,33 @@ func TestOSTQuantileValue(t *testing.T) {
 		require.NoError(t, err)
 		testutil.Approx(t, 30.5, value)
 	})
+
+	t.Run("fail: if no values seen, return error", func(t *testing.T) {
+		config := &Config{
+			Window:        stream.IntPtr(6),
+			Interpolation: Linear.Ptr(),
+		}
+		quantile, err := NewOSTQuantile(config, ost.AVL)
+		require.NoError(t, err)
+
+		_, err = quantile.Value(0.25)
+		testutil.ContainsError(t, err, "no values seen yet")
+	})
+
+	t.Run("fail: if quantile not in (0, 1), return error", func(t *testing.T) {
+		config := &Config{
+			Window:        stream.IntPtr(6),
+			Interpolation: Linear.Ptr(),
+		}
+		quantile, err := NewOSTQuantile(config, ost.AVL)
+		require.NoError(t, err)
+
+		_, err = quantile.Value(0.)
+		testutil.ContainsError(t, err, fmt.Sprintf("quantile %f not in (0, 1)", 0.))
+
+		_, err = quantile.Value(1.)
+		testutil.ContainsError(t, err, fmt.Sprintf("quantile %f not in (0, 1)", 1.))
+	})
 }
 
 func TestOSTQuantileClear(t *testing.T) {

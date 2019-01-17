@@ -85,6 +85,10 @@ func (q *OSTQuantile) Push(x float64) error {
 
 // Value returns the value of the quantile.
 func (q *OSTQuantile) Value(quantile float64) (float64, error) {
+	if quantile <= 0 || quantile >= 1 {
+		return 0, errors.Errorf("quantile %f not in (0, 1)", quantile)
+	}
+
 	q.mux.Lock()
 	defer q.mux.Unlock()
 
