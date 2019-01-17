@@ -47,7 +47,7 @@ func TestNewSimpleAggregateMetric(t *testing.T) {
 	metric1 := &mockMetric{}
 	metric2 := &mockMetric{}
 	metric := NewSimpleAggregateMetric(metric1, metric2)
-	assert.Equal(t, []stream.Metric{metric1, metric2}, metric.metrics)
+	assert.Equal(t, []stream.SimpleMetric{metric1, metric2}, metric.metrics)
 }
 
 func TestSimpleAggregateMetricPush(t *testing.T) {

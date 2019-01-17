@@ -13,12 +13,12 @@ import (
 // Note that it simply stores multiple metrics and pushes to all of them; this can be inefficient
 // for metrics that could make use of shared data.
 type SimpleAggregateMetric struct {
-	metrics []stream.Metric
+	metrics []stream.SimpleMetric
 	mux     sync.Mutex
 }
 
 // NewSimpleAggregateMetric instantiates an SimpleAggregateMetric struct.
-func NewSimpleAggregateMetric(metrics ...stream.Metric) *SimpleAggregateMetric {
+func NewSimpleAggregateMetric(metrics ...stream.SimpleMetric) *SimpleAggregateMetric {
 	return &SimpleAggregateMetric{metrics: metrics}
 }
 
@@ -32,7 +32,7 @@ func (s *SimpleAggregateMetric) Push(x float64) error {
 
 	for _, metric := range s.metrics {
 		wg.Add(1)
-		go func(metric stream.Metric) {
+		go func(metric stream.SimpleMetric) {
 			defer wg.Done()
 			err := metric.Push(x)
 			if err != nil {
@@ -69,7 +69,7 @@ func (s *SimpleAggregateMetric) Values() (map[string]float64, error) {
 
 	for _, metric := range s.metrics {
 		wg.Add(1)
-		go func(metric stream.Metric) {
+		go func(metric stream.SimpleMetric) {
 			defer wg.Done()
 			val, err := metric.Value()
 
@@ -104,7 +104,7 @@ func (s *SimpleAggregateMetric) Clear() {
 
 	for _, metric := range s.metrics {
 		wg.Add(1)
-		go func(metric stream.Metric) {
+		go func(metric stream.SimpleMetric) {
 			defer wg.Done()
 			metric.Clear()
 		}(metric)

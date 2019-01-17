@@ -4,12 +4,20 @@ package stream
 
 // Metric is the interface for a metric that consumes from a stream.
 // Metric is the standard interface for most metrics; in particular
-// for those that consume single numeric values at a time.
+// for those that consume single numeric values at a time. There is no
+// Value method for this interface, allowing implementations to return
+// multiple values if they so choose.
 type Metric interface {
 	Push(float64) error
-	Value() (float64, error)
 	String() string
 	Clear()
+}
+
+// SimpleMetric is the interface for a metric that consumes and returns
+// singular values.
+type SimpleMetric interface {
+	Metric
+	Value() (float64, error)
 }
 
 // AggregateMetric is the interface for a metric that tracks multiple single-value metrics simultaneously.
