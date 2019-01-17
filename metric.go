@@ -5,16 +5,15 @@ package stream
 // Metric is the interface for a metric that consumes from a stream.
 // Metric is the standard interface for most metrics; in particular
 // for those that consume single numeric values at a time. There is no
-// Value method for this interface, allowing implementations to return
-// multiple values if they so choose.
+// Value method for this interface, allowing implementations to roll
+// custom value methods.
 type Metric interface {
 	Push(float64) error
 	String() string
 	Clear()
 }
 
-// SimpleMetric is the interface for a metric that consumes and returns
-// singular values.
+// SimpleMetric is the interface for a Metric that returns a singular value.
 type SimpleMetric interface {
 	Metric
 	Value() (float64, error)
@@ -30,8 +29,15 @@ type AggregateMetric interface {
 }
 
 // JointMetric is the interface for a metric that tracks joint statistics from a stream.
+// There is no Value method for this interface, allowing implementations to roll
+// custom value methods.
 type JointMetric interface {
 	Push(...float64) error
-	Value() (float64, error)
 	Clear()
+}
+
+// SimpleJointMetric is the interface for a JointMetric that returns a singular value.
+type SimpleJointMetric interface {
+	JointMetric
+	Value() (float64, error)
 }
