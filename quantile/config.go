@@ -9,13 +9,11 @@ import (
 // Config is the struct containing configuration options
 // for quantile metrics.
 type Config struct {
-	Quantile      *float64
 	Window        *int
 	Interpolation *Interpolation
 }
 
 var defaultConfig = &Config{
-	Quantile:      nil,
 	Window:        stream.IntPtr(0),
 	Interpolation: Linear.Ptr(),
 }
@@ -67,19 +65,10 @@ func (i Interpolation) Ptr() *Interpolation {
 }
 
 func validateConfig(config *Config) error {
-	if config.Quantile == nil {
-		return errors.New("config Quantile is not set")
-	} else if config.Window == nil {
+	if config.Window == nil {
 		return errors.New("config Window is not set")
 	} else if config.Interpolation == nil {
 		return errors.New("config Interpolation is not set")
-	}
-
-	if *config.Quantile <= 0 || *config.Quantile >= 1 {
-		return errors.Errorf(
-			"config has a quantile of %f that is not in (0, 1)",
-			*config.Quantile,
-		)
 	}
 
 	if *config.Window < 0 {
@@ -97,10 +86,6 @@ func validateConfig(config *Config) error {
 }
 
 func setConfigDefaults(config *Config) *Config {
-	if config.Quantile == nil {
-		config.Quantile = defaultConfig.Quantile
-	}
-
 	if config.Window == nil {
 		config.Window = defaultConfig.Window
 	}

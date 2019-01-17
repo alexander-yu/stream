@@ -19,7 +19,6 @@ type OSTMedian struct {
 // of type ost.Impl.
 func NewOSTMedian(window int, impl ost.Impl) (*OSTMedian, error) {
 	quantile, err := NewOSTQuantile(&Config{
-		Quantile:      stream.FloatPtr(0.5),
 		Window:        stream.IntPtr(window),
 		Interpolation: Midpoint.Ptr(),
 	}, impl)
@@ -48,7 +47,7 @@ func (m *OSTMedian) Push(x float64) error {
 
 // Value returns the value of the median.
 func (m *OSTMedian) Value() (float64, error) {
-	value, err := m.quantile.Value()
+	value, err := m.quantile.Value(0.5)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving quantile value")
 	}

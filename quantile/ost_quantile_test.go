@@ -15,7 +15,6 @@ import (
 func TestNewOSTQuantile(t *testing.T) {
 	t.Run("fail: unsupported OST implementation is invalid", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.25),
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
 		}
@@ -25,9 +24,8 @@ func TestNewOSTQuantile(t *testing.T) {
 }
 
 func TestOSTQuantileString(t *testing.T) {
-	expectedString := "quantile.OSTQuantile_{quantile:0.25,window:3,interpolation:1}"
+	expectedString := "quantile.OSTQuantile_{window:3,interpolation:1}"
 	config := &Config{
-		Quantile:      stream.FloatPtr(0.25),
 		Window:        stream.IntPtr(3),
 		Interpolation: Linear.Ptr(),
 	}
@@ -40,7 +38,6 @@ func TestOSTQuantileString(t *testing.T) {
 func TestOSTQuantilePush(t *testing.T) {
 	t.Run("pass: successfully pushes values", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.25),
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
 		}
@@ -64,7 +61,6 @@ func TestOSTQuantilePush(t *testing.T) {
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.25),
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
 		}
@@ -84,7 +80,6 @@ func TestOSTQuantilePush(t *testing.T) {
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.25),
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
 		}
@@ -102,7 +97,6 @@ func TestOSTQuantilePush(t *testing.T) {
 func TestOSTQuantileValue(t *testing.T) {
 	t.Run("pass: returns quantile for exact index", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.25),
 			Window:        stream.IntPtr(5),
 			Interpolation: Linear.Ptr(),
 		}
@@ -114,14 +108,13 @@ func TestOSTQuantileValue(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		value, err := quantile.Value()
+		value, err := quantile.Value(0.25)
 		require.NoError(t, err)
 		testutil.Approx(t, 36., value)
 	})
 
 	t.Run("pass: returns quantile with linear interpolation", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.25),
 			Window:        stream.IntPtr(6),
 			Interpolation: Linear.Ptr(),
 		}
@@ -133,14 +126,13 @@ func TestOSTQuantileValue(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		value, err := quantile.Value()
+		value, err := quantile.Value(0.25)
 		require.NoError(t, err)
 		testutil.Approx(t, .75*25+.25*36, value)
 	})
 
 	t.Run("pass: returns quantile with lower interpolation", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.25),
 			Window:        stream.IntPtr(6),
 			Interpolation: Lower.Ptr(),
 		}
@@ -152,14 +144,13 @@ func TestOSTQuantileValue(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		value, err := quantile.Value()
+		value, err := quantile.Value(0.25)
 		require.NoError(t, err)
 		testutil.Approx(t, 25., value)
 	})
 
 	t.Run("pass: returns quantile with higher interpolation", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.25),
 			Window:        stream.IntPtr(6),
 			Interpolation: Higher.Ptr(),
 		}
@@ -171,14 +162,13 @@ func TestOSTQuantileValue(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		value, err := quantile.Value()
+		value, err := quantile.Value(0.25)
 		require.NoError(t, err)
 		testutil.Approx(t, 36., value)
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta < 0.5)", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.25),
 			Window:        stream.IntPtr(6),
 			Interpolation: Nearest.Ptr(),
 		}
@@ -190,14 +180,13 @@ func TestOSTQuantileValue(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		value, err := quantile.Value()
+		value, err := quantile.Value(0.25)
 		require.NoError(t, err)
 		testutil.Approx(t, 25., value)
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta == 0.5, idx % 2 == 0)", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.5),
 			Window:        stream.IntPtr(6),
 			Interpolation: Nearest.Ptr(),
 		}
@@ -209,14 +198,13 @@ func TestOSTQuantileValue(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		value, err := quantile.Value()
+		value, err := quantile.Value(0.5)
 		require.NoError(t, err)
 		testutil.Approx(t, 36., value)
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta == 0.5, idx % 2 == 1)", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.5),
 			Window:        stream.IntPtr(8),
 			Interpolation: Nearest.Ptr(),
 		}
@@ -228,14 +216,13 @@ func TestOSTQuantileValue(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		value, err := quantile.Value()
+		value, err := quantile.Value(0.5)
 		require.NoError(t, err)
 		testutil.Approx(t, 36., value)
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta > 0.5)", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.75),
 			Window:        stream.IntPtr(6),
 			Interpolation: Nearest.Ptr(),
 		}
@@ -247,14 +234,13 @@ func TestOSTQuantileValue(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		value, err := quantile.Value()
+		value, err := quantile.Value(0.75)
 		require.NoError(t, err)
 		testutil.Approx(t, 64., value)
 	})
 
 	t.Run("pass: returns quantile with midpoint interpolation", func(t *testing.T) {
 		config := &Config{
-			Quantile:      stream.FloatPtr(0.25),
 			Window:        stream.IntPtr(6),
 			Interpolation: Midpoint.Ptr(),
 		}
@@ -266,7 +252,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		value, err := quantile.Value()
+		value, err := quantile.Value(0.25)
 		require.NoError(t, err)
 		testutil.Approx(t, 30.5, value)
 	})
@@ -274,7 +260,6 @@ func TestOSTQuantileValue(t *testing.T) {
 
 func TestOSTQuantileClear(t *testing.T) {
 	config := &Config{
-		Quantile:      stream.FloatPtr(0.25),
 		Window:        stream.IntPtr(3),
 		Interpolation: Linear.Ptr(),
 	}

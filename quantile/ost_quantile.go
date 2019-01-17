@@ -14,7 +14,6 @@ import (
 
 // OSTQuantile keeps track of the quantile of a stream using order statistic trees.
 type OSTQuantile struct {
-	quantile      float64
 	window        uint64
 	interpolation Interpolation
 	queue         *queue.RingBuffer
@@ -41,7 +40,6 @@ func NewOSTQuantile(config *Config, impl ost.Impl) (*OSTQuantile, error) {
 	}
 
 	return &OSTQuantile{
-		quantile:      *config.Quantile,
 		window:        uint64(*config.Window),
 		interpolation: *config.Interpolation,
 		queue:         queue.NewRingBuffer(uint64(*config.Window)),
@@ -53,7 +51,6 @@ func NewOSTQuantile(config *Config, impl ost.Impl) (*OSTQuantile, error) {
 func (q *OSTQuantile) String() string {
 	name := "quantile.OSTQuantile"
 	params := []string{
-		fmt.Sprintf("quantile:%v", q.quantile),
 		fmt.Sprintf("window:%v", q.window),
 		fmt.Sprintf("interpolation:%v", q.interpolation),
 	}
@@ -87,7 +84,7 @@ func (q *OSTQuantile) Push(x float64) error {
 }
 
 // Value returns the value of the quantile.
-func (q *OSTQuantile) Value() (float64, error) {
+func (q *OSTQuantile) Value(quantile float64) (float64, error) {
 	q.mux.Lock()
 	defer q.mux.Unlock()
 
@@ -96,7 +93,7 @@ func (q *OSTQuantile) Value() (float64, error) {
 		return 0, errors.New("no values seen yet")
 	}
 
-	idxRaw := q.quantile * float64(size-1)
+	idxRaw := quantile * float64(size-1)
 	idxTrunc := math.Trunc(idxRaw)
 	idx := int(idxTrunc)
 	// if the estimated index is actually an integer,
