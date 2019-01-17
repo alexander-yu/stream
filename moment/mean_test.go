@@ -22,14 +22,6 @@ func TestNewMean(t *testing.T) {
 	})
 }
 
-func TestMeanString(t *testing.T) {
-	expectedString := "moment.Mean_{window:3}"
-	mean, err := NewMean(3)
-	require.NoError(t, err)
-
-	assert.Equal(t, expectedString, mean.String())
-}
-
 func TestMeanValue(t *testing.T) {
 	t.Run("pass: returns the mean", func(t *testing.T) {
 		mean, err := NewMean(3)
@@ -75,16 +67,24 @@ func TestMeanValue(t *testing.T) {
 		err = mean.Push(val)
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
-}
 
-func TestMeanClear(t *testing.T) {
-	mean, err := NewMean(3)
-	require.NoError(t, err)
+	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
+		mean, err := NewMean(3)
+		require.NoError(t, err)
 
-	err = testData(mean)
-	require.NoError(t, err)
+		err = testData(mean)
+		require.NoError(t, err)
 
-	mean.Clear()
-	assert.Equal(t, float64(0), mean.core.mean)
-	assert.Equal(t, uint64(0), mean.core.queue.Len())
+		mean.Clear()
+		assert.Equal(t, float64(0), mean.core.mean)
+		assert.Equal(t, uint64(0), mean.core.queue.Len())
+	})
+
+	t.Run("pass: String() returns string representation", func(t *testing.T) {
+		expectedString := "moment.Mean_{window:3}"
+		mean, err := NewMean(3)
+		require.NoError(t, err)
+
+		assert.Equal(t, expectedString, mean.String())
+	})
 }

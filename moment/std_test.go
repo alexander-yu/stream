@@ -23,14 +23,6 @@ func TestNewStd(t *testing.T) {
 	})
 }
 
-func TestStdString(t *testing.T) {
-	expectedString := "moment.Std_{window:3}"
-	std, err := NewStd(3)
-	require.NoError(t, err)
-
-	assert.Equal(t, expectedString, std.String())
-}
-
 func TestStdValue(t *testing.T) {
 	t.Run("pass: returns the standard deviation", func(t *testing.T) {
 		std, err := NewStd(3)
@@ -76,18 +68,26 @@ func TestStdValue(t *testing.T) {
 		err = std.Push(val)
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
-}
 
-func TestStdClear(t *testing.T) {
-	std, err := NewStd(3)
-	require.NoError(t, err)
+	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
+		std, err := NewStd(3)
+		require.NoError(t, err)
 
-	err = testData(std)
-	require.NoError(t, err)
+		err = testData(std)
+		require.NoError(t, err)
 
-	std.Clear()
-	expectedSums := []float64{0, 0, 0}
-	assert.Equal(t, expectedSums, std.variance.core.sums)
-	assert.Equal(t, int(0), std.variance.core.count)
-	assert.Equal(t, uint64(0), std.variance.core.queue.Len())
+		std.Clear()
+		expectedSums := []float64{0, 0, 0}
+		assert.Equal(t, expectedSums, std.variance.core.sums)
+		assert.Equal(t, int(0), std.variance.core.count)
+		assert.Equal(t, uint64(0), std.variance.core.queue.Len())
+	})
+
+	t.Run("pass: String() returns string representation", func(t *testing.T) {
+		expectedString := "moment.Std_{window:3}"
+		std, err := NewStd(3)
+		require.NoError(t, err)
+
+		assert.Equal(t, expectedString, std.String())
+	})
 }

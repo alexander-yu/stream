@@ -23,14 +23,6 @@ func TestNewKurtosis(t *testing.T) {
 	})
 }
 
-func TestKurtosisString(t *testing.T) {
-	expectedString := "moment.Kurtosis_{window:3}"
-	kurtosis, err := NewKurtosis(3)
-	require.NoError(t, err)
-
-	assert.Equal(t, expectedString, kurtosis.String())
-}
-
 func TestKurtosisValue(t *testing.T) {
 	t.Run("pass: returns the excess kurtosis", func(t *testing.T) {
 		kurtosis, err := NewKurtosis(3)
@@ -79,18 +71,26 @@ func TestKurtosisValue(t *testing.T) {
 		err = kurtosis.Push(val)
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
-}
 
-func TestKurtosisClear(t *testing.T) {
-	kurtosis, err := NewKurtosis(3)
-	require.NoError(t, err)
+	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
+		kurtosis, err := NewKurtosis(3)
+		require.NoError(t, err)
 
-	err = testData(kurtosis)
-	require.NoError(t, err)
+		err = testData(kurtosis)
+		require.NoError(t, err)
 
-	kurtosis.Clear()
-	expectedSums := []float64{0, 0, 0, 0, 0}
-	assert.Equal(t, expectedSums, kurtosis.core.sums)
-	assert.Equal(t, int(0), kurtosis.core.count)
-	assert.Equal(t, uint64(0), kurtosis.core.queue.Len())
+		kurtosis.Clear()
+		expectedSums := []float64{0, 0, 0, 0, 0}
+		assert.Equal(t, expectedSums, kurtosis.core.sums)
+		assert.Equal(t, int(0), kurtosis.core.count)
+		assert.Equal(t, uint64(0), kurtosis.core.queue.Len())
+	})
+
+	t.Run("pass: String() returns string representation", func(t *testing.T) {
+		expectedString := "moment.Kurtosis_{window:3}"
+		kurtosis, err := NewKurtosis(3)
+		require.NoError(t, err)
+
+		assert.Equal(t, expectedString, kurtosis.String())
+	})
 }

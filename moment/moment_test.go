@@ -32,14 +32,6 @@ func TestNewMoment(t *testing.T) {
 	})
 }
 
-func TestMomentString(t *testing.T) {
-	expectedString := "moment.Moment_{k:2,window:3}"
-	moment, err := NewMoment(2, 3)
-	require.NoError(t, err)
-
-	assert.Equal(t, expectedString, moment.String())
-}
-
 func TestMomentValue(t *testing.T) {
 	t.Run("pass: returns the kth moment", func(t *testing.T) {
 		moment, err := NewMoment(2, 3)
@@ -85,18 +77,26 @@ func TestMomentValue(t *testing.T) {
 		err = moment.Push(val)
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
-}
 
-func TestMomentClear(t *testing.T) {
-	moment, err := NewMoment(1, 3)
-	require.NoError(t, err)
+	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
+		moment, err := NewMoment(1, 3)
+		require.NoError(t, err)
 
-	err = testData(moment)
-	require.NoError(t, err)
+		err = testData(moment)
+		require.NoError(t, err)
 
-	moment.Clear()
-	expectedSums := []float64{0, 0}
-	assert.Equal(t, expectedSums, moment.core.sums)
-	assert.Equal(t, int(0), moment.core.count)
-	assert.Equal(t, uint64(0), moment.core.queue.Len())
+		moment.Clear()
+		expectedSums := []float64{0, 0}
+		assert.Equal(t, expectedSums, moment.core.sums)
+		assert.Equal(t, int(0), moment.core.count)
+		assert.Equal(t, uint64(0), moment.core.queue.Len())
+	})
+
+	t.Run("pass: String() returns string representation", func(t *testing.T) {
+		expectedString := "moment.Moment_{k:2,window:3}"
+		moment, err := NewMoment(2, 3)
+		require.NoError(t, err)
+
+		assert.Equal(t, expectedString, moment.String())
+	})
 }

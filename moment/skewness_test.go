@@ -23,14 +23,6 @@ func TestNewSkewness(t *testing.T) {
 	})
 }
 
-func TestSkewnessString(t *testing.T) {
-	expectedString := "moment.Skewness_{window:3}"
-	skewness, err := NewSkewness(3)
-	require.NoError(t, err)
-
-	assert.Equal(t, expectedString, skewness.String())
-}
-
 func TestSkewnessValue(t *testing.T) {
 	t.Run("pass: returns the skewness", func(t *testing.T) {
 		skewness, err := NewSkewness(3)
@@ -80,18 +72,26 @@ func TestSkewnessValue(t *testing.T) {
 		err = skewness.Push(val)
 		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
 	})
-}
 
-func TestSkewnessClear(t *testing.T) {
-	skewness, err := NewSkewness(3)
-	require.NoError(t, err)
+	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
+		skewness, err := NewSkewness(3)
+		require.NoError(t, err)
 
-	err = testData(skewness)
-	require.NoError(t, err)
+		err = testData(skewness)
+		require.NoError(t, err)
 
-	skewness.Clear()
-	expectedSums := []float64{0, 0, 0, 0}
-	assert.Equal(t, expectedSums, skewness.core.sums)
-	assert.Equal(t, int(0), skewness.core.count)
-	assert.Equal(t, uint64(0), skewness.core.queue.Len())
+		skewness.Clear()
+		expectedSums := []float64{0, 0, 0, 0}
+		assert.Equal(t, expectedSums, skewness.core.sums)
+		assert.Equal(t, int(0), skewness.core.count)
+		assert.Equal(t, uint64(0), skewness.core.queue.Len())
+	})
+
+	t.Run("pass: String() returns string representation", func(t *testing.T) {
+		expectedString := "moment.Skewness_{window:3}"
+		skewness, err := NewSkewness(3)
+		require.NoError(t, err)
+
+		assert.Equal(t, expectedString, skewness.String())
+	})
 }
