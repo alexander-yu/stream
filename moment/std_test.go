@@ -12,20 +12,14 @@ import (
 )
 
 func TestNewStd(t *testing.T) {
-	t.Run("pass: returns an Std", func(t *testing.T) {
-		_, err := NewStd(3)
-		assert.NoError(t, err)
-	})
-
-	t.Run("fail: negative window is invalid", func(t *testing.T) {
-		_, err := NewStd(-1)
-		testutil.ContainsError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
-	})
+	std := NewStd(3)
+	assert.Equal(t, &Moment{K: 2, Window: 3}, std.variance)
 }
 
 func TestStdValue(t *testing.T) {
 	t.Run("pass: returns the standard deviation", func(t *testing.T) {
-		std, err := NewStd(3)
+		std := NewStd(3)
+		err := SetupMetric(std)
 		require.NoError(t, err)
 
 		err = testData(std)
@@ -38,7 +32,8 @@ func TestStdValue(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		std, err := NewStd(3)
+		std := NewStd(3)
+		err := SetupMetric(std)
 		require.NoError(t, err)
 
 		_, err = std.Value()
@@ -46,7 +41,8 @@ func TestStdValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		std, err := NewStd(3)
+		std := NewStd(3)
+		err := SetupMetric(std)
 		require.NoError(t, err)
 
 		err = testData(std)
@@ -59,7 +55,8 @@ func TestStdValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		std, err := NewStd(3)
+		std := NewStd(3)
+		err := SetupMetric(std)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -70,7 +67,8 @@ func TestStdValue(t *testing.T) {
 	})
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		std, err := NewStd(3)
+		std := NewStd(3)
+		err := SetupMetric(std)
 		require.NoError(t, err)
 
 		err = testData(std)
@@ -85,9 +83,7 @@ func TestStdValue(t *testing.T) {
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
 		expectedString := "moment.Std_{window:3}"
-		std, err := NewStd(3)
-		require.NoError(t, err)
-
+		std := NewStd(3)
 		assert.Equal(t, expectedString, std.String())
 	})
 }

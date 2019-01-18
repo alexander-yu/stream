@@ -8,18 +8,8 @@ import (
 
 // Mean is a metric that tracks the mean.
 type Mean struct {
-	window int
+	Window int
 	core   *Core
-}
-
-// NewMean instantiates a Mean struct.
-func NewMean(window int) (*Mean, error) {
-	mean := &Mean{window: window}
-	err := SetupMetric(mean)
-	if err != nil {
-		return nil, errors.Wrap(err, "error setting up Metric")
-	}
-	return mean, nil
 }
 
 // Subscribe subscribes the Mean to a Core object.
@@ -30,14 +20,14 @@ func (m *Mean) Subscribe(c *Core) {
 // Config returns the CoreConfig needed.
 func (m *Mean) Config() *CoreConfig {
 	return &CoreConfig{
-		Window: &m.window,
+		Window: &m.Window,
 	}
 }
 
 // String returns a string representation of the metric.
 func (m *Mean) String() string {
 	name := "moment.Mean"
-	window := fmt.Sprintf("window:%v", m.window)
+	window := fmt.Sprintf("window:%v", m.Window)
 	return fmt.Sprintf("%s_{%s}", name, window)
 }
 

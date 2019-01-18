@@ -10,21 +10,10 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
-func TestNewMean(t *testing.T) {
-	t.Run("pass: returns a Mean", func(t *testing.T) {
-		_, err := NewMean(3)
-		assert.NoError(t, err)
-	})
-
-	t.Run("fail: negative window is invalid", func(t *testing.T) {
-		_, err := NewMean(-1)
-		testutil.ContainsError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
-	})
-}
-
 func TestMeanValue(t *testing.T) {
 	t.Run("pass: returns the mean", func(t *testing.T) {
-		mean, err := NewMean(3)
+		mean := &Mean{Window: 3}
+		err := SetupMetric(mean)
 		require.NoError(t, err)
 
 		err = testData(mean)
@@ -37,7 +26,8 @@ func TestMeanValue(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		mean, err := NewMean(3)
+		mean := &Mean{Window: 3}
+		err := SetupMetric(mean)
 		require.NoError(t, err)
 
 		_, err = mean.Value()
@@ -45,7 +35,8 @@ func TestMeanValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		mean, err := NewMean(3)
+		mean := &Mean{Window: 3}
+		err := SetupMetric(mean)
 		require.NoError(t, err)
 
 		err = testData(mean)
@@ -58,7 +49,8 @@ func TestMeanValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		mean, err := NewMean(3)
+		mean := &Mean{Window: 3}
+		err := SetupMetric(mean)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -69,7 +61,8 @@ func TestMeanValue(t *testing.T) {
 	})
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		mean, err := NewMean(3)
+		mean := &Mean{Window: 3}
+		err := SetupMetric(mean)
 		require.NoError(t, err)
 
 		err = testData(mean)
@@ -82,8 +75,7 @@ func TestMeanValue(t *testing.T) {
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
 		expectedString := "moment.Mean_{window:3}"
-		mean, err := NewMean(3)
-		require.NoError(t, err)
+		mean := &Mean{Window: 3}
 
 		assert.Equal(t, expectedString, mean.String())
 	})

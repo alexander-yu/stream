@@ -9,25 +9,9 @@ import (
 
 // Moment is a metric that tracks the kth sample central moment.
 type Moment struct {
-	k      int
-	window int
+	K      int
+	Window int
 	core   *Core
-}
-
-// NewMoment instantiates a Moment struct that tracks the kth moment.
-func NewMoment(k int, window int) (*Moment, error) {
-	if k <= 0 {
-		return nil, errors.Errorf("%d is a nonpositive moment", k)
-	}
-
-	moment := &Moment{k: k, window: window}
-
-	err := SetupMetric(moment)
-	if err != nil {
-		return nil, errors.Wrap(err, "error setting up Metric")
-	}
-
-	return moment, nil
 }
 
 // Subscribe subscribes the Moment to a Core object.
@@ -38,8 +22,8 @@ func (m *Moment) Subscribe(c *Core) {
 // Config returns the CoreConfig needed.
 func (m *Moment) Config() *CoreConfig {
 	return &CoreConfig{
-		Sums:   SumsConfig{m.k: true},
-		Window: &m.window,
+		Sums:   SumsConfig{m.K: true},
+		Window: &m.Window,
 	}
 }
 
@@ -47,8 +31,8 @@ func (m *Moment) Config() *CoreConfig {
 func (m *Moment) String() string {
 	name := "moment.Moment"
 	params := []string{
-		fmt.Sprintf("k:%v", m.k),
-		fmt.Sprintf("window:%v", m.window),
+		fmt.Sprintf("k:%v", m.K),
+		fmt.Sprintf("window:%v", m.Window),
 	}
 	return fmt.Sprintf("%s_{%s}", name, strings.Join(params, ","))
 }
@@ -67,7 +51,7 @@ func (m *Moment) Value() (float64, error) {
 	m.core.RLock()
 	defer m.core.RUnlock()
 
-	moment, err := m.core.Sum(m.k)
+	moment, err := m.core.Sum(m.K)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum")
 	}

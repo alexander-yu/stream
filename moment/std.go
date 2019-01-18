@@ -13,20 +13,9 @@ type Std struct {
 }
 
 // NewStd instantiates an Std struct.
-func NewStd(window int) (*Std, error) {
-	variance, err := NewMoment(2, window)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating 2nd Moment")
-	}
-
-	std := &Std{variance: variance}
-
-	err = SetupMetric(std)
-	if err != nil {
-		return nil, errors.Wrap(err, "error setting up Metric")
-	}
-
-	return std, nil
+func NewStd(window int) *Std {
+	variance := &Moment{K: 2, Window: window}
+	return &Std{variance: variance}
 }
 
 // Subscribe subscribes the Std to a Core object.

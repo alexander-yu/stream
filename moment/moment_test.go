@@ -10,31 +10,10 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
-func TestNewMoment(t *testing.T) {
-	t.Run("pass: returns a Moment", func(t *testing.T) {
-		moment, err := NewMoment(1, 3)
-		require.NoError(t, err)
-		assert.Equal(t, 1, moment.k)
-
-		moment, err = NewMoment(5, 3)
-		require.NoError(t, err)
-		assert.Equal(t, 5, moment.k)
-	})
-
-	t.Run("fail: nonpositive moment is invalid", func(t *testing.T) {
-		_, err := NewMoment(-1, 3)
-		assert.EqualError(t, err, "-1 is a nonpositive moment")
-	})
-
-	t.Run("fail: negative window is invalid", func(t *testing.T) {
-		_, err := NewMoment(3, -1)
-		testutil.ContainsError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
-	})
-}
-
 func TestMomentValue(t *testing.T) {
 	t.Run("pass: returns the kth moment", func(t *testing.T) {
-		moment, err := NewMoment(2, 3)
+		moment := &Moment{K: 2, Window: 3}
+		err := SetupMetric(moment)
 		require.NoError(t, err)
 
 		err = testData(moment)
@@ -47,7 +26,8 @@ func TestMomentValue(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		moment, err := NewMoment(2, 3)
+		moment := &Moment{K: 2, Window: 3}
+		err := SetupMetric(moment)
 		require.NoError(t, err)
 
 		_, err = moment.Value()
@@ -55,7 +35,8 @@ func TestMomentValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		moment, err := NewMoment(1, 3)
+		moment := &Moment{K: 1, Window: 3}
+		err := SetupMetric(moment)
 		require.NoError(t, err)
 
 		err = testData(moment)
@@ -68,7 +49,8 @@ func TestMomentValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		moment, err := NewMoment(1, 3)
+		moment := &Moment{K: 1, Window: 3}
+		err := SetupMetric(moment)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -79,7 +61,8 @@ func TestMomentValue(t *testing.T) {
 	})
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		moment, err := NewMoment(1, 3)
+		moment := &Moment{K: 1, Window: 3}
+		err := SetupMetric(moment)
 		require.NoError(t, err)
 
 		err = testData(moment)
@@ -94,8 +77,7 @@ func TestMomentValue(t *testing.T) {
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
 		expectedString := "moment.Moment_{k:2,window:3}"
-		moment, err := NewMoment(2, 3)
-		require.NoError(t, err)
+		moment := &Moment{K: 2, Window: 3}
 
 		assert.Equal(t, expectedString, moment.String())
 	})

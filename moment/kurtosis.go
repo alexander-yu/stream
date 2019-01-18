@@ -16,34 +16,22 @@ type Kurtosis struct {
 }
 
 // NewKurtosis instantiates a Kurtosis struct.
-func NewKurtosis(window int) (*Kurtosis, error) {
-	variance, err := NewMoment(2, window)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating 2nd Moment")
+func NewKurtosis(window int) *Kurtosis {
+	variance := &Moment{K: 2, Window: window}
+	moment4 := &Moment{K: 4, Window: window}
+	config := &CoreConfig{
+		Sums: SumsConfig{
+			2: true,
+			4: true,
+		},
+		Window: &window,
 	}
 
-	moment4, err := NewMoment(4, window)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating 4th Moment")
-	}
-
-	config, err := MergeConfigs(variance.Config(), moment4.Config())
-	if err != nil {
-		return nil, errors.Wrap(err, "error merging configs")
-	}
-
-	kurtosis := &Kurtosis{
+	return &Kurtosis{
 		variance: variance,
 		moment4:  moment4,
 		config:   config,
 	}
-
-	err = SetupMetric(kurtosis)
-	if err != nil {
-		return nil, errors.Wrap(err, "error setting up Metric")
-	}
-
-	return kurtosis, nil
 }
 
 // Subscribe subscribes the Kurtosis to a Core object.

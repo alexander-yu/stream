@@ -12,20 +12,25 @@ import (
 )
 
 func TestNewKurtosis(t *testing.T) {
-	t.Run("pass: returns a Kurtosis", func(t *testing.T) {
-		_, err := NewKurtosis(3)
-		assert.NoError(t, err)
-	})
-
-	t.Run("fail: negative window is invalid", func(t *testing.T) {
-		_, err := NewKurtosis(-1)
-		testutil.ContainsError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
-	})
+	window := 3
+	kurtosis := NewKurtosis(window)
+	assert.Equal(t, &Kurtosis{
+		variance: &Moment{K: 2, Window: window},
+		moment4:  &Moment{K: 4, Window: window},
+		config: &CoreConfig{
+			Sums: SumsConfig{
+				2: true,
+				4: true,
+			},
+			Window: &window,
+		},
+	}, kurtosis)
 }
 
 func TestKurtosisValue(t *testing.T) {
 	t.Run("pass: returns the excess kurtosis", func(t *testing.T) {
-		kurtosis, err := NewKurtosis(3)
+		kurtosis := NewKurtosis(3)
+		err := SetupMetric(kurtosis)
 		require.NoError(t, err)
 
 		err = testData(kurtosis)
@@ -41,7 +46,8 @@ func TestKurtosisValue(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		kurtosis, err := NewKurtosis(3)
+		kurtosis := NewKurtosis(3)
+		err := SetupMetric(kurtosis)
 		require.NoError(t, err)
 
 		_, err = kurtosis.Value()
@@ -49,7 +55,8 @@ func TestKurtosisValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		kurtosis, err := NewKurtosis(3)
+		kurtosis := NewKurtosis(3)
+		err := SetupMetric(kurtosis)
 		require.NoError(t, err)
 
 		err = testData(kurtosis)
@@ -62,7 +69,8 @@ func TestKurtosisValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		kurtosis, err := NewKurtosis(3)
+		kurtosis := NewKurtosis(3)
+		err := SetupMetric(kurtosis)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -73,7 +81,8 @@ func TestKurtosisValue(t *testing.T) {
 	})
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		kurtosis, err := NewKurtosis(3)
+		kurtosis := NewKurtosis(3)
+		err := SetupMetric(kurtosis)
 		require.NoError(t, err)
 
 		err = testData(kurtosis)
@@ -88,9 +97,7 @@ func TestKurtosisValue(t *testing.T) {
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
 		expectedString := "moment.Kurtosis_{window:3}"
-		kurtosis, err := NewKurtosis(3)
-		require.NoError(t, err)
-
+		kurtosis := NewKurtosis(3)
 		assert.Equal(t, expectedString, kurtosis.String())
 	})
 }

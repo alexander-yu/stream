@@ -16,34 +16,22 @@ type Skewness struct {
 }
 
 // NewSkewness instantiates a Skewness struct.
-func NewSkewness(window int) (*Skewness, error) {
-	variance, err := NewMoment(2, window)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating 2nd Moment")
+func NewSkewness(window int) *Skewness {
+	variance := &Moment{K: 2, Window: window}
+	moment3 := &Moment{K: 3, Window: window}
+	config := &CoreConfig{
+		Sums: SumsConfig{
+			2: true,
+			3: true,
+		},
+		Window: &window,
 	}
 
-	moment3, err := NewMoment(3, window)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating 3rd Moment")
-	}
-
-	config, err := MergeConfigs(variance.Config(), moment3.Config())
-	if err != nil {
-		return nil, errors.Wrap(err, "error merging configs")
-	}
-
-	skewness := &Skewness{
+	return &Skewness{
 		variance: variance,
 		moment3:  moment3,
 		config:   config,
 	}
-
-	err = SetupMetric(skewness)
-	if err != nil {
-		return nil, errors.Wrap(err, "error setting up Metric")
-	}
-
-	return skewness, nil
 }
 
 // Subscribe subscribes the Skewness to a Core object.

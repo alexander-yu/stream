@@ -12,20 +12,25 @@ import (
 )
 
 func TestNewSkewness(t *testing.T) {
-	t.Run("pass: returns a Skewness", func(t *testing.T) {
-		_, err := NewSkewness(3)
-		assert.NoError(t, err)
-	})
-
-	t.Run("fail: negative window is invalid", func(t *testing.T) {
-		_, err := NewSkewness(-1)
-		testutil.ContainsError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
-	})
+	window := 3
+	skewness := NewSkewness(window)
+	assert.Equal(t, &Skewness{
+		variance: &Moment{K: 2, Window: window},
+		moment3:  &Moment{K: 3, Window: window},
+		config: &CoreConfig{
+			Sums: SumsConfig{
+				2: true,
+				3: true,
+			},
+			Window: &window,
+		},
+	}, skewness)
 }
 
 func TestSkewnessValue(t *testing.T) {
 	t.Run("pass: returns the skewness", func(t *testing.T) {
-		skewness, err := NewSkewness(3)
+		skewness := NewSkewness(3)
+		err := SetupMetric(skewness)
 		require.NoError(t, err)
 
 		err = testData(skewness)
@@ -42,7 +47,8 @@ func TestSkewnessValue(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		skewness, err := NewSkewness(3)
+		skewness := NewSkewness(3)
+		err := SetupMetric(skewness)
 		require.NoError(t, err)
 
 		_, err = skewness.Value()
@@ -50,7 +56,8 @@ func TestSkewnessValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		skewness, err := NewSkewness(3)
+		skewness := NewSkewness(3)
+		err := SetupMetric(skewness)
 		require.NoError(t, err)
 
 		err = testData(skewness)
@@ -63,7 +70,8 @@ func TestSkewnessValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		skewness, err := NewSkewness(3)
+		skewness := NewSkewness(3)
+		err := SetupMetric(skewness)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -74,7 +82,8 @@ func TestSkewnessValue(t *testing.T) {
 	})
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		skewness, err := NewSkewness(3)
+		skewness := NewSkewness(3)
+		err := SetupMetric(skewness)
 		require.NoError(t, err)
 
 		err = testData(skewness)
@@ -89,9 +98,7 @@ func TestSkewnessValue(t *testing.T) {
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
 		expectedString := "moment.Skewness_{window:3}"
-		skewness, err := NewSkewness(3)
-		require.NoError(t, err)
-
+		skewness := NewSkewness(3)
 		assert.Equal(t, expectedString, skewness.String())
 	})
 }
