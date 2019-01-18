@@ -23,17 +23,13 @@ type Max struct {
 }
 
 // NewMax instantiates a Max struct.
-func NewMax(window int) (*Max, error) {
-	if window < 0 {
-		return nil, errors.Errorf("%d is a negative window", window)
-	}
-
+func NewMax(window uint64) *Max {
 	return &Max{
-		queue:  queue.NewRingBuffer(uint64(window)),
+		queue:  queue.NewRingBuffer(window),
 		deque:  &deque.Deque{},
 		max:    math.Inf(-1),
-		window: uint64(window),
-	}, nil
+		window: window,
+	}
 }
 
 // String returns a string representation of the metric.
