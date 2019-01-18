@@ -38,7 +38,7 @@ func TestPush(t *testing.T) {
 		// any stats upon removing the last item from the queue, which only happens
 		// in the special case of the queue having a size of 1.
 		core, err := NewCore(&CoreConfig{
-			Sums: map[int]bool{
+			Sums: SumsConfig{
 				1: true,
 				2: true,
 				3: true,

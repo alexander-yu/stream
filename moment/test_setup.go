@@ -29,7 +29,7 @@ func (m *mockMetric) Subscribe(c *Core) {
 
 func (m *mockMetric) Config() *CoreConfig {
 	return &CoreConfig{
-		Sums: map[int]bool{
+		Sums: SumsConfig{
 			1: true,
 			2: true,
 			3: true,
