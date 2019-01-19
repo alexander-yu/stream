@@ -13,15 +13,25 @@ import (
 )
 
 func TestNewAutocorrelation(t *testing.T) {
-	autocorrelation := NewAutocorrelation(1, 3)
-	assert.Equal(t, 1, autocorrelation.lag)
-	assert.Equal(t, NewCorrelation(3), autocorrelation.correlation)
+	t.Run("pass: valid Autocorrelation is valid", func(t *testing.T) {
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+		assert.Equal(t, 1, autocorrelation.lag)
+		assert.Equal(t, NewCorrelation(3), autocorrelation.correlation)
+	})
+
+	t.Run("fail: negative lag returns error", func(t *testing.T) {
+		_, err := NewAutocorrelation(-1, 3)
+		testutil.ContainsError(t, err, "-1 is a negative lag")
+	})
 }
 
 func TestAutocorrelation(t *testing.T) {
 	t.Run("pass: returns the autocorrelation", func(t *testing.T) {
-		autocorrelation := NewAutocorrelation(1, 3)
-		err := Init(autocorrelation)
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+
+		err = Init(autocorrelation)
 		require.NoError(t, err)
 
 		err = testData(autocorrelation)
@@ -34,8 +44,10 @@ func TestAutocorrelation(t *testing.T) {
 	})
 
 	t.Run("pass: returns the correlation for lag=0", func(t *testing.T) {
-		autocorrelation := NewAutocorrelation(0, 3)
-		err := Init(autocorrelation)
+		autocorrelation, err := NewAutocorrelation(0, 3)
+		require.NoError(t, err)
+
+		err = Init(autocorrelation)
 		require.NoError(t, err)
 
 		err = testData(autocorrelation)
@@ -48,8 +60,10 @@ func TestAutocorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: if core push fails for lag=0, return error", func(t *testing.T) {
-		autocorrelation := NewAutocorrelation(0, 3)
-		err := Init(autocorrelation)
+		autocorrelation, err := NewAutocorrelation(0, 3)
+		require.NoError(t, err)
+
+		err = Init(autocorrelation)
 		require.NoError(t, err)
 
 		err = testData(autocorrelation)
@@ -66,8 +80,10 @@ func TestAutocorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		autocorrelation := NewAutocorrelation(1, 3)
-		err := Init(autocorrelation)
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+
+		err = Init(autocorrelation)
 		require.NoError(t, err)
 
 		_, err = autocorrelation.Value()
@@ -75,8 +91,10 @@ func TestAutocorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: error if wrong number of values are pushed", func(t *testing.T) {
-		autocorrelation := NewAutocorrelation(1, 3)
-		err := Init(autocorrelation)
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+
+		err = Init(autocorrelation)
 		require.NoError(t, err)
 
 		vals := []float64{3.}
@@ -97,8 +115,10 @@ func TestAutocorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: if core queue retrieval fails, return error", func(t *testing.T) {
-		autocorrelation := NewAutocorrelation(1, 3)
-		err := Init(autocorrelation)
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+
+		err = Init(autocorrelation)
 		require.NoError(t, err)
 
 		err = testData(autocorrelation)
@@ -115,8 +135,10 @@ func TestAutocorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: if core queue insertion fails, return error", func(t *testing.T) {
-		autocorrelation := NewAutocorrelation(1, 3)
-		err := Init(autocorrelation)
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+
+		err = Init(autocorrelation)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -136,8 +158,10 @@ func TestAutocorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: if lag queue retrieval fails, return error", func(t *testing.T) {
-		autocorrelation := NewAutocorrelation(1, 3)
-		err := Init(autocorrelation)
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+
+		err = Init(autocorrelation)
 		require.NoError(t, err)
 
 		err = testData(autocorrelation)
@@ -150,8 +174,10 @@ func TestAutocorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: if lag queue insertion fails, return error", func(t *testing.T) {
-		autocorrelation := NewAutocorrelation(1, 3)
-		err := Init(autocorrelation)
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+
+		err = Init(autocorrelation)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -164,8 +190,10 @@ func TestAutocorrelation(t *testing.T) {
 	})
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		autocorrelation := NewAutocorrelation(1, 3)
-		err := Init(autocorrelation)
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+
+		err = Init(autocorrelation)
 		require.NoError(t, err)
 
 		err = testData(autocorrelation)
@@ -189,7 +217,9 @@ func TestAutocorrelation(t *testing.T) {
 	})
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
-		autocorrelation := NewAutocorrelation(1, 3)
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+
 		expectedString := "joint.Autocorrelation_{lag:1,window:3}"
 		assert.Equal(t, expectedString, autocorrelation.String())
 	})

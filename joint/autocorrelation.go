@@ -17,14 +17,16 @@ type Autocorrelation struct {
 }
 
 // NewAutocorrelation instantiates an Autocorrelation struct.
-func NewAutocorrelation(lag int, window int) *Autocorrelation {
-	autocorrelation := &Autocorrelation{
+func NewAutocorrelation(lag int, window int) (*Autocorrelation, error) {
+	if lag < 0 {
+		return nil, errors.Errorf("%d is a negative lag", lag)
+	}
+
+	return &Autocorrelation{
 		lag:         lag,
 		queue:       queue.NewRingBuffer(uint64(lag)),
 		correlation: NewCorrelation(window),
-	}
-
-	return autocorrelation
+	}, nil
 }
 
 // Subscribe subscribes the Autocorrelation to a Core object.
