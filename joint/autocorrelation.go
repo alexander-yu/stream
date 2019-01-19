@@ -10,19 +10,17 @@ import (
 
 // Autocorrelation is a metric that tracks the sample autocorrelation.
 type Autocorrelation struct {
-	lag         uint64
+	lag         int
 	queue       *queue.RingBuffer
 	correlation *Correlation
 	core        *Core
 }
 
 // NewAutocorrelation instantiates an Autocorrelation struct.
-// The lag parameter is of type uint64 due to the internal queue.RingBuffer
-// used, whose constructor requires uint64 as input.
-func NewAutocorrelation(lag uint64, window int) *Autocorrelation {
+func NewAutocorrelation(lag int, window int) *Autocorrelation {
 	autocorrelation := &Autocorrelation{
 		lag:         lag,
-		queue:       queue.NewRingBuffer(lag),
+		queue:       queue.NewRingBuffer(uint64(lag)),
 		correlation: NewCorrelation(window),
 	}
 
@@ -73,7 +71,7 @@ func (a *Autocorrelation) Push(xs ...float64) error {
 		return nil
 	}
 
-	if a.queue.Len() >= a.lag {
+	if a.queue.Len() >= uint64(a.lag) {
 		tail, err := a.queue.Get()
 		if err != nil {
 			return errors.Wrap(err, "error popping item from lag queue")
@@ -105,5 +103,5 @@ func (a *Autocorrelation) Clear() {
 	defer a.correlation.core.Unlock()
 	a.correlation.core.UnsafeClear()
 	a.queue.Dispose()
-	a.queue = queue.NewRingBuffer(a.lag)
+	a.queue = queue.NewRingBuffer(uint64(a.lag))
 }

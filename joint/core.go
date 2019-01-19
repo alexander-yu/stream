@@ -19,7 +19,7 @@ type Core struct {
 	sums    map[uint64]float64
 	newSums map[uint64]float64
 	count   int
-	window  uint64
+	window  int
 	queue   *queue.RingBuffer
 }
 
@@ -52,7 +52,7 @@ func NewCore(config *CoreConfig) (*Core, error) {
 
 	// initialize and create Core
 	c := &Core{}
-	c.window = uint64(*config.Window)
+	c.window = *config.Window
 
 	c.sums = map[uint64]float64{}
 	c.newSums = map[uint64]float64{}
@@ -67,7 +67,7 @@ func NewCore(config *CoreConfig) (*Core, error) {
 
 	c.tuples = config.Sums
 	c.means = make([]float64, *config.Vars)
-	c.queue = queue.NewRingBuffer(c.window)
+	c.queue = queue.NewRingBuffer(uint64(c.window))
 
 	return c, nil
 }
@@ -92,7 +92,7 @@ func (c *Core) UnsafePush(xs ...float64) error {
 	}
 
 	if c.window != 0 {
-		if c.queue.Len() == c.window {
+		if c.queue.Len() == uint64(c.window) {
 			tail, err := c.queue.Get()
 			if err != nil {
 				return errors.Wrap(err, "error popping item from queue")
@@ -350,7 +350,7 @@ func (c *Core) UnsafeClear() {
 
 	c.count = 0
 	c.queue.Dispose()
-	c.queue = queue.NewRingBuffer(c.window)
+	c.queue = queue.NewRingBuffer(uint64(c.window))
 }
 
 // RLock locks the Core internals for reading.

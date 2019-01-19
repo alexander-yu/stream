@@ -54,7 +54,7 @@ func TestNewCore(t *testing.T) {
 		core, err := NewCore(config)
 		require.NoError(t, err)
 
-		assert.Equal(t, uint64(2), core.window)
+		assert.Equal(t, 2, core.window)
 		assert.Equal(t, config.Sums, SumsConfig(core.tuples))
 		assert.Equal(t, make([]float64, 2), core.means)
 		assert.Equal(t, uint64(0), core.queue.Len())
