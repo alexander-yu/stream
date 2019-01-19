@@ -13,7 +13,7 @@ import (
 
 func TestNewMax(t *testing.T) {
 	max := NewMax(3)
-	assert.Equal(t, uint64(3), max.window)
+	assert.Equal(t, 3, max.window)
 	assert.Equal(t, uint64(0), max.queue.Len())
 	assert.Equal(t, 0, max.deque.Len())
 	assert.Equal(t, math.Inf(-1), max.max)

@@ -12,7 +12,7 @@ import (
 
 // Max keeps track of the maximum of a stream.
 type Max struct {
-	window uint64
+	window int
 	mux    sync.Mutex
 	// Used if window > 0
 	queue *queue.RingBuffer
@@ -23,9 +23,9 @@ type Max struct {
 }
 
 // NewMax instantiates a Max struct.
-func NewMax(window uint64) *Max {
+func NewMax(window int) *Max {
 	return &Max{
-		queue:  queue.NewRingBuffer(window),
+		queue:  queue.NewRingBuffer(uint64(window)),
 		deque:  &deque.Deque{},
 		max:    math.Inf(-1),
 		window: window,
@@ -99,6 +99,6 @@ func (m *Max) Clear() {
 	m.count = 0
 	m.max = math.Inf(-1)
 	m.queue.Dispose()
-	m.queue = queue.NewRingBuffer(m.window)
+	m.queue = queue.NewRingBuffer(uint64(m.window))
 	m.deque = &deque.Deque{}
 }

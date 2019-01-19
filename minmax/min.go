@@ -12,7 +12,7 @@ import (
 
 // Min keeps track of the minimum of a stream.
 type Min struct {
-	window uint64
+	window int
 	mux    sync.Mutex
 	count  int
 	// Used if window > 0
@@ -23,9 +23,9 @@ type Min struct {
 }
 
 // NewMin instantiates a Min struct.
-func NewMin(window uint64) *Min {
+func NewMin(window int) *Min {
 	return &Min{
-		queue:  queue.NewRingBuffer(window),
+		queue:  queue.NewRingBuffer(uint64(window)),
 		deque:  &deque.Deque{},
 		min:    math.Inf(1),
 		window: window,
@@ -99,6 +99,6 @@ func (m *Min) Clear() {
 	m.count = 0
 	m.min = math.Inf(1)
 	m.queue.Dispose()
-	m.queue = queue.NewRingBuffer(m.window)
+	m.queue = queue.NewRingBuffer(uint64(m.window))
 	m.deque = &deque.Deque{}
 }

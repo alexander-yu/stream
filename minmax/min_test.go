@@ -13,7 +13,7 @@ import (
 
 func TestNewMin(t *testing.T) {
 	min := NewMin(3)
-	assert.Equal(t, uint64(3), min.window)
+	assert.Equal(t, 3, min.window)
 	assert.Equal(t, uint64(0), min.queue.Len())
 	assert.Equal(t, 0, min.deque.Len())
 	assert.Equal(t, math.Inf(1), min.min)
