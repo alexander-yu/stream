@@ -23,6 +23,6 @@ func TestImplInit(t *testing.T) {
 	t.Run("fail: unsupported implementations return an error", func(t *testing.T) {
 		i := Impl(-1)
 		_, err := i.init()
-		assert.EqualError(t, err, fmt.Sprintf("%v is not a supported OST implementation", i))
+		assert.EqualError(t, err, fmt.Sprintf("%v is not a supported Impl value", i))
 	})
 }
