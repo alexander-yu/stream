@@ -54,7 +54,7 @@ import (
 
 func main() {
     // tracks the mean over a rolling window of size 5
-    mean := moment.Mean{Window: 5}
+    mean := moment.NewMean(5)
     err := moment.Init(mean)
     if err != nil {
         fmt.Printf("error creating Mean: %+v", err)
