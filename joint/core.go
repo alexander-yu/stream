@@ -55,14 +55,11 @@ func NewCore(config *CoreConfig) (*Core, error) {
 	c.window = uint64(*config.Window)
 
 	c.sums = map[uint64]float64{}
+	c.newSums = map[uint64]float64{}
 	for _, tuple := range config.Sums {
 		iter(tuple, false, func(xs ...int) {
 			c.sums[Tuple(xs).hash()] = 0
 		})
-	}
-
-	c.newSums = map[uint64]float64{}
-	for _, tuple := range config.Sums {
 		iter(tuple, false, func(xs ...int) {
 			c.newSums[Tuple(xs).hash()] = 0
 		})

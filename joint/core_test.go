@@ -11,6 +11,79 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
+type invalidMetric struct {
+	subscribed bool
+}
+
+func (m *invalidMetric) Push(xs ...float64) error {
+	return nil
+}
+
+func (m *invalidMetric) Value() (float64, error) {
+	return 0, nil
+}
+
+func (m *invalidMetric) Clear() {}
+
+func (m *invalidMetric) Subscribe(c *Core) {
+	m.subscribed = true
+}
+
+func (m *invalidMetric) Config() *CoreConfig {
+	return &CoreConfig{Vars: stream.IntPtr(-1)}
+}
+
+func TestNewCore(t *testing.T) {
+	t.Run("fail: invalid config returns error", func(t *testing.T) {
+		_, err := NewCore(&CoreConfig{Vars: stream.IntPtr(-1)})
+		testutil.ContainsError(t, err, "error validating config")
+	})
+
+	t.Run("pass: valid config returns Core", func(t *testing.T) {
+		config := &CoreConfig{
+			Sums: SumsConfig{
+				{2, 2},
+				{3, 1},
+			},
+			Window: stream.IntPtr(2),
+		}
+		core, err := NewCore(config)
+		require.NoError(t, err)
+
+		assert.Equal(t, uint64(2), core.window)
+		assert.Equal(t, config.Sums, SumsConfig(core.tuples))
+		assert.Equal(t, make([]float64, 2), core.means)
+		assert.Equal(t, uint64(0), core.queue.Len())
+
+		for _, tuple := range config.Sums {
+			iter(tuple, false, func(xs ...int) {
+				assert.Equal(t, 0., core.sums[Tuple(xs).hash()])
+			})
+			iter(tuple, false, func(xs ...int) {
+				assert.Equal(t, 0., core.newSums[Tuple(xs).hash()])
+			})
+		}
+	})
+}
+
+func TestSetupMetric(t *testing.T) {
+	t.Run("fail: invalid config returns error", func(t *testing.T) {
+		metric := &invalidMetric{}
+		err := SetupMetric(metric)
+
+		testutil.ContainsError(t, err, "error creating Core")
+		assert.False(t, metric.subscribed)
+	})
+
+	t.Run("pass: valid config subscribes metric to new Core", func(t *testing.T) {
+		metric := &mockMetric{}
+		err := SetupMetric(metric)
+		require.NoError(t, err)
+
+		assert.NotNil(t, metric.core)
+	})
+}
+
 func TestPush(t *testing.T) {
 	t.Run("pass: successfully pushes values", func(t *testing.T) {
 		m := newMockMetric()
