@@ -55,6 +55,7 @@ func (m *HeapMedian) Push(x float64) error {
 	defer m.mux.Unlock()
 
 	var item *heap.Item
+	// if queue is full, we need to remove old item
 	if m.window != 0 && m.queue.Len() == uint64(m.window) {
 		tail, err := m.queue.Get()
 		if err != nil {
@@ -64,10 +65,12 @@ func (m *HeapMedian) Push(x float64) error {
 		item = tail.(*heap.Item)
 		low := item.HeapID == m.lowHeap.ID
 		switch {
+		// if new/old items are in the same heap, just replace the old item
 		case low && x <= m.lowHeap.Peek():
 			m.lowHeap.Update(item, x)
 		case !low && x > m.lowHeap.Peek():
 			m.highHeap.Update(item, x)
+		// otherwise, remove old item and push new value to other heap
 		case low && x > m.lowHeap.Peek():
 			m.lowHeap.Remove(item)
 			item.Val = x
@@ -78,6 +81,7 @@ func (m *HeapMedian) Push(x float64) error {
 			heapops.Push(m.lowHeap, item)
 		}
 
+		// rebalance heaps
 		if m.lowHeap.Len()+1 < m.highHeap.Len() {
 			item = heapops.Pop(m.highHeap).(*heap.Item)
 			heapops.Push(m.lowHeap, item)
@@ -93,6 +97,7 @@ func (m *HeapMedian) Push(x float64) error {
 			heapops.Push(m.highHeap, item)
 		}
 
+		// rebalance heaps
 		if m.lowHeap.Len()+1 < m.highHeap.Len() {
 			item = heapops.Pop(m.highHeap).(*heap.Item)
 			heapops.Push(m.lowHeap, item)
@@ -121,11 +126,13 @@ func (m *HeapMedian) Value() (float64, error) {
 		return 0, errors.New("no values seen yet")
 	}
 
+	// return top of the larger of the heaps
 	if m.lowHeap.Len() < m.highHeap.Len() {
 		return m.highHeap.Peek(), nil
 	} else if m.lowHeap.Len() > m.highHeap.Len() {
 		return m.lowHeap.Peek(), nil
 	} else {
+		// otherwise, return average of the two tops
 		low := m.lowHeap.Peek()
 		high := m.highHeap.Peek()
 		return (low + high) / 2, nil

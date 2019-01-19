@@ -282,25 +282,40 @@ func (n *RBNode) Rank(val float64) int {
  * Pretty-printing
  *******************/
 
+// treeString recursively prints out a subtree rooted at the node in a sideways format, as below:
+// │       ┌── 7.000000
+// │   ┌── 6.000000
+// │   │   └── 5.000000
+// └── 4.000000
+//     │   ┌── 3.000000
+//     └── 2.000000
+//         └── 1.000000
+//             └── 1.000000
 func (n *RBNode) treeString(prefix string, result string, isTail bool) string {
-	if n.right != nil {
-		if isTail {
+	// isTail indicates whether or not the current node's parent branch needs to be represented
+	// as a "tail", i.e. its branch needs to hang in the string representation, rather than branch upwards.
+	if isTail {
+		// If true, then we need to print the subtree like this:
+		// │   ┌── [n.right.treeString()]
+		// └── [n.val]
+		//     └── [n.left.treeString()]
+		if n.right != nil {
 			result = n.right.treeString(fmt.Sprintf("%s│   ", prefix), result, false)
-		} else {
+		}
+		result = fmt.Sprintf("%s%s└── %f\n", result, prefix, n.val)
+		if n.left != nil {
+			result = n.left.treeString(fmt.Sprintf("%s    ", prefix), result, true)
+		}
+	} else {
+		// If false, then we need to print the subtree like this:
+		//     ┌── [n.right.treeString()]
+		// ┌── [n.val]
+		// │   └── [n.left.treeString()]
+		if n.right != nil {
 			result = n.right.treeString(fmt.Sprintf("%s    ", prefix), result, false)
 		}
-	}
-
-	if isTail {
-		result = fmt.Sprintf("%s%s└── %f\n", result, prefix, n.val)
-	} else {
 		result = fmt.Sprintf("%s%s┌── %f\n", result, prefix, n.val)
-	}
-
-	if n.left != nil {
-		if isTail {
-			result = n.left.treeString(fmt.Sprintf("%s    ", prefix), result, true)
-		} else {
+		if n.left != nil {
 			result = n.left.treeString(fmt.Sprintf("%s│   ", prefix), result, true)
 		}
 	}
