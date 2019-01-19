@@ -33,6 +33,7 @@ type AggregateMetric interface {
 // custom value methods.
 type JointMetric interface {
 	Push(...float64) error
+	String() string
 	Clear()
 }
 

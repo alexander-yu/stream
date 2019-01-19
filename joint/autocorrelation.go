@@ -1,6 +1,9 @@
 package joint
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/pkg/errors"
 	"github.com/workiva/go-datastructures/queue"
 )
@@ -34,6 +37,16 @@ func (a *Autocorrelation) Subscribe(c *Core) {
 // Config returns the CoreConfig needed.
 func (a *Autocorrelation) Config() *CoreConfig {
 	return a.correlation.Config()
+}
+
+// String returns a string representation of the metric.
+func (a *Autocorrelation) String() string {
+	name := "joint.Autocorrelation"
+	params := []string{
+		fmt.Sprintf("lag:%v", a.lag),
+		fmt.Sprintf("window:%v", a.correlation.Window),
+	}
+	return fmt.Sprintf("%s_{%s}", name, strings.Join(params, ","))
 }
 
 // Push adds a new pair of values for Autocorrelation to consume.

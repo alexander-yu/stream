@@ -15,6 +15,10 @@ type invalidMetric struct {
 	subscribed bool
 }
 
+func (m *invalidMetric) String() string {
+	return ""
+}
+
 func (m *invalidMetric) Push(xs ...float64) error {
 	return nil
 }

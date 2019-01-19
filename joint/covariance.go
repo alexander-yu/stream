@@ -1,6 +1,10 @@
 package joint
 
-import "github.com/pkg/errors"
+import (
+	"fmt"
+
+	"github.com/pkg/errors"
+)
 
 // Covariance is a metric that tracks the sample covariance.
 type Covariance struct {
@@ -19,6 +23,12 @@ func (cov *Covariance) Config() *CoreConfig {
 		Sums:   SumsConfig{{1, 1}},
 		Window: &cov.Window,
 	}
+}
+
+// String returns a string representation of the metric.
+func (cov *Covariance) String() string {
+	name := "joint.Covariance"
+	return fmt.Sprintf("%s_{window:%v}", name, cov.Window)
 }
 
 // Push adds a new pair of values for Covariance to consume.

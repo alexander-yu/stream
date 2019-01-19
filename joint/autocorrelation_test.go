@@ -187,4 +187,10 @@ func TestAutocorrelation(t *testing.T) {
 		assert.Equal(t, uint64(0), autocorrelation.core.queue.Len())
 		assert.Equal(t, uint64(0), autocorrelation.queue.Len())
 	})
+
+	t.Run("pass: String() returns string representation", func(t *testing.T) {
+		autocorrelation := NewAutocorrelation(1, 3)
+		expectedString := "joint.Autocorrelation_{lag:1,window:3}"
+		assert.Equal(t, expectedString, autocorrelation.String())
+	})
 }

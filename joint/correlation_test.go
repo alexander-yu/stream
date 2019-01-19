@@ -106,4 +106,10 @@ func TestCorrelation(t *testing.T) {
 		assert.Equal(t, 0, correlation.core.count)
 		assert.Equal(t, uint64(0), correlation.core.queue.Len())
 	})
+
+	t.Run("pass: String() returns string representation", func(t *testing.T) {
+		correlation := &Correlation{Window: 3}
+		expectedString := "joint.Correlation_{window:3}"
+		assert.Equal(t, expectedString, correlation.String())
+	})
 }

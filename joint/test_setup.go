@@ -36,6 +36,10 @@ func (m *mockMetric) Config() *CoreConfig {
 	}
 }
 
+func (m *mockMetric) String() string {
+	return ""
+}
+
 func (m *mockMetric) Push(xs ...float64) error {
 	m.vals = append(m.vals, xs)
 	err := m.core.Push(xs...)

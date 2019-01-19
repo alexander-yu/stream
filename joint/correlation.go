@@ -1,6 +1,7 @@
 package joint
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/pkg/errors"
@@ -27,6 +28,12 @@ func (corr *Correlation) Config() *CoreConfig {
 		},
 		Window: &corr.Window,
 	}
+}
+
+// String returns a string representation of the metric.
+func (corr *Correlation) String() string {
+	name := "joint.Correlation"
+	return fmt.Sprintf("%s_{window:%v}", name, corr.Window)
 }
 
 // Push adds a new pair of values for Correlation to consume.
