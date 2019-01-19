@@ -23,13 +23,17 @@ type Min struct {
 }
 
 // NewMin instantiates a Min struct.
-func NewMin(window int) *Min {
+func NewMin(window int) (*Min, error) {
+	if window < 0 {
+		return nil, errors.Errorf("%d is a negative window", window)
+	}
+
 	return &Min{
 		queue:  queue.NewRingBuffer(uint64(window)),
 		deque:  &deque.Deque{},
 		min:    math.Inf(1),
 		window: window,
-	}
+	}, nil
 }
 
 // String returns a string representation of the metric.
