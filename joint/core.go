@@ -23,8 +23,8 @@ type Core struct {
 	queue   *queue.RingBuffer
 }
 
-// SetupMetric sets a Metric up with a Core for consuming.
-func SetupMetric(metric Metric) error {
+// Init sets a Metric up with a Core for consuming.
+func Init(metric Metric) error {
 	config := metric.Config()
 	core, err := NewCore(config)
 	if err != nil {

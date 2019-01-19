@@ -14,7 +14,7 @@ import (
 func TestCorrelation(t *testing.T) {
 	t.Run("pass: returns the correlation", func(t *testing.T) {
 		correlation := &Correlation{Window: 3}
-		err := SetupMetric(correlation)
+		err := Init(correlation)
 		require.NoError(t, err)
 
 		err = testData(correlation)
@@ -28,7 +28,7 @@ func TestCorrelation(t *testing.T) {
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		correlation := &Correlation{Window: 3}
-		err := SetupMetric(correlation)
+		err := Init(correlation)
 		require.NoError(t, err)
 
 		_, err = correlation.Value()
@@ -37,7 +37,7 @@ func TestCorrelation(t *testing.T) {
 
 	t.Run("fail: error if wrong number of values are pushed", func(t *testing.T) {
 		correlation := &Correlation{Window: 3}
-		err := SetupMetric(correlation)
+		err := Init(correlation)
 		require.NoError(t, err)
 
 		vals := []float64{3.}
@@ -59,7 +59,7 @@ func TestCorrelation(t *testing.T) {
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
 		correlation := &Correlation{Window: 3}
-		err := SetupMetric(correlation)
+		err := Init(correlation)
 		require.NoError(t, err)
 
 		err = testData(correlation)
@@ -73,7 +73,7 @@ func TestCorrelation(t *testing.T) {
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
 		correlation := &Correlation{Window: 3}
-		err := SetupMetric(correlation)
+		err := Init(correlation)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -85,7 +85,7 @@ func TestCorrelation(t *testing.T) {
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
 		correlation := &Correlation{Window: 3}
-		err := SetupMetric(correlation)
+		err := Init(correlation)
 		require.NoError(t, err)
 
 		err = testData(correlation)
