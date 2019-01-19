@@ -92,7 +92,7 @@ func (q *OSTQuantile) Value(quantile float64) (float64, error) {
 	q.mux.Lock()
 	defer q.mux.Unlock()
 
-	size := int(q.queue.Len())
+	size := int(q.tree.Size())
 	if size == 0 {
 		return 0, errors.New("no values seen yet")
 	}
