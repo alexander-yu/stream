@@ -14,28 +14,15 @@ type Autocorrelation struct {
 }
 
 // NewAutocorrelation instantiates an Autocorrelation struct.
-func NewAutocorrelation(lag int, window int) (*Autocorrelation, error) {
-	if lag < 1 {
-		return nil, errors.Errorf("%d is a lag that is less than 1", lag)
-	}
-
-	correlation, err := NewCorrelation(window)
-	if err != nil {
-		return nil, errors.Wrap(err, "error creating Correlation")
-	}
-
+func NewAutocorrelation(lag uint64, window int) *Autocorrelation {
+	correlation := &Correlation{Window: window}
 	autocorrelation := &Autocorrelation{
-		lag:         uint64(lag),
-		queue:       queue.NewRingBuffer(uint64(lag)),
+		lag:         lag,
+		queue:       queue.NewRingBuffer(lag),
 		correlation: correlation,
 	}
 
-	err = SetupMetric(autocorrelation)
-	if err != nil {
-		return nil, errors.Wrap(err, "error setting up Metric")
-	}
-
-	return autocorrelation, nil
+	return autocorrelation
 }
 
 // Subscribe subscribes the Autocorrelation to a Core object.
@@ -63,6 +50,14 @@ func (a *Autocorrelation) Push(xs ...float64) error {
 
 	a.core.Lock()
 	defer a.core.Unlock()
+
+	if a.lag == 0 {
+		err := a.core.UnsafePush(x, y)
+		if err != nil {
+			return errors.Wrapf(err, "error pushing (%f, %f) to core", x, y)
+		}
+		return nil
+	}
 
 	if a.queue.Len() >= a.lag {
 		tail, err := a.queue.Get()

@@ -11,21 +11,10 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
-func TestNewCorrelation(t *testing.T) {
-	t.Run("pass: returns a Correlation", func(t *testing.T) {
-		_, err := NewCorrelation(3)
-		require.NoError(t, err)
-	})
-
-	t.Run("fail: negative window is invalid", func(t *testing.T) {
-		_, err := NewCorrelation(-1)
-		testutil.ContainsError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
-	})
-}
-
 func TestCorrelation(t *testing.T) {
 	t.Run("pass: returns the correlation", func(t *testing.T) {
-		correlation, err := NewCorrelation(3)
+		correlation := &Correlation{Window: 3}
+		err := SetupMetric(correlation)
 		require.NoError(t, err)
 
 		err = testData(correlation)
@@ -38,7 +27,8 @@ func TestCorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		correlation, err := NewCorrelation(3)
+		correlation := &Correlation{Window: 3}
+		err := SetupMetric(correlation)
 		require.NoError(t, err)
 
 		_, err = correlation.Value()
@@ -46,7 +36,8 @@ func TestCorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: error if wrong number of values are pushed", func(t *testing.T) {
-		correlation, err := NewCorrelation(3)
+		correlation := &Correlation{Window: 3}
+		err := SetupMetric(correlation)
 		require.NoError(t, err)
 
 		vals := []float64{3.}
@@ -67,7 +58,8 @@ func TestCorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		correlation, err := NewCorrelation(3)
+		correlation := &Correlation{Window: 3}
+		err := SetupMetric(correlation)
 		require.NoError(t, err)
 
 		err = testData(correlation)
@@ -80,7 +72,8 @@ func TestCorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		correlation, err := NewCorrelation(3)
+		correlation := &Correlation{Window: 3}
+		err := SetupMetric(correlation)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -91,7 +84,8 @@ func TestCorrelation(t *testing.T) {
 	})
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		correlation, err := NewCorrelation(3)
+		correlation := &Correlation{Window: 3}
+		err := SetupMetric(correlation)
 		require.NoError(t, err)
 
 		err = testData(correlation)

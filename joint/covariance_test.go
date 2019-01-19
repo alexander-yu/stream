@@ -10,21 +10,10 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
-func TestNewCovariance(t *testing.T) {
-	t.Run("pass: returns a Covariance", func(t *testing.T) {
-		_, err := NewCovariance(3)
-		require.NoError(t, err)
-	})
-
-	t.Run("fail: negative window is invalid", func(t *testing.T) {
-		_, err := NewCovariance(-1)
-		testutil.ContainsError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
-	})
-}
-
 func TestCovarianceValue(t *testing.T) {
 	t.Run("pass: returns the covariance", func(t *testing.T) {
-		covariance, err := NewCovariance(3)
+		covariance := &Covariance{Window: 3}
+		err := SetupMetric(covariance)
 		require.NoError(t, err)
 
 		err = testData(covariance)
@@ -37,7 +26,8 @@ func TestCovarianceValue(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		covariance, err := NewCovariance(3)
+		covariance := &Covariance{Window: 3}
+		err := SetupMetric(covariance)
 		require.NoError(t, err)
 
 		_, err = covariance.Value()
@@ -45,7 +35,8 @@ func TestCovarianceValue(t *testing.T) {
 	})
 
 	t.Run("fail: error if wrong number of values are pushed", func(t *testing.T) {
-		covariance, err := NewCovariance(3)
+		covariance := &Covariance{Window: 3}
+		err := SetupMetric(covariance)
 		require.NoError(t, err)
 
 		vals := []float64{3.}
@@ -66,7 +57,8 @@ func TestCovarianceValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		covariance, err := NewCovariance(3)
+		covariance := &Covariance{Window: 3}
+		err := SetupMetric(covariance)
 		require.NoError(t, err)
 
 		err = testData(covariance)
@@ -79,7 +71,8 @@ func TestCovarianceValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		covariance, err := NewCovariance(3)
+		covariance := &Covariance{Window: 3}
+		err := SetupMetric(covariance)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -90,7 +83,8 @@ func TestCovarianceValue(t *testing.T) {
 	})
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		covariance, err := NewCovariance(3)
+		covariance := &Covariance{Window: 3}
+		err := SetupMetric(covariance)
 		require.NoError(t, err)
 
 		err = testData(covariance)

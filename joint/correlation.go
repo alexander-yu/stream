@@ -8,20 +8,8 @@ import (
 
 // Correlation is a metric that tracks the sample Pearson correlation coefficient.
 type Correlation struct {
-	window int
+	Window int
 	core   *Core
-}
-
-// NewCorrelation instantiates a Correlation struct.
-func NewCorrelation(window int) (*Correlation, error) {
-	correlation := &Correlation{window: window}
-
-	err := SetupMetric(correlation)
-	if err != nil {
-		return nil, errors.Wrap(err, "error setting up Metric")
-	}
-
-	return correlation, nil
 }
 
 // Subscribe subscribes the Correlation to a Core object.
@@ -37,7 +25,7 @@ func (corr *Correlation) Config() *CoreConfig {
 			{2, 0},
 			{0, 2},
 		},
-		Window: &corr.window,
+		Window: &corr.Window,
 	}
 }
 

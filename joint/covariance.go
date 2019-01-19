@@ -4,20 +4,8 @@ import "github.com/pkg/errors"
 
 // Covariance is a metric that tracks the sample covariance.
 type Covariance struct {
-	window int
+	Window int
 	core   *Core
-}
-
-// NewCovariance instantiates a Covariance struct.
-func NewCovariance(window int) (*Covariance, error) {
-	covariance := &Covariance{window: window}
-
-	err := SetupMetric(covariance)
-	if err != nil {
-		return nil, errors.Wrap(err, "error setting up Metric")
-	}
-
-	return covariance, nil
 }
 
 // Subscribe subscribes the Covariance to a Core object.
@@ -29,7 +17,7 @@ func (cov *Covariance) Subscribe(c *Core) {
 func (cov *Covariance) Config() *CoreConfig {
 	return &CoreConfig{
 		Sums:   SumsConfig{{1, 1}},
-		Window: &cov.window,
+		Window: &cov.Window,
 	}
 }
 
