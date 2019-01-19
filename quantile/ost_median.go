@@ -20,7 +20,8 @@ func NewOSTMedian(window int, impl Impl) (*OSTMedian, error) {
 	quantile, err := NewOSTQuantile(&Config{
 		Window:        stream.IntPtr(window),
 		Interpolation: Midpoint.Ptr(),
-	}, impl)
+		Impl:          impl.Ptr(),
+	})
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating OSTQuantile")
 	}

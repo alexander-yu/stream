@@ -20,10 +20,8 @@ type OSTQuantile struct {
 	mux           sync.Mutex
 }
 
-// NewOSTQuantile instantiates an OSTQuantile struct. The implementation of the
-// underlying order statistic tree can be configured by passing in a constant
-// of type Impl.
-func NewOSTQuantile(config *Config, impl Impl) (*OSTQuantile, error) {
+// NewOSTQuantile instantiates an OSTQuantile struct.
+func NewOSTQuantile(config *Config) (*OSTQuantile, error) {
 	// set defaults for any remaining unset fields
 	config = setConfigDefaults(config)
 
@@ -33,9 +31,9 @@ func NewOSTQuantile(config *Config, impl Impl) (*OSTQuantile, error) {
 		return nil, errors.Wrap(err, "error validating config")
 	}
 
-	statistic, err := impl.init()
+	statistic, err := config.Impl.init()
 	if err != nil {
-		return nil, errors.Wrap(err, "error instantiating empty ost.Tree")
+		return nil, errors.Wrap(err, "error instantiating order.Statistic")
 	}
 
 	return &OSTQuantile{

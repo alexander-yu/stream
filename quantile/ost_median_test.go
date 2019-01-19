@@ -33,7 +33,10 @@ func TestNewOSTMedian(t *testing.T) {
 }
 
 func TestOSTMedianString(t *testing.T) {
-	expectedString := "quantile.OSTMedian_{quantile:quantile.OSTQuantile_{window:3,interpolation:5}}"
+	expectedString := fmt.Sprintf(
+		"quantile.OSTMedian_{quantile:quantile.OSTQuantile_{window:3,interpolation:%d}}",
+		Midpoint,
+	)
 	median, err := NewOSTMedian(3, AVL)
 	require.NoError(t, err)
 

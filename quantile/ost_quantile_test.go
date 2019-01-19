@@ -13,22 +13,28 @@ import (
 
 func TestNewOSTQuantile(t *testing.T) {
 	t.Run("fail: unsupported OST implementation is invalid", func(t *testing.T) {
+		impl := Impl(-1)
 		config := &Config{
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
+			Impl:          &impl,
 		}
-		_, err := NewOSTQuantile(config, Impl(-1))
-		testutil.ContainsError(t, err, "error instantiating empty ost.Tree")
+		_, err := NewOSTQuantile(config)
+		testutil.ContainsError(t, err, "error validating config")
 	})
 }
 
 func TestOSTQuantileString(t *testing.T) {
-	expectedString := "quantile.OSTQuantile_{window:3,interpolation:1}"
+	expectedString := fmt.Sprintf(
+		"quantile.OSTQuantile_{window:3,interpolation:%d}",
+		Linear,
+	)
 	config := &Config{
 		Window:        stream.IntPtr(3),
 		Interpolation: Linear.Ptr(),
+		Impl:          AVL.Ptr(),
 	}
-	quantile, err := NewOSTQuantile(config, AVL)
+	quantile, err := NewOSTQuantile(config)
 	require.NoError(t, err)
 
 	assert.Equal(t, expectedString, quantile.String())
@@ -39,8 +45,9 @@ func TestOSTQuantilePush(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 		for i := 0.; i < 5; i++ {
 			err := quantile.Push(i)
@@ -62,8 +69,9 @@ func TestOSTQuantilePush(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		for i := 0.; i < 3; i++ {
@@ -81,8 +89,9 @@ func TestOSTQuantilePush(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -98,8 +107,9 @@ func TestOSTQuantileValue(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(5),
 			Interpolation: Linear.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -116,8 +126,9 @@ func TestOSTQuantileValue(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(6),
 			Interpolation: Linear.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -134,8 +145,9 @@ func TestOSTQuantileValue(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(6),
 			Interpolation: Lower.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -152,8 +164,9 @@ func TestOSTQuantileValue(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(6),
 			Interpolation: Higher.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -170,8 +183,9 @@ func TestOSTQuantileValue(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(6),
 			Interpolation: Nearest.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -188,8 +202,9 @@ func TestOSTQuantileValue(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(6),
 			Interpolation: Nearest.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -206,8 +221,9 @@ func TestOSTQuantileValue(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(8),
 			Interpolation: Nearest.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -224,8 +240,9 @@ func TestOSTQuantileValue(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(6),
 			Interpolation: Nearest.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -242,8 +259,9 @@ func TestOSTQuantileValue(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(6),
 			Interpolation: Midpoint.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -260,8 +278,9 @@ func TestOSTQuantileValue(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(6),
 			Interpolation: Linear.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		_, err = quantile.Value(0.25)
@@ -272,8 +291,9 @@ func TestOSTQuantileValue(t *testing.T) {
 		config := &Config{
 			Window:        stream.IntPtr(6),
 			Interpolation: Linear.Ptr(),
+			Impl:          AVL.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, AVL)
+		quantile, err := NewOSTQuantile(config)
 		require.NoError(t, err)
 
 		_, err = quantile.Value(0.)
@@ -288,8 +308,9 @@ func TestOSTQuantileClear(t *testing.T) {
 	config := &Config{
 		Window:        stream.IntPtr(3),
 		Interpolation: Linear.Ptr(),
+		Impl:          AVL.Ptr(),
 	}
-	quantile, err := NewOSTQuantile(config, AVL)
+	quantile, err := NewOSTQuantile(config)
 	require.NoError(t, err)
 
 	for i := 0.; i < 10; i++ {

@@ -18,6 +18,21 @@ const (
 	RB
 )
 
+// Ptr returns a pointer to the Impl value.
+func (i Impl) Ptr() *Impl {
+	return &i
+}
+
+// Valid returns whether or not the Impl value is a valid value.
+func (i Impl) Valid() bool {
+	switch i {
+	case AVL, RB:
+		return true
+	default:
+		return false
+	}
+}
+
 // Init returns an empty Impl struct, depending on which implementation
 // is being called.
 func (i Impl) init() (order.Statistic, error) {
@@ -27,6 +42,6 @@ func (i Impl) init() (order.Statistic, error) {
 	case RB:
 		return &ost.RBTree{}, nil
 	default:
-		return nil, errors.Errorf("%v is not a supported OST implementation", i)
+		return nil, errors.Errorf("%v is not a supported Impl value", i)
 	}
 }

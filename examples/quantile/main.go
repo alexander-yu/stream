@@ -49,8 +49,8 @@ func main() {
 		&quantile.Config{
 			Window:        stream.IntPtr(3),
 			Interpolation: quantile.Linear.Ptr(),
+			Impl:          quantile.AVL.Ptr(),
 		},
-		quantile.AVL,
 	)
 	if err != nil {
 		log.Fatal(err)
