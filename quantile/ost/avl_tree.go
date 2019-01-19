@@ -1,5 +1,7 @@
 package ost
 
+import "github.com/alexander-yu/stream/quantile/order"
+
 // AVLTree implements an AVL tree data structure,
 // and also satisfies the Tree interface.
 type AVLTree struct {
@@ -27,7 +29,7 @@ func (t *AVLTree) Remove(val float64) {
 }
 
 // Select returns the node with the ith smallest value in the tree.
-func (t *AVLTree) Select(i int) Node {
+func (t *AVLTree) Select(i int) order.Node {
 	return t.root.Select(i)
 }
 

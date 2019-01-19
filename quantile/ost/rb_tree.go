@@ -1,5 +1,7 @@
 package ost
 
+import "github.com/alexander-yu/stream/quantile/order"
+
 // RBTree implements a red-black tree data structure,
 // and also satisfies the Tree interface.
 type RBTree struct {
@@ -22,7 +24,7 @@ func (t *RBTree) Remove(val float64) {
 }
 
 // Select returns the node with the ith smallest value in the tree.
-func (t *RBTree) Select(i int) Node {
+func (t *RBTree) Select(i int) order.Node {
 	return t.root.Select(i)
 }
 

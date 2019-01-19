@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+
+	"github.com/alexander-yu/stream/quantile/order"
 )
 
 // AVLNode represents a node in an AVL tree.
@@ -204,7 +206,7 @@ func (n *AVLNode) rotateRight() *AVLNode {
 
 // Select returns the node with the ith smallest value in the
 // subtree rooted at the node..
-func (n *AVLNode) Select(i int) Node {
+func (n *AVLNode) Select(i int) order.Node {
 	if n == nil {
 		return nil
 	}

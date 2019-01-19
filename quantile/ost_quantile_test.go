@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/alexander-yu/stream"
-	"github.com/alexander-yu/stream/quantile/ost"
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
@@ -18,7 +17,7 @@ func TestNewOSTQuantile(t *testing.T) {
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
 		}
-		_, err := NewOSTQuantile(config, ost.Impl(-1))
+		_, err := NewOSTQuantile(config, Impl(-1))
 		testutil.ContainsError(t, err, "error instantiating empty ost.Tree")
 	})
 }
@@ -29,7 +28,7 @@ func TestOSTQuantileString(t *testing.T) {
 		Window:        stream.IntPtr(3),
 		Interpolation: Linear.Ptr(),
 	}
-	quantile, err := NewOSTQuantile(config, ost.AVL)
+	quantile, err := NewOSTQuantile(config, AVL)
 	require.NoError(t, err)
 
 	assert.Equal(t, expectedString, quantile.String())
@@ -41,7 +40,7 @@ func TestOSTQuantilePush(t *testing.T) {
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 		for i := 0.; i < 5; i++ {
 			err := quantile.Push(i)
@@ -56,7 +55,7 @@ func TestOSTQuantilePush(t *testing.T) {
 			testutil.Approx(t, i, y)
 		}
 
-		assert.Equal(t, 3, quantile.tree.Size())
+		assert.Equal(t, 3, quantile.statistic.Size())
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
@@ -64,7 +63,7 @@ func TestOSTQuantilePush(t *testing.T) {
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		for i := 0.; i < 3; i++ {
@@ -83,7 +82,7 @@ func TestOSTQuantilePush(t *testing.T) {
 			Window:        stream.IntPtr(3),
 			Interpolation: Linear.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -100,7 +99,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			Window:        stream.IntPtr(5),
 			Interpolation: Linear.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -118,7 +117,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			Window:        stream.IntPtr(6),
 			Interpolation: Linear.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -136,7 +135,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			Window:        stream.IntPtr(6),
 			Interpolation: Lower.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -154,7 +153,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			Window:        stream.IntPtr(6),
 			Interpolation: Higher.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -172,7 +171,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			Window:        stream.IntPtr(6),
 			Interpolation: Nearest.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -190,7 +189,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			Window:        stream.IntPtr(6),
 			Interpolation: Nearest.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -208,7 +207,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			Window:        stream.IntPtr(8),
 			Interpolation: Nearest.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -226,7 +225,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			Window:        stream.IntPtr(6),
 			Interpolation: Nearest.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -244,7 +243,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			Window:        stream.IntPtr(6),
 			Interpolation: Midpoint.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -262,7 +261,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			Window:        stream.IntPtr(6),
 			Interpolation: Linear.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		_, err = quantile.Value(0.25)
@@ -274,7 +273,7 @@ func TestOSTQuantileValue(t *testing.T) {
 			Window:        stream.IntPtr(6),
 			Interpolation: Linear.Ptr(),
 		}
-		quantile, err := NewOSTQuantile(config, ost.AVL)
+		quantile, err := NewOSTQuantile(config, AVL)
 		require.NoError(t, err)
 
 		_, err = quantile.Value(0.)
@@ -290,7 +289,7 @@ func TestOSTQuantileClear(t *testing.T) {
 		Window:        stream.IntPtr(3),
 		Interpolation: Linear.Ptr(),
 	}
-	quantile, err := NewOSTQuantile(config, ost.AVL)
+	quantile, err := NewOSTQuantile(config, AVL)
 	require.NoError(t, err)
 
 	for i := 0.; i < 10; i++ {
@@ -300,5 +299,5 @@ func TestOSTQuantileClear(t *testing.T) {
 
 	quantile.Clear()
 	assert.Equal(t, uint64(0), quantile.queue.Len())
-	assert.Equal(t, 0, quantile.tree.Size())
+	assert.Equal(t, 0, quantile.statistic.Size())
 }

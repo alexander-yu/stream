@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+
+	"github.com/alexander-yu/stream/quantile/order"
 )
 
 // Color represents the color of the node.
@@ -250,7 +252,7 @@ func (n *RBNode) moveRedRight() *RBNode {
 
 // Select returns the node with the ith smallest value in the
 // subtree rooted at the node..
-func (n *RBNode) Select(i int) Node {
+func (n *RBNode) Select(i int) order.Node {
 	if n == nil {
 		return nil
 	}

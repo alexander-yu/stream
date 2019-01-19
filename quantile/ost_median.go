@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/alexander-yu/stream"
-	"github.com/alexander-yu/stream/quantile/ost"
 )
 
 // OSTMedian keeps track of the median of a stream using order statistic trees.
@@ -16,8 +15,8 @@ type OSTMedian struct {
 
 // NewOSTMedian instantiates an OSTMedian struct. The implementation of the
 // underlying order statistic tree can be configured by passing in a constant
-// of type ost.Impl.
-func NewOSTMedian(window int, impl ost.Impl) (*OSTMedian, error) {
+// of type Impl.
+func NewOSTMedian(window int, impl Impl) (*OSTMedian, error) {
 	quantile, err := NewOSTQuantile(&Config{
 		Window:        stream.IntPtr(window),
 		Interpolation: Midpoint.Ptr(),

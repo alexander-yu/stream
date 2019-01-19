@@ -10,7 +10,6 @@ import (
 
 	"github.com/alexander-yu/stream"
 	"github.com/alexander-yu/stream/quantile"
-	"github.com/alexander-yu/stream/quantile/ost"
 )
 
 func push(metrics []stream.Metric) error {
@@ -39,7 +38,7 @@ func push(metrics []stream.Metric) error {
 
 func main() {
 	// tracks the global median via a red-black tree
-	ostMedian, err := quantile.NewOSTMedian(0, ost.RB)
+	ostMedian, err := quantile.NewOSTMedian(0, quantile.RB)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,7 +50,7 @@ func main() {
 			Window:        stream.IntPtr(3),
 			Interpolation: quantile.Linear.Ptr(),
 		},
-		ost.AVL,
+		quantile.AVL,
 	)
 	if err != nil {
 		log.Fatal(err)
