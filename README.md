@@ -37,7 +37,6 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
       - [Core (Multivariate)](#core-multivariate)
     - [AggregateStatistics](#aggregatestatistics)
       - [SimpleAggregateMetric](#simpleaggregatemetric)
-  - [References](#references)
 
 ## Installation
 
@@ -88,17 +87,13 @@ func main() {
 
 ## Statistics
 
+For time/space complexity details on the algorithms listed below, see [here](complexity.md).
+
 ### [Quantile](https://godoc.org/github.com/alexander-yu/stream/quantile)
 
 #### OSTQuantile
 
 OSTQuantile keeps track of a given quantile of a stream with an [order statistic tree](https://en.wikipedia.org/wiki/Order_statistic_tree) as the underlying data structure. OSTQuantile can calculate the global quantile of a stream, or over a rolling window. You can also configure which implementation to use for the underlying order statistic tree (see the [godoc](https://godoc.org/github.com/alexander-yu/stream/quantile#NewOSTQuantile) entry for details), as well as which interpolation method to use in the case that the quantile actually lies in between two elements. For now only [AVL trees](https://en.wikipedia.org/wiki/AVL_tree) and [red black trees](https://en.wikipedia.org/wiki/Red-black_tree) are supported.
-
-Let `n` be the size of the window, or the stream if tracking the global quantile. Then we have the following complexities:
-
-| Push (time) | Value (time) | Space  |
-| :---------: | :----------: | :----: |
-| `O(log n)`  | `O(log n)`   | `O(n)` |
 
 #### OSTMedian
 
@@ -108,33 +103,15 @@ OSTMedian keeps track of the median of a stream; this is simply a convenient wra
 
 HeapMedian keeps track of the median of a stream with a pair of [heaps](https://en.wikipedia.org/wiki/Heap_(data_structure)). In particular, it uses a max-heap and a min-heap to keep track of elements below and above the median, respectively. HeapMedian can calculate the global median of a stream, or over a rolling window.
 
-Let `n` be the size of the window, or the stream if tracking the global quantile. Then we have the following complexities:
-
-| Push (time) | Value (time) | Space  |
-| :---------: | :----------: | :----: |
-| `O(log n)`  | `O(log n)`   | `O(n)` |
-
 ### [Min/Max](https://godoc.org/github.com/alexander-yu/stream/minmax)
 
 #### Min
 
 Min keeps track of the minimum of a stream; it can track either the global minimum, or over a rolling window.
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
-
-| Push (time)        | Value (time)       | Space                         |
-| :----------------: | :----------------: | :---------------------------: |
-| `O(1)` (amortized) | `O(1)` (amortized) | `O(1)` if global, else `O(n)` |
-
 #### Max
 
 Max keeps track of the maximum of a stream; it can track either the global maximum, or over a rolling window.
-
-Let `n` be the size of the window, or the stream if tracking the global maximum. Then we have the following complexities:
-
-| Push (time)        | Value (time)       | Space                         |
-| :----------------: | :----------------: | :---------------------------: |
-| `O(1)` (amortized) | `O(1)` (amortized) | `O(1)` if global, else `O(n)` |
 
 ### [Moment-Based Statistics](https://godoc.org/github.com/alexander-yu/stream/moment)
 
@@ -142,63 +119,25 @@ Let `n` be the size of the window, or the stream if tracking the global maximum.
 
 Mean keeps track of the mean of a stream; it can track either the global mean, or over a rolling window.
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
-
-| Push (time) | Value (time) | Space                         |
-| :---------: | :----------: | :---------------------------: |
-| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
-
 #### Moment
 
 Moment keeps track of the `k`-th sample [central moment](https://en.wikipedia.org/wiki/Central_moment); it can track either the global moment, or over a rolling window.
-
-Let `n` be the size of the window, or the stream if tracking the global minimum; let `k` be the moment being tracked. Then we have the following complexities:
-
-| Push (time) | Value (time) | Space                         |
-| :---------: | :----------: | :---------------------------: |
-| `O(k^2)`    | `O(1)`       | `O(1)` if global, else `O(n)` |
-
-See [Core](#Core) for an explanation of why `Push` has a time complexity of `O(k^2)`, rather than `O(k)`.
 
 #### Variance
 
 Variance keeps track of the sample [variance](https://en.wikipedia.org/wiki/Variance) of a stream; it can track either the global variance, or over a rolling window.
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
-
-| Push (time) | Value (time) | Space                         |
-| :---------: | :----------: | :---------------------------: |
-| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
-
 #### Std
 
 Std keeps track of the sample [standard deviation](https://en.wikipedia.org/wiki/Standard_deviation) of a stream; it can track either the global standard deviation, or over a rolling window.
-
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
-
-| Push (time) | Value (time) | Space                         |
-| :---------: | :----------: | :---------------------------: |
-| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Skewness
 
 Skewness keeps track of the sample [skewness](https://en.wikipedia.org/wiki/Skewness) of a stream (in particular, the [adjusted Fisher-Pearson standardized moment coefficient](https://en.wikipedia.org/wiki/Skewness#Sample_skewness)); it can track either the global skewness, or over a rolling window.
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
-
-| Push (time) | Value (time) | Space                         |
-| :---------: | :----------: | :---------------------------: |
-| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
-
 #### Kurtosis
 
 Kurtosis keeps track of the sample [kurtosis](https://en.wikipedia.org/wiki/Kurtosis) of a stream (in particular, the [sample excess kurtosis](https://en.wikipedia.org/wiki/Kurtosis#Sample_kurtosis)); it can track either the global kurtosis, or over a rolling window.
-
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
-
-| Push (time) | Value (time) | Space                         |
-| :---------: | :----------: | :---------------------------: |
-| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Core (Univariate)
 
@@ -219,43 +158,19 @@ core, err := NewCore(config)
 
 See the [godoc](https://godoc.org/github.com/alexander-yu/stream/moment#Core) entry for more details on Core's methods.
 
-Let `n` be the size of the window, or the stream if tracking the global minimum; let `k` be the maximum exponent of the power sums that is being tracked. Then we have the following complexities:
-
-| Push (time) | Sum (time) | Count (time) | Space                                     |
-| :---------: | :--------: | :----------: | :---------------------------------------: |
-| `O(k^2)`    | `O(1)`     | `O(1)`       | `O(k)` if global, else `O(k + n)` |
-
-The reason that the `Push` method has a time complexity of `O(k^2)` is due to the algorithm being used to update the power sums; while the traditional `O(k)` method involves simply keeping track of raw power sums (i.e. non-centralized) and then representing the centralized power sum as a linear combination of the raw power sums and the mean (by doing binomial expansion), this is prone to underflow/overflow and as a result is much less numerically stable. See [1] for the paper whose algorithm this library uses, and a more in-depth explanation of the above.
-
 ### [Joint Distribution Statistics](https://godoc.org/github.com/alexander-yu/stream/joint)
 
 #### Covariance
 
 Covariance keeps track of the sample [covariance](https://en.wikipedia.org/wiki/Covariance) of a stream; it can track either the global covariance, or over a rolling window.
 
-| Push (time) | Value (time) | Space                         |
-| :---------: | :----------: | :---------------------------: |
-| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
-
 #### Correlation
 
 Correlation keeps track of the sample [correlation](https://en.wikipedia.org/wiki/Correlation) of a stream (in particular, the [sample Pearson correlation coefficient](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient#For_a_sample)); it can track either the global correlation, or over a rolling window.
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
-
-| Push (time) | Value (time) | Space                         |
-| :---------: | :----------: | :---------------------------: |
-| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
-
 #### Autocorrelation
 
 Autocorrelation keeps track of the sample [autocorrelation](https://en.wikipedia.org/wiki/Autocorrelation) of a stream (in particular, the [sample autocorrelation](https://en.wikipedia.org/wiki/Autocorrelation#Estimation)) for a given lag; it can track either the global autocorrelation, or over a rolling window.
-
-Let `n` be the size of the window, or the stream if tracking the global minimum; let `l` be the lag of the autocorrelation. Then we have the following complexities:
-
-| Push (time) | Value (time) | Space                             |
-| :---------: | :----------: | :-------------------------------: |
-| `O(1)`      | `O(1)`       | `O(l)` if global, else `O(l + n)` |
 
 #### Core (Multivariate)
 
@@ -277,22 +192,8 @@ core, err := NewCore(config)
 
 See the [godoc](https://godoc.org/github.com/alexander-yu/stream/joint#Core) entry for more details on Core's methods.
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Moreover, let `t` be the number of tuples that are configured, let `d` be the number of variables being tracked. Now for a given tuple `m`, define
-
-    p(m) = (m_1 + 1) * ... * (m_k + 1)
-
- and let `a` be the maximum such `p(m)` over all tuples `m` that are configured. Then we have the following complexities:
-
-| Push (time)  | Sum (time) | Count (time) | Space                                                 |
-| :----------: | :--------: | :----------: | :---------------------------------------------------: |
-| `O(tda^2)` | `O(d)`     | `O(1)`       | `O(d + ta^2)` if global, else `O(d + ta^2 + n)` |
-
 ### [AggregateStatistics](https://godoc.org/github.com/alexander-yu/stream/aggregate)
 
 #### SimpleAggregateMetric
 
 SimpleAggregateMetric is a convenience wrapper that stores multiple metrics and will push a value to all metrics simultaneously; instead of returning a single scalar, it returns a map of metrics to their corresponding values.
-
-## References
-
-1: P. Pebay, T. B. Terriberry, H. Kolla, J. Bennett, Numerically stable, scalable formulas for parallel and online computation of higher-order multivariate central moments with arbitrary weights, Computational Statistics 31 (2016) 1305–1325.
