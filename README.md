@@ -13,7 +13,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
 - [Stream](#stream)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
-  - [Example](#example)
+  - [Example Usage](#example-usage)
   - [Statistics](#statistics)
     - [Quantile](#quantile)
       - [OSTQuantile](#ostquantile)
@@ -35,7 +35,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
       - [Correlation](#correlation)
       - [Autocorrelation](#autocorrelation)
       - [Core (Multivariate)](#core-multivariate)
-    - [AggregateStatistics](#aggregatestatistics)
+    - [Aggregate Statistics](#aggregate-statistics)
       - [SimpleAggregateMetric](#simpleaggregatemetric)
 
 ## Installation
@@ -46,9 +46,9 @@ Use `go get`:
 go get github.com/alexander-yu/stream
 ```
 
-## Example
+## Example Usage
 
-In-depth examples are provided in the [examples](https://github.com/alexander-yu/stream/examples) directory, but a small taste is provided below:
+In-depth examples are provided in the [examples](https://github.com/alexander-yu/stream/tree/master/examples) directory, but a small taste is provided below:
 
 ```go
 // tracks the autocorrelation over a
@@ -190,7 +190,7 @@ core, err := NewCore(config)
 
 See the [godoc](https://godoc.org/github.com/alexander-yu/stream/joint#Core) entry for more details on Core's methods.
 
-### [AggregateStatistics](https://godoc.org/github.com/alexander-yu/stream/aggregate)
+### [Aggregate Statistics](https://godoc.org/github.com/alexander-yu/stream/aggregate)
 
 #### SimpleAggregateMetric
 
