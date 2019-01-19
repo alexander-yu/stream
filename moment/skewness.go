@@ -32,11 +32,16 @@ func NewSkewness(window int) *Skewness {
 	}
 }
 
-// Subscribe subscribes the Skewness to a Core object.
-func (s *Skewness) Subscribe(c *Core) {
-	s.variance.Subscribe(c)
-	s.moment3.Subscribe(c)
+// SetCore sets the Core.
+func (s *Skewness) SetCore(c *Core) {
+	s.variance.SetCore(c)
+	s.moment3.SetCore(c)
 	s.core = c
+}
+
+// IsSetCore returns if the core has been set.
+func (s *Skewness) IsSetCore() bool {
+	return s.core != nil
 }
 
 // Config returns the CoreConfig needed.
@@ -53,6 +58,10 @@ func (s *Skewness) String() string {
 
 // Push adds a new value for Skewness to consume.
 func (s *Skewness) Push(x float64) error {
+	if !s.IsSetCore() {
+		return errors.New("Core is not set")
+	}
+
 	err := s.core.Push(x)
 	if err != nil {
 		return errors.Wrap(err, "error pushing to core")
@@ -62,6 +71,10 @@ func (s *Skewness) Push(x float64) error {
 
 // Value returns the value of the adjusted Fisher-Pearson sample skewness.
 func (s *Skewness) Value() (float64, error) {
+	if !s.IsSetCore() {
+		return 0, errors.New("Core is not set")
+	}
+
 	s.core.RLock()
 	defer s.core.RUnlock()
 
@@ -88,5 +101,7 @@ func (s *Skewness) Value() (float64, error) {
 
 // Clear resets the metric.
 func (s *Skewness) Clear() {
-	s.core.Clear()
+	if s.IsSetCore() {
+		s.core.Clear()
+	}
 }

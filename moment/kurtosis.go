@@ -32,11 +32,16 @@ func NewKurtosis(window int) *Kurtosis {
 	}
 }
 
-// Subscribe subscribes the Kurtosis to a Core object.
-func (k *Kurtosis) Subscribe(c *Core) {
-	k.variance.Subscribe(c)
-	k.moment4.Subscribe(c)
+// SetCore sets the Core.
+func (k *Kurtosis) SetCore(c *Core) {
+	k.variance.SetCore(c)
+	k.moment4.SetCore(c)
 	k.core = c
+}
+
+// IsSetCore returns if the core has been set.
+func (k *Kurtosis) IsSetCore() bool {
+	return k.core != nil
 }
 
 // Config returns the CoreConfig needed.
@@ -53,6 +58,10 @@ func (k *Kurtosis) String() string {
 
 // Push adds a new value for Kurtosis to consume.
 func (k *Kurtosis) Push(x float64) error {
+	if !k.IsSetCore() {
+		return errors.New("Core is not set")
+	}
+
 	err := k.core.Push(x)
 	if err != nil {
 		return errors.Wrap(err, "error pushing to core")
@@ -62,6 +71,10 @@ func (k *Kurtosis) Push(x float64) error {
 
 // Value returns the value of the sample excess kurtosis.
 func (k *Kurtosis) Value() (float64, error) {
+	if !k.IsSetCore() {
+		return 0, errors.New("Core is not set")
+	}
+
 	k.core.RLock()
 	defer k.core.RUnlock()
 
@@ -88,5 +101,7 @@ func (k *Kurtosis) Value() (float64, error) {
 
 // Clear resets the metric.
 func (k *Kurtosis) Clear() {
-	k.core.Clear()
+	if k.IsSetCore() {
+		k.core.Clear()
+	}
 }

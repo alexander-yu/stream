@@ -45,6 +45,16 @@ func TestKurtosisValue(t *testing.T) {
 		testutil.Approx(t, moment/math.Pow(variance, 2.)-3., value)
 	})
 
+	t.Run("fail: if Core is not set, return error", func(t *testing.T) {
+		kurtosis := NewKurtosis(3)
+
+		err := kurtosis.Push(0.)
+		testutil.ContainsError(t, err, "Core is not set")
+
+		_, err = kurtosis.Value()
+		testutil.ContainsError(t, err, "Core is not set")
+	})
+
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		kurtosis := NewKurtosis(3)
 		err := Init(kurtosis)

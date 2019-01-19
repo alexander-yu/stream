@@ -46,6 +46,16 @@ func TestSkewnessValue(t *testing.T) {
 		testutil.Approx(t, adjust*moment/math.Pow(variance, 1.5), value)
 	})
 
+	t.Run("fail: if Core is not set, return error", func(t *testing.T) {
+		skewness := NewSkewness(3)
+
+		err := skewness.Push(0.)
+		testutil.ContainsError(t, err, "Core is not set")
+
+		_, err = skewness.Value()
+		testutil.ContainsError(t, err, "Core is not set")
+	})
+
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		skewness := NewSkewness(3)
 		err := Init(skewness)

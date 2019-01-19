@@ -17,9 +17,14 @@ func NewMean(window int) *Mean {
 	return &Mean{window: window}
 }
 
-// Subscribe subscribes the Mean to a Core object.
-func (m *Mean) Subscribe(c *Core) {
+// SetCore sets the Core.
+func (m *Mean) SetCore(c *Core) {
 	m.core = c
+}
+
+// IsSetCore returns if the core has been set.
+func (m *Mean) IsSetCore() bool {
+	return m.core != nil
 }
 
 // Config returns the CoreConfig needed.
@@ -38,6 +43,10 @@ func (m *Mean) String() string {
 
 // Push adds a new value for Mean to consume.
 func (m *Mean) Push(x float64) error {
+	if !m.IsSetCore() {
+		return errors.New("Core is not set")
+	}
+
 	err := m.core.Push(x)
 	if err != nil {
 		return errors.Wrap(err, "error pushing to core")
@@ -47,6 +56,10 @@ func (m *Mean) Push(x float64) error {
 
 // Value returns the value of the mean.
 func (m *Mean) Value() (float64, error) {
+	if !m.IsSetCore() {
+		return 0, errors.New("Core is not set")
+	}
+
 	m.core.RLock()
 	defer m.core.RUnlock()
 
@@ -59,5 +72,7 @@ func (m *Mean) Value() (float64, error) {
 
 // Clear resets the metric.
 func (m *Mean) Clear() {
-	m.core.Clear()
+	if m.IsSetCore() {
+		m.core.Clear()
+	}
 }

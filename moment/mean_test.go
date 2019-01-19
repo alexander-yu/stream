@@ -30,6 +30,16 @@ func TestMeanValue(t *testing.T) {
 		testutil.Approx(t, 5, value)
 	})
 
+	t.Run("fail: if Core is not set, return error", func(t *testing.T) {
+		mean := NewMean(3)
+
+		err := mean.Push(0.)
+		testutil.ContainsError(t, err, "Core is not set")
+
+		_, err = mean.Value()
+		testutil.ContainsError(t, err, "Core is not set")
+	})
+
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		mean := NewMean(3)
 		err := Init(mean)

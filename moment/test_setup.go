@@ -23,7 +23,7 @@ func newMockMetric() *mockMetric {
 	return metric
 }
 
-func (m *mockMetric) Subscribe(c *Core) {
+func (m *mockMetric) SetCore(c *Core) {
 	m.core = c
 }
 

@@ -31,6 +31,16 @@ func TestMomentValue(t *testing.T) {
 		testutil.Approx(t, 7, value)
 	})
 
+	t.Run("fail: if Core is not set, return error", func(t *testing.T) {
+		moment := NewMoment(2, 3)
+
+		err := moment.Push(0.)
+		testutil.ContainsError(t, err, "Core is not set")
+
+		_, err = moment.Value()
+		testutil.ContainsError(t, err, "Core is not set")
+	})
+
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		moment := NewMoment(2, 3)
 		err := Init(moment)

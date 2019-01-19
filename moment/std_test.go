@@ -31,6 +31,16 @@ func TestStdValue(t *testing.T) {
 		testutil.Approx(t, math.Sqrt(7.), value)
 	})
 
+	t.Run("fail: if Core is not set, return error", func(t *testing.T) {
+		Std := NewStd(3)
+
+		err := Std.Push(0.)
+		testutil.ContainsError(t, err, "Core is not set")
+
+		_, err = Std.Value()
+		testutil.ContainsError(t, err, "Core is not set")
+	})
+
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		std := NewStd(3)
 		err := Init(std)

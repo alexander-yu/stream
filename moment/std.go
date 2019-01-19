@@ -17,9 +17,14 @@ func NewStd(window int) *Std {
 	return &Std{variance: NewMoment(2, window)}
 }
 
-// Subscribe subscribes the Std to a Core object.
-func (s *Std) Subscribe(c *Core) {
-	s.variance.Subscribe(c)
+// SetCore sets the Core.
+func (s *Std) SetCore(c *Core) {
+	s.variance.SetCore(c)
+}
+
+// IsSetCore returns if the core has been set.
+func (s *Std) IsSetCore() bool {
+	return s.variance.IsSetCore()
 }
 
 // Config returns the CoreConfig needed.
@@ -36,6 +41,10 @@ func (s *Std) String() string {
 
 // Push adds a new value for Std to consume.
 func (s *Std) Push(x float64) error {
+	if !s.IsSetCore() {
+		return errors.New("Core is not set")
+	}
+
 	err := s.variance.Push(x)
 	if err != nil {
 		return errors.Wrap(err, "error pushing to core")
@@ -45,6 +54,10 @@ func (s *Std) Push(x float64) error {
 
 // Value returns the value of the sample standard deviation.
 func (s *Std) Value() (float64, error) {
+	if !s.IsSetCore() {
+		return 0, errors.New("Core is not set")
+	}
+
 	variance, err := s.variance.Value()
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving 2nd moment")
@@ -54,5 +67,7 @@ func (s *Std) Value() (float64, error) {
 
 // Clear resets the metric.
 func (s *Std) Clear() {
-	s.variance.Clear()
+	if s.IsSetCore() {
+		s.variance.Clear()
+	}
 }

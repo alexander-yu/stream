@@ -12,7 +12,7 @@ import (
 )
 
 type invalidMetric struct {
-	subscribed bool
+	coreSet bool
 }
 
 func (m *invalidMetric) String() string {
@@ -29,8 +29,8 @@ func (m *invalidMetric) Value() (float64, error) {
 
 func (m *invalidMetric) Clear() {}
 
-func (m *invalidMetric) Subscribe(c *Core) {
-	m.subscribed = true
+func (m *invalidMetric) SetCore(c *Core) {
+	m.coreSet = true
 }
 
 func (m *invalidMetric) Config() *CoreConfig {
@@ -70,7 +70,7 @@ func TestInit(t *testing.T) {
 		err := Init(metric)
 
 		testutil.ContainsError(t, err, "error creating Core")
-		assert.False(t, metric.subscribed)
+		assert.False(t, metric.coreSet)
 	})
 
 	t.Run("pass: valid config subscribes metric to new Core", func(t *testing.T) {
