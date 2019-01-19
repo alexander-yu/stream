@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
@@ -39,7 +40,17 @@ func push(metrics []joint.Metric) error {
 
 	for _, metric := range metrics {
 		for i := 0.; i < 100; i++ {
-			err := metric.Push(i, i*i)
+			var xs []float64
+			// in the case of Autocorrelation, it actually
+			// only takes one variable, since it's calculating
+			// the correlation against itself (but at a lag)
+			if strings.HasPrefix(metric.String(), "joint.Autocorrelation") {
+				xs = []float64{i * i}
+			} else {
+				xs = []float64{i, i * i}
+			}
+
+			err := metric.Push(xs...)
 			if err != nil {
 				errs = append(errs, err)
 				break
@@ -84,7 +95,7 @@ func values(metrics []joint.Metric) (map[string]float64, error) {
 
 func main() {
 	// tracks the global correlation
-	corr := joint.NewCorrelation(5)
+	corr := joint.NewCorrelation(0)
 
 	// tracks the autocorrelation over a rolling window of size 10 and a lag of 4
 	autocorr, err := joint.NewAutocorrelation(4, 10)

@@ -5,12 +5,28 @@ import (
 	"math"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
 
 	testutil "github.com/alexander-yu/stream/util/test"
 )
+
+func testAutocorrData(autocorr *Autocorrelation) error {
+	for i := 1.; i < 5; i++ {
+		err := autocorr.Push(i)
+		if err != nil {
+			return errors.Wrapf(err, "failed to push %f to metric", i)
+		}
+	}
+
+	err := autocorr.Push(8.)
+	if err != nil {
+		return errors.Wrapf(err, "failed to push %f to metric", 8.)
+	}
+	return nil
+}
 
 func TestNewAutocorrelation(t *testing.T) {
 	t.Run("pass: valid Autocorrelation is valid", func(t *testing.T) {
@@ -34,13 +50,13 @@ func TestAutocorrelation(t *testing.T) {
 		err = Init(autocorrelation)
 		require.NoError(t, err)
 
-		err = testData(autocorrelation)
+		err = testAutocorrData(autocorrelation)
 		require.NoError(t, err)
 
 		value, err := autocorrelation.Value()
 		require.NoError(t, err)
 
-		testutil.Approx(t, 31.*math.Sqrt(2289.)/1526., value)
+		testutil.Approx(t, 5./(2.*math.Sqrt(7.)), value)
 	})
 
 	t.Run("pass: returns the correlation for lag=0", func(t *testing.T) {
@@ -50,13 +66,13 @@ func TestAutocorrelation(t *testing.T) {
 		err = Init(autocorrelation)
 		require.NoError(t, err)
 
-		err = testData(autocorrelation)
+		err = testAutocorrData(autocorrelation)
 		require.NoError(t, err)
 
 		value, err := autocorrelation.Value()
 		require.NoError(t, err)
 
-		testutil.Approx(t, 158./math.Sqrt(14.*5378./3.), value)
+		testutil.Approx(t, 1., value)
 	})
 
 	t.Run("fail: if core push fails for lag=0, return error", func(t *testing.T) {
@@ -66,16 +82,16 @@ func TestAutocorrelation(t *testing.T) {
 		err = Init(autocorrelation)
 		require.NoError(t, err)
 
-		err = testData(autocorrelation)
+		err = testAutocorrData(autocorrelation)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to push to the core
 		autocorrelation.core.queue.Dispose()
-		err = autocorrelation.Push(3., 9.)
+		err = autocorrelation.Push(3.)
 		testutil.ContainsError(t, err, fmt.Sprintf(
 			"error pushing (%f, %f) to core: error popping item from queue",
 			3.,
-			9.,
+			3.,
 		))
 	})
 
@@ -83,7 +99,7 @@ func TestAutocorrelation(t *testing.T) {
 		autocorrelation, err := NewAutocorrelation(1, 3)
 		require.NoError(t, err)
 
-		err = autocorrelation.Push(0., 0.)
+		err = autocorrelation.Push(0.)
 		testutil.ContainsError(t, err, "Core is not set")
 
 		_, err = autocorrelation.Value()
@@ -108,18 +124,18 @@ func TestAutocorrelation(t *testing.T) {
 		err = Init(autocorrelation)
 		require.NoError(t, err)
 
-		vals := []float64{3.}
+		vals := []float64{3., 5.}
 		err = autocorrelation.Push(vals...)
 		testutil.ContainsError(t, err, fmt.Sprintf(
-			"Autocorrelation expected 2 arguments: got %d (%v)",
+			"Autocorrelation expected 1 argument: got %d (%v)",
 			len(vals),
 			vals,
 		))
 
-		vals = []float64{3., 9., 27.}
+		vals = []float64{}
 		err = autocorrelation.Push(vals...)
 		testutil.ContainsError(t, err, fmt.Sprintf(
-			"Autocorrelation expected 2 arguments: got %d (%v)",
+			"Autocorrelation expected 1 argument: got %d (%v)",
 			len(vals),
 			vals,
 		))
@@ -132,16 +148,16 @@ func TestAutocorrelation(t *testing.T) {
 		err = Init(autocorrelation)
 		require.NoError(t, err)
 
-		err = testData(autocorrelation)
+		err = testAutocorrData(autocorrelation)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to retrieve from the queue
 		autocorrelation.core.queue.Dispose()
-		err = autocorrelation.Push(3., 9.)
+		err = autocorrelation.Push(3.)
 		testutil.ContainsError(t, err, fmt.Sprintf(
 			"error pushing (%f, %f) to core: error popping item from queue",
 			3.,
-			64.,
+			8.,
 		))
 	})
 
@@ -156,15 +172,15 @@ func TestAutocorrelation(t *testing.T) {
 		autocorrelation.core.queue.Dispose()
 
 		// no error yet because we have not populated the lag yet
-		err = autocorrelation.Push(8., 64.)
+		err = autocorrelation.Push(8.)
 		require.NoError(t, err)
 
-		err = autocorrelation.Push(3., 9.)
+		err = autocorrelation.Push(3.)
 		testutil.ContainsError(t, err, fmt.Sprintf(
 			"error pushing (%f, %f) to core: error pushing %v to queue",
 			3.,
-			64.,
-			[]float64{3., 64.},
+			8.,
+			[]float64{3., 8.},
 		))
 	})
 
@@ -175,12 +191,12 @@ func TestAutocorrelation(t *testing.T) {
 		err = Init(autocorrelation)
 		require.NoError(t, err)
 
-		err = testData(autocorrelation)
+		err = testAutocorrData(autocorrelation)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to retrieve from the queue
 		autocorrelation.queue.Dispose()
-		err = autocorrelation.Push(3., 9.)
+		err = autocorrelation.Push(3.)
 		testutil.ContainsError(t, err, "error popping item from lag queue")
 	})
 
@@ -193,10 +209,10 @@ func TestAutocorrelation(t *testing.T) {
 
 		// dispose the queue to simulate an error when we try to insert into the queue
 		autocorrelation.queue.Dispose()
-		err = autocorrelation.Push(8., 64.)
+		err = autocorrelation.Push(8.)
 		testutil.ContainsError(t, err, fmt.Sprintf(
 			"error pushing %f to lag queue",
-			64.,
+			8.,
 		))
 	})
 
@@ -207,7 +223,7 @@ func TestAutocorrelation(t *testing.T) {
 		err = Init(autocorrelation)
 		require.NoError(t, err)
 
-		err = testData(autocorrelation)
+		err = testAutocorrData(autocorrelation)
 		require.NoError(t, err)
 
 		autocorrelation.Clear()

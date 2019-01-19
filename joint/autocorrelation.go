@@ -55,29 +55,31 @@ func (a *Autocorrelation) String() string {
 	return fmt.Sprintf("%s_{%s}", name, strings.Join(params, ","))
 }
 
-// Push adds a new pair of values for Autocorrelation to consume.
+// Push adds a new value for Autocorrelation to consume.
+// Autocorrelation actually only takes one value, because we're
+// calculating the lagged correlation of a series of data against itself.
 func (a *Autocorrelation) Push(xs ...float64) error {
 	if !a.IsSetCore() {
 		return errors.New("Core is not set")
 	}
 
-	if len(xs) != 2 {
+	if len(xs) != 1 {
 		return errors.Errorf(
-			"Autocorrelation expected 2 arguments: got %d (%v)",
+			"Autocorrelation expected 1 argument: got %d (%v)",
 			len(xs),
 			xs,
 		)
 	}
 
-	x, y := xs[0], xs[1]
+	x := xs[0]
 
 	a.core.Lock()
 	defer a.core.Unlock()
 
 	if a.lag == 0 {
-		err := a.core.UnsafePush(x, y)
+		err := a.core.UnsafePush(x, x)
 		if err != nil {
-			return errors.Wrapf(err, "error pushing (%f, %f) to core", x, y)
+			return errors.Wrapf(err, "error pushing (%f, %f) to core", x, x)
 		}
 		return nil
 	}
@@ -95,9 +97,9 @@ func (a *Autocorrelation) Push(xs ...float64) error {
 		}
 	}
 
-	err := a.queue.Put(y)
+	err := a.queue.Put(x)
 	if err != nil {
-		return errors.Wrapf(err, "error pushing %f to lag queue", y)
+		return errors.Wrapf(err, "error pushing %f to lag queue", x)
 	}
 
 	return nil

@@ -53,7 +53,7 @@ In-depth examples are provided in the [examples](https://github.com/alexander-yu
 ```go
 // tracks the autocorrelation over a
 // rolling window of size 15 and lag of 5
-autocorr, err := joint.AutoCorrelation(5, 15)
+autocorr, err := joint.NewAutocorrelation(5, 15)
 // handle err
 
 // all metrics in the joint package must be passed
@@ -66,7 +66,7 @@ median, err := quantile.NewHeapMedian(5)
 // handle err
 
 for i := 0., i < 100; i++ {
-    err = autocorr.Push(i, i*i)
+    err = autocorr.Push(i)
     // handle err
 
     err = median.Push(i)
