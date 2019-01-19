@@ -15,7 +15,7 @@ type mockMetric struct {
 
 func newMockMetric() *mockMetric {
 	metric := &mockMetric{}
-	err := SetupMetric(metric)
+	err := Init(metric)
 	if err != nil {
 		panic(fmt.Sprintf("%+v", err))
 	}

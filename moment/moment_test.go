@@ -13,7 +13,7 @@ import (
 func TestMomentValue(t *testing.T) {
 	t.Run("pass: returns the kth moment", func(t *testing.T) {
 		moment := &Moment{K: 2, Window: 3}
-		err := SetupMetric(moment)
+		err := Init(moment)
 		require.NoError(t, err)
 
 		err = testData(moment)
@@ -27,7 +27,7 @@ func TestMomentValue(t *testing.T) {
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		moment := &Moment{K: 2, Window: 3}
-		err := SetupMetric(moment)
+		err := Init(moment)
 		require.NoError(t, err)
 
 		_, err = moment.Value()
@@ -36,7 +36,7 @@ func TestMomentValue(t *testing.T) {
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
 		moment := &Moment{K: 1, Window: 3}
-		err := SetupMetric(moment)
+		err := Init(moment)
 		require.NoError(t, err)
 
 		err = testData(moment)
@@ -50,7 +50,7 @@ func TestMomentValue(t *testing.T) {
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
 		moment := &Moment{K: 1, Window: 3}
-		err := SetupMetric(moment)
+		err := Init(moment)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -62,7 +62,7 @@ func TestMomentValue(t *testing.T) {
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
 		moment := &Moment{K: 1, Window: 3}
-		err := SetupMetric(moment)
+		err := Init(moment)
 		require.NoError(t, err)
 
 		err = testData(moment)

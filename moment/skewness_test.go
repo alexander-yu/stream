@@ -30,7 +30,7 @@ func TestNewSkewness(t *testing.T) {
 func TestSkewnessValue(t *testing.T) {
 	t.Run("pass: returns the skewness", func(t *testing.T) {
 		skewness := NewSkewness(3)
-		err := SetupMetric(skewness)
+		err := Init(skewness)
 		require.NoError(t, err)
 
 		err = testData(skewness)
@@ -48,7 +48,7 @@ func TestSkewnessValue(t *testing.T) {
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		skewness := NewSkewness(3)
-		err := SetupMetric(skewness)
+		err := Init(skewness)
 		require.NoError(t, err)
 
 		_, err = skewness.Value()
@@ -57,7 +57,7 @@ func TestSkewnessValue(t *testing.T) {
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
 		skewness := NewSkewness(3)
-		err := SetupMetric(skewness)
+		err := Init(skewness)
 		require.NoError(t, err)
 
 		err = testData(skewness)
@@ -71,7 +71,7 @@ func TestSkewnessValue(t *testing.T) {
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
 		skewness := NewSkewness(3)
-		err := SetupMetric(skewness)
+		err := Init(skewness)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -83,7 +83,7 @@ func TestSkewnessValue(t *testing.T) {
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
 		skewness := NewSkewness(3)
-		err := SetupMetric(skewness)
+		err := Init(skewness)
 		require.NoError(t, err)
 
 		err = testData(skewness)

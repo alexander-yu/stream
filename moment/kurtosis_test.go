@@ -30,7 +30,7 @@ func TestNewKurtosis(t *testing.T) {
 func TestKurtosisValue(t *testing.T) {
 	t.Run("pass: returns the excess kurtosis", func(t *testing.T) {
 		kurtosis := NewKurtosis(3)
-		err := SetupMetric(kurtosis)
+		err := Init(kurtosis)
 		require.NoError(t, err)
 
 		err = testData(kurtosis)
@@ -47,7 +47,7 @@ func TestKurtosisValue(t *testing.T) {
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		kurtosis := NewKurtosis(3)
-		err := SetupMetric(kurtosis)
+		err := Init(kurtosis)
 		require.NoError(t, err)
 
 		_, err = kurtosis.Value()
@@ -56,7 +56,7 @@ func TestKurtosisValue(t *testing.T) {
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
 		kurtosis := NewKurtosis(3)
-		err := SetupMetric(kurtosis)
+		err := Init(kurtosis)
 		require.NoError(t, err)
 
 		err = testData(kurtosis)
@@ -70,7 +70,7 @@ func TestKurtosisValue(t *testing.T) {
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
 		kurtosis := NewKurtosis(3)
-		err := SetupMetric(kurtosis)
+		err := Init(kurtosis)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -82,7 +82,7 @@ func TestKurtosisValue(t *testing.T) {
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
 		kurtosis := NewKurtosis(3)
-		err := SetupMetric(kurtosis)
+		err := Init(kurtosis)
 		require.NoError(t, err)
 
 		err = testData(kurtosis)

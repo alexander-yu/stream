@@ -63,10 +63,10 @@ func TestNewCore(t *testing.T) {
 	})
 }
 
-func TestSetupMetric(t *testing.T) {
+func TestInit(t *testing.T) {
 	t.Run("fail: invalid config returns error", func(t *testing.T) {
 		metric := &invalidMetric{}
-		err := SetupMetric(metric)
+		err := Init(metric)
 
 		testutil.ContainsError(t, err, "error creating Core")
 		assert.False(t, metric.subscribed)

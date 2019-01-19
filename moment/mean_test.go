@@ -13,7 +13,7 @@ import (
 func TestMeanValue(t *testing.T) {
 	t.Run("pass: returns the mean", func(t *testing.T) {
 		mean := &Mean{Window: 3}
-		err := SetupMetric(mean)
+		err := Init(mean)
 		require.NoError(t, err)
 
 		err = testData(mean)
@@ -27,7 +27,7 @@ func TestMeanValue(t *testing.T) {
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		mean := &Mean{Window: 3}
-		err := SetupMetric(mean)
+		err := Init(mean)
 		require.NoError(t, err)
 
 		_, err = mean.Value()
@@ -36,7 +36,7 @@ func TestMeanValue(t *testing.T) {
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
 		mean := &Mean{Window: 3}
-		err := SetupMetric(mean)
+		err := Init(mean)
 		require.NoError(t, err)
 
 		err = testData(mean)
@@ -50,7 +50,7 @@ func TestMeanValue(t *testing.T) {
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
 		mean := &Mean{Window: 3}
-		err := SetupMetric(mean)
+		err := Init(mean)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -62,7 +62,7 @@ func TestMeanValue(t *testing.T) {
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
 		mean := &Mean{Window: 3}
-		err := SetupMetric(mean)
+		err := Init(mean)
 		require.NoError(t, err)
 
 		err = testData(mean)
