@@ -11,9 +11,14 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
+func TestNewCorrelation(t *testing.T) {
+	correlation := NewCorrelation(3)
+	assert.Equal(t, uint64(3), correlation.window)
+}
+
 func TestCorrelation(t *testing.T) {
 	t.Run("pass: returns the correlation", func(t *testing.T) {
-		correlation := &Correlation{Window: 3}
+		correlation := NewCorrelation(3)
 		err := Init(correlation)
 		require.NoError(t, err)
 
@@ -27,7 +32,7 @@ func TestCorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		correlation := &Correlation{Window: 3}
+		correlation := NewCorrelation(3)
 		err := Init(correlation)
 		require.NoError(t, err)
 
@@ -36,7 +41,7 @@ func TestCorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: error if wrong number of values are pushed", func(t *testing.T) {
-		correlation := &Correlation{Window: 3}
+		correlation := NewCorrelation(3)
 		err := Init(correlation)
 		require.NoError(t, err)
 
@@ -58,7 +63,7 @@ func TestCorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		correlation := &Correlation{Window: 3}
+		correlation := NewCorrelation(3)
 		err := Init(correlation)
 		require.NoError(t, err)
 
@@ -72,7 +77,7 @@ func TestCorrelation(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		correlation := &Correlation{Window: 3}
+		correlation := NewCorrelation(3)
 		err := Init(correlation)
 		require.NoError(t, err)
 
@@ -84,7 +89,7 @@ func TestCorrelation(t *testing.T) {
 	})
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		correlation := &Correlation{Window: 3}
+		correlation := NewCorrelation(3)
 		err := Init(correlation)
 		require.NoError(t, err)
 
@@ -108,7 +113,7 @@ func TestCorrelation(t *testing.T) {
 	})
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
-		correlation := &Correlation{Window: 3}
+		correlation := NewCorrelation(3)
 		expectedString := "joint.Correlation_{window:3}"
 		assert.Equal(t, expectedString, correlation.String())
 	})

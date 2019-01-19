@@ -15,7 +15,7 @@ import (
 func TestNewAutocorrelation(t *testing.T) {
 	autocorrelation := NewAutocorrelation(1, 3)
 	assert.Equal(t, uint64(1), autocorrelation.lag)
-	assert.Equal(t, &Correlation{Window: 3}, autocorrelation.correlation)
+	assert.Equal(t, NewCorrelation(3), autocorrelation.correlation)
 }
 
 func TestAutocorrelation(t *testing.T) {

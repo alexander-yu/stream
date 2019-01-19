@@ -22,7 +22,7 @@ func NewAutocorrelation(lag uint64, window int) *Autocorrelation {
 	autocorrelation := &Autocorrelation{
 		lag:         lag,
 		queue:       queue.NewRingBuffer(lag),
-		correlation: correlation,
+		correlation: NewCorrelation(window),
 	}
 
 	return autocorrelation
@@ -44,7 +44,7 @@ func (a *Autocorrelation) String() string {
 	name := "joint.Autocorrelation"
 	params := []string{
 		fmt.Sprintf("lag:%v", a.lag),
-		fmt.Sprintf("window:%v", a.correlation.Window),
+		fmt.Sprintf("window:%v", a.correlation.window),
 	}
 	return fmt.Sprintf("%s_{%s}", name, strings.Join(params, ","))
 }

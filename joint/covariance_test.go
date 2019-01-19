@@ -10,9 +10,14 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
+func TestNewCovariance(t *testing.T) {
+	covariance := NewCovariance(3)
+	assert.Equal(t, uint64(3), covariance.window)
+}
+
 func TestCovarianceValue(t *testing.T) {
 	t.Run("pass: returns the covariance", func(t *testing.T) {
-		covariance := &Covariance{Window: 3}
+		covariance := NewCovariance(3)
 		err := Init(covariance)
 		require.NoError(t, err)
 
@@ -26,7 +31,7 @@ func TestCovarianceValue(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		covariance := &Covariance{Window: 3}
+		covariance := NewCovariance(3)
 		err := Init(covariance)
 		require.NoError(t, err)
 
@@ -35,7 +40,7 @@ func TestCovarianceValue(t *testing.T) {
 	})
 
 	t.Run("fail: error if wrong number of values are pushed", func(t *testing.T) {
-		covariance := &Covariance{Window: 3}
+		covariance := NewCovariance(3)
 		err := Init(covariance)
 		require.NoError(t, err)
 
@@ -57,7 +62,7 @@ func TestCovarianceValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		covariance := &Covariance{Window: 3}
+		covariance := NewCovariance(3)
 		err := Init(covariance)
 		require.NoError(t, err)
 
@@ -71,7 +76,7 @@ func TestCovarianceValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		covariance := &Covariance{Window: 3}
+		covariance := NewCovariance(3)
 		err := Init(covariance)
 		require.NoError(t, err)
 
@@ -83,7 +88,7 @@ func TestCovarianceValue(t *testing.T) {
 	})
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		covariance := &Covariance{Window: 3}
+		covariance := NewCovariance(3)
 		err := Init(covariance)
 		require.NoError(t, err)
 
@@ -105,7 +110,7 @@ func TestCovarianceValue(t *testing.T) {
 	})
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
-		covariance := &Covariance{Window: 3}
+		covariance := NewCovariance(3)
 		expectedString := "joint.Covariance_{window:3}"
 		assert.Equal(t, expectedString, covariance.String())
 	})

@@ -12,6 +12,11 @@ type Covariance struct {
 	core   *Core
 }
 
+// NewCovariance instantiates a Covariance struct.
+func NewCovariance(window uint64) *Covariance {
+	return &Covariance{window: window}
+}
+
 // Subscribe subscribes the Covariance to a Core object.
 func (cov *Covariance) Subscribe(c *Core) {
 	cov.core = c
@@ -21,14 +26,14 @@ func (cov *Covariance) Subscribe(c *Core) {
 func (cov *Covariance) Config() *CoreConfig {
 	return &CoreConfig{
 		Sums:   SumsConfig{{1, 1}},
-		Window: &cov.Window,
+		Window: &cov.window,
 	}
 }
 
 // String returns a string representation of the metric.
 func (cov *Covariance) String() string {
 	name := "joint.Covariance"
-	return fmt.Sprintf("%s_{window:%v}", name, cov.Window)
+	return fmt.Sprintf("%s_{window:%v}", name, cov.window)
 }
 
 // Push adds a new pair of values for Covariance to consume.

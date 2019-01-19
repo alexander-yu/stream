@@ -13,6 +13,11 @@ type Correlation struct {
 	core   *Core
 }
 
+// NewCorrelation instantiates a Correlation struct.
+func NewCorrelation(window uint64) *Correlation {
+	return &Correlation{window: window}
+}
+
 // Subscribe subscribes the Correlation to a Core object.
 func (corr *Correlation) Subscribe(c *Core) {
 	corr.core = c
@@ -26,14 +31,14 @@ func (corr *Correlation) Config() *CoreConfig {
 			{2, 0},
 			{0, 2},
 		},
-		Window: &corr.Window,
+		Window: &corr.window,
 	}
 }
 
 // String returns a string representation of the metric.
 func (corr *Correlation) String() string {
 	name := "joint.Correlation"
-	return fmt.Sprintf("%s_{window:%v}", name, corr.Window)
+	return fmt.Sprintf("%s_{window:%v}", name, corr.window)
 }
 
 // Push adds a new pair of values for Correlation to consume.
