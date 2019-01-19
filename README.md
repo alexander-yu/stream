@@ -48,41 +48,39 @@ go get github.com/alexander-yu/stream
 
 ## Example
 
+In-depth examples are provided in the [examples](https://github.com/alexander-yu/stream/examples) directory, but a small taste is provided below:
+
 ```go
-package main
+// tracks the autocorrelation over a
+// rolling window of size 15 and lag of 5
+autocorr, err := joint.AutoCorrelation(5, 15)
+// handle err
 
-import (
-    "fmt"
+// all metrics in the joint package must be passed
+// through joint.Init in order to consume values
+err = joint.Init(autocorr)
+// handle err
 
-    "github.com/alexander-yu/stream/moment"
-)
+// tracks the global median using a pair of heaps
+median, err := quantile.NewHeapMedian(5)
+// handle err
 
-func main() {
-    // tracks the mean over a rolling window of size 5
-    mean := moment.NewMean(5)
-    err := moment.Init(mean)
-    if err != nil {
-        fmt.Printf("error creating Mean: %+v", err)
-        return
-    }
+for i := 0., i < 100; i++ {
+    err = autocorr.Push(i, i*i)
+    // handle err
 
-    for i := 0.; i < 100; i++ {
-        err := mean.Push(i)
-        if err != nil {
-            fmt.Printf("error pushing %f: %+v", i, err)
-            return
-        }
-    }
-
-    val, err := mean.Value()
-    if err != nil {
-        fmt.Printf("error getting value: %+v", err)
-        return
-    }
-
-    // "mean: 97"
-    fmt.Println("mean:", val)
+    err = median.Push(i)
+    // handle err
 }
+
+autocorrVal, err := autocorr.Value()
+// handle err
+
+medianVal, err := median.Value()
+// handle err
+
+fmt.Println("%s: %f", autocorr.String(), autocorrVal)
+fmt.Println("%s: %f", median.String(), medianVal)
 ```
 
 ## Statistics
