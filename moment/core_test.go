@@ -59,7 +59,8 @@ func TestNewCore(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.Equal(t, uint64(3), core.window)
-		assert.Equal(t, 6, len(core.sums))
+		assert.Equal(t, make([]float64, 6), core.sums)
+		assert.Equal(t, uint64(0), core.queue.Len())
 	})
 }
 
