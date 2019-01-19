@@ -15,11 +15,11 @@ func TestNewOSTMedian(t *testing.T) {
 	t.Run("pass: nonnegative window is valid", func(t *testing.T) {
 		median, err := NewOSTMedian(0, ost.AVL)
 		require.NoError(t, err)
-		assert.Equal(t, uint64(0), median.quantile.window)
+		assert.Equal(t, 0, median.quantile.window)
 
 		median, err = NewOSTMedian(5, ost.AVL)
 		require.NoError(t, err)
-		assert.Equal(t, uint64(5), median.quantile.window)
+		assert.Equal(t, 5, median.quantile.window)
 	})
 
 	t.Run("fail: negative window is invalid", func(t *testing.T) {

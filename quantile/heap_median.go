@@ -137,7 +137,7 @@ func (m *HeapMedian) Clear() {
 	m.mux.Lock()
 	defer m.mux.Unlock()
 	m.queue.Dispose()
-	m.queue = queue.NewRingBuffer(m.window)
+	m.queue = queue.NewRingBuffer(uint64(m.window))
 	m.lowHeap = heap.NewHeap("low", []float64{}, fmax)
 	m.highHeap = heap.NewHeap("high", []float64{}, fmin)
 }
