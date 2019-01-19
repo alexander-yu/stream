@@ -11,6 +11,68 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
+type invalidMetric struct {
+	subscribed bool
+}
+
+func (m *invalidMetric) String() string {
+	return ""
+}
+
+func (m *invalidMetric) Push(x float64) error {
+	return nil
+}
+
+func (m *invalidMetric) Value() (float64, error) {
+	return 0, nil
+}
+
+func (m *invalidMetric) Clear() {}
+
+func (m *invalidMetric) Subscribe(c *Core) {
+	m.subscribed = true
+}
+
+func (m *invalidMetric) Config() *CoreConfig {
+	return &CoreConfig{Sums: SumsConfig{-1: true}}
+}
+
+func TestNewCore(t *testing.T) {
+	t.Run("fail: invalid config returns error", func(t *testing.T) {
+		_, err := NewCore(&CoreConfig{
+			Sums: SumsConfig{
+				-1: true,
+			},
+			Window: stream.IntPtr(3),
+		})
+		testutil.ContainsError(t, err, "error validating config")
+	})
+
+	t.Run("pass: valid config returns Core", func(t *testing.T) {
+		core, err := NewCore(&CoreConfig{
+			Sums: SumsConfig{
+				1: true,
+				5: true,
+			},
+			Window: stream.IntPtr(3),
+		})
+		require.NoError(t, err)
+
+		assert.Equal(t, uint64(3), core.window)
+		assert.Equal(t, 6, len(core.sums))
+	})
+}
+
+func TestSetupMetric(t *testing.T) {
+	t.Run("fail: invalid config returns error", func(t *testing.T) {
+		metric := &invalidMetric{}
+		err := SetupMetric(metric)
+
+		testutil.ContainsError(t, err, "error creating Core")
+		assert.False(t, metric.subscribed)
+	})
+}
+
 func TestPush(t *testing.T) {
 	t.Run("pass: successfully pushes values", func(t *testing.T) {
 		m := newMockMetric()
