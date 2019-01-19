@@ -76,9 +76,8 @@ func TestMomentValue(t *testing.T) {
 	})
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
-		expectedString := "moment.Moment_{k:2,window:3}"
 		moment := &Moment{K: 2, Window: 3}
-
+		expectedString := "moment.Moment_{k:2,window:3}"
 		assert.Equal(t, expectedString, moment.String())
 	})
 }

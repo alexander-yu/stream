@@ -96,8 +96,8 @@ func TestKurtosisValue(t *testing.T) {
 	})
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
-		expectedString := "moment.Kurtosis_{window:3}"
 		kurtosis := NewKurtosis(3)
+		expectedString := "moment.Kurtosis_{window:3}"
 		assert.Equal(t, expectedString, kurtosis.String())
 	})
 }

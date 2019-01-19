@@ -74,9 +74,8 @@ func TestMeanValue(t *testing.T) {
 	})
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
-		expectedString := "moment.Mean_{window:3}"
 		mean := &Mean{Window: 3}
-
+		expectedString := "moment.Mean_{window:3}"
 		assert.Equal(t, expectedString, mean.String())
 	})
 }

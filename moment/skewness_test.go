@@ -97,8 +97,8 @@ func TestSkewnessValue(t *testing.T) {
 	})
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
-		expectedString := "moment.Skewness_{window:3}"
 		skewness := NewSkewness(3)
+		expectedString := "moment.Skewness_{window:3}"
 		assert.Equal(t, expectedString, skewness.String())
 	})
 }

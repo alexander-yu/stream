@@ -82,8 +82,8 @@ func TestStdValue(t *testing.T) {
 	})
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
-		expectedString := "moment.Std_{window:3}"
 		std := NewStd(3)
+		expectedString := "moment.Std_{window:3}"
 		assert.Equal(t, expectedString, std.String())
 	})
 }
