@@ -8,12 +8,12 @@ import (
 
 // Mean is a metric that tracks the mean.
 type Mean struct {
-	Window int
+	window int
 	core   *Core
 }
 
 // NewMean instantiates a Mean struct.
-func NewMean(window uint64) *Mean {
+func NewMean(window int) *Mean {
 	return &Mean{window: window}
 }
 

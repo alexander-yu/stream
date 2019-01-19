@@ -13,7 +13,7 @@ import (
 func TestNewMoment(t *testing.T) {
 	moment := NewMoment(2, 3)
 	assert.Equal(t, 2, moment.k)
-	assert.Equal(t, uint64(3), moment.window)
+	assert.Equal(t, 3, moment.window)
 }
 
 func TestMomentValue(t *testing.T) {

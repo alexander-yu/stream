@@ -14,8 +14,7 @@ type Std struct {
 
 // NewStd instantiates an Std struct.
 func NewStd(window int) *Std {
-	variance := &Moment{K: 2, Window: window}
-	return &Std{variance: variance}
+	return &Std{variance: NewMoment(2, window)}
 }
 
 // Subscribe subscribes the Std to a Core object.

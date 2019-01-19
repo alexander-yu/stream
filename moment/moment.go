@@ -9,13 +9,13 @@ import (
 
 // Moment is a metric that tracks the kth sample central moment.
 type Moment struct {
-	K      int
-	Window int
+	k      int
+	window int
 	core   *Core
 }
 
 // NewMoment instantiates a Moment struct.
-func NewMoment(k int, window uint64) *Moment {
+func NewMoment(k int, window int) *Moment {
 	return &Moment{
 		k:      k,
 		window: window,

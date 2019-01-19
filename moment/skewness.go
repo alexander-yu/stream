@@ -17,8 +17,6 @@ type Skewness struct {
 
 // NewSkewness instantiates a Skewness struct.
 func NewSkewness(window int) *Skewness {
-	variance := &Moment{K: 2, Window: window}
-	moment3 := &Moment{K: 3, Window: window}
 	config := &CoreConfig{
 		Sums: SumsConfig{
 			2: true,

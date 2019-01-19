@@ -17,8 +17,6 @@ type Kurtosis struct {
 
 // NewKurtosis instantiates a Kurtosis struct.
 func NewKurtosis(window int) *Kurtosis {
-	variance := &Moment{K: 2, Window: window}
-	moment4 := &Moment{K: 4, Window: window}
 	config := &CoreConfig{
 		Sums: SumsConfig{
 			2: true,

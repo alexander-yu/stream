@@ -12,7 +12,7 @@ import (
 
 func TestNewMean(t *testing.T) {
 	mean := NewMean(3)
-	assert.Equal(t, uint64(3), mean.window)
+	assert.Equal(t, 3, mean.window)
 }
 
 func TestMeanValue(t *testing.T) {
