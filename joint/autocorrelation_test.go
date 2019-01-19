@@ -79,6 +79,17 @@ func TestAutocorrelation(t *testing.T) {
 		))
 	})
 
+	t.Run("fail: if Core is not set, return error", func(t *testing.T) {
+		autocorrelation, err := NewAutocorrelation(1, 3)
+		require.NoError(t, err)
+
+		err = autocorrelation.Push(0., 0.)
+		testutil.ContainsError(t, err, "Core is not set")
+
+		_, err = autocorrelation.Value()
+		testutil.ContainsError(t, err, "Core is not set")
+	})
+
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		autocorrelation, err := NewAutocorrelation(1, 3)
 		require.NoError(t, err)

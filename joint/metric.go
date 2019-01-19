@@ -8,6 +8,6 @@ import "github.com/alexander-yu/stream"
 // with a Core for consuming values and keeping track of centralized sums.
 type Metric interface {
 	stream.SimpleJointMetric
-	Subscribe(*Core)
+	SetCore(*Core)
 	Config() *CoreConfig
 }

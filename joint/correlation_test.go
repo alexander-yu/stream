@@ -31,6 +31,16 @@ func TestCorrelation(t *testing.T) {
 		testutil.Approx(t, 158./math.Sqrt(14.*5378./3.), value)
 	})
 
+	t.Run("fail: if Core is not set, return error", func(t *testing.T) {
+		correlation := NewCorrelation(3)
+
+		err := correlation.Push(0., 0.)
+		testutil.ContainsError(t, err, "Core is not set")
+
+		_, err = correlation.Value()
+		testutil.ContainsError(t, err, "Core is not set")
+	})
+
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		correlation := NewCorrelation(3)
 		err := Init(correlation)

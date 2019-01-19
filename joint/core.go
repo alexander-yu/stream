@@ -31,7 +31,7 @@ func Init(metric Metric) error {
 		return errors.Wrap(err, "error creating Core")
 	}
 
-	metric.Subscribe(core)
+	metric.SetCore(core)
 	return nil
 }
 

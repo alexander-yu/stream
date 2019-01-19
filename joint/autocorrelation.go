@@ -29,10 +29,15 @@ func NewAutocorrelation(lag int, window int) (*Autocorrelation, error) {
 	}, nil
 }
 
-// Subscribe subscribes the Autocorrelation to a Core object.
-func (a *Autocorrelation) Subscribe(c *Core) {
-	a.correlation.Subscribe(c)
+// SetCore sets the Core.
+func (a *Autocorrelation) SetCore(c *Core) {
+	a.correlation.SetCore(c)
 	a.core = c
+}
+
+// IsSetCore returns if the core has been set.
+func (a *Autocorrelation) IsSetCore() bool {
+	return a.core != nil
 }
 
 // Config returns the CoreConfig needed.
@@ -52,6 +57,10 @@ func (a *Autocorrelation) String() string {
 
 // Push adds a new pair of values for Autocorrelation to consume.
 func (a *Autocorrelation) Push(xs ...float64) error {
+	if !a.IsSetCore() {
+		return errors.New("Core is not set")
+	}
+
 	if len(xs) != 2 {
 		return errors.Errorf(
 			"Autocorrelation expected 2 arguments: got %d (%v)",
@@ -96,14 +105,20 @@ func (a *Autocorrelation) Push(xs ...float64) error {
 
 // Value returns the value of the sample autocorrelation.
 func (a *Autocorrelation) Value() (float64, error) {
+	if !a.IsSetCore() {
+		return 0, errors.New("Core is not set")
+	}
+
 	return a.correlation.Value()
 }
 
 // Clear resets the metric.
 func (a *Autocorrelation) Clear() {
-	a.correlation.core.Lock()
-	defer a.correlation.core.Unlock()
-	a.correlation.core.UnsafeClear()
-	a.queue.Dispose()
-	a.queue = queue.NewRingBuffer(uint64(a.lag))
+	if a.IsSetCore() {
+		a.correlation.core.Lock()
+		defer a.correlation.core.Unlock()
+		a.correlation.core.UnsafeClear()
+		a.queue.Dispose()
+		a.queue = queue.NewRingBuffer(uint64(a.lag))
+	}
 }

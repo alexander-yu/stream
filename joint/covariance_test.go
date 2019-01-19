@@ -30,6 +30,16 @@ func TestCovarianceValue(t *testing.T) {
 		testutil.Approx(t, 79., value)
 	})
 
+	t.Run("fail: if Core is not set, return error", func(t *testing.T) {
+		covariance := NewCovariance(3)
+
+		err := covariance.Push(0., 0.)
+		testutil.ContainsError(t, err, "Core is not set")
+
+		_, err = covariance.Value()
+		testutil.ContainsError(t, err, "Core is not set")
+	})
+
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
 		covariance := NewCovariance(3)
 		err := Init(covariance)

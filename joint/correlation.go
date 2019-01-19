@@ -18,9 +18,14 @@ func NewCorrelation(window int) *Correlation {
 	return &Correlation{window: window}
 }
 
-// Subscribe subscribes the Correlation to a Core object.
-func (corr *Correlation) Subscribe(c *Core) {
+// SetCore sets the Core.
+func (corr *Correlation) SetCore(c *Core) {
 	corr.core = c
+}
+
+// IsSetCore returns if the core has been set.
+func (corr *Correlation) IsSetCore() bool {
+	return corr.core != nil
 }
 
 // Config returns the CoreConfig needed.
@@ -43,6 +48,10 @@ func (corr *Correlation) String() string {
 
 // Push adds a new pair of values for Correlation to consume.
 func (corr *Correlation) Push(xs ...float64) error {
+	if !corr.IsSetCore() {
+		return errors.New("Core is not set")
+	}
+
 	if len(xs) != 2 {
 		return errors.Errorf(
 			"Correlation expected 2 arguments: got %d (%v)",
@@ -60,6 +69,10 @@ func (corr *Correlation) Push(xs ...float64) error {
 
 // Value returns the value of the sample Pearson correlation coefficient.
 func (corr *Correlation) Value() (float64, error) {
+	if !corr.IsSetCore() {
+		return 0, errors.New("Core is not set")
+	}
+
 	corr.core.RLock()
 	defer corr.core.RUnlock()
 
@@ -83,5 +96,7 @@ func (corr *Correlation) Value() (float64, error) {
 
 // Clear resets the metric.
 func (corr *Correlation) Clear() {
-	corr.core.Clear()
+	if corr.IsSetCore() {
+		corr.core.Clear()
+	}
 }

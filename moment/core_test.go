@@ -73,7 +73,7 @@ func TestInit(t *testing.T) {
 		assert.False(t, metric.coreSet)
 	})
 
-	t.Run("pass: valid config subscribes metric to new Core", func(t *testing.T) {
+	t.Run("pass: valid config sets Core for metric", func(t *testing.T) {
 		metric := &mockMetric{}
 		err := Init(metric)
 		require.NoError(t, err)

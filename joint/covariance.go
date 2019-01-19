@@ -17,9 +17,14 @@ func NewCovariance(window int) *Covariance {
 	return &Covariance{window: window}
 }
 
-// Subscribe subscribes the Covariance to a Core object.
-func (cov *Covariance) Subscribe(c *Core) {
+// SetCore sets the Core.
+func (cov *Covariance) SetCore(c *Core) {
 	cov.core = c
+}
+
+// IsSetCore returns if the core has been set.
+func (cov *Covariance) IsSetCore() bool {
+	return cov.core != nil
 }
 
 // Config returns the CoreConfig needed.
@@ -38,6 +43,10 @@ func (cov *Covariance) String() string {
 
 // Push adds a new pair of values for Covariance to consume.
 func (cov *Covariance) Push(xs ...float64) error {
+	if !cov.IsSetCore() {
+		return errors.New("Core is not set")
+	}
+
 	if len(xs) != 2 {
 		return errors.Errorf(
 			"Covariance expected 2 arguments: got %d (%v)",
@@ -55,6 +64,10 @@ func (cov *Covariance) Push(xs ...float64) error {
 
 // Value returns the value of the sample covariance.
 func (cov *Covariance) Value() (float64, error) {
+	if !cov.IsSetCore() {
+		return 0, errors.New("Core is not set")
+	}
+
 	cov.core.RLock()
 	defer cov.core.RUnlock()
 
@@ -71,5 +84,7 @@ func (cov *Covariance) Value() (float64, error) {
 
 // Clear resets the metric.
 func (cov *Covariance) Clear() {
-	cov.core.Clear()
+	if cov.IsSetCore() {
+		cov.core.Clear()
+	}
 }
