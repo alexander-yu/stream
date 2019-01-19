@@ -28,8 +28,8 @@ func NewSkewness(window int) *Skewness {
 	}
 
 	return &Skewness{
-		variance: variance,
-		moment3:  moment3,
+		variance: NewMoment(2, window),
+		moment3:  NewMoment(3, window),
 		config:   config,
 	}
 }

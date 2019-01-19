@@ -10,9 +10,15 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
+func TestNewMoment(t *testing.T) {
+	moment := NewMoment(2, 3)
+	assert.Equal(t, 2, moment.k)
+	assert.Equal(t, uint64(3), moment.window)
+}
+
 func TestMomentValue(t *testing.T) {
 	t.Run("pass: returns the kth moment", func(t *testing.T) {
-		moment := &Moment{K: 2, Window: 3}
+		moment := NewMoment(2, 3)
 		err := Init(moment)
 		require.NoError(t, err)
 
@@ -26,7 +32,7 @@ func TestMomentValue(t *testing.T) {
 	})
 
 	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		moment := &Moment{K: 2, Window: 3}
+		moment := NewMoment(2, 3)
 		err := Init(moment)
 		require.NoError(t, err)
 
@@ -35,7 +41,7 @@ func TestMomentValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		moment := &Moment{K: 1, Window: 3}
+		moment := NewMoment(1, 3)
 		err := Init(moment)
 		require.NoError(t, err)
 
@@ -49,7 +55,7 @@ func TestMomentValue(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		moment := &Moment{K: 1, Window: 3}
+		moment := NewMoment(1, 3)
 		err := Init(moment)
 		require.NoError(t, err)
 
@@ -61,7 +67,7 @@ func TestMomentValue(t *testing.T) {
 	})
 
 	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		moment := &Moment{K: 1, Window: 3}
+		moment := NewMoment(1, 3)
 		err := Init(moment)
 		require.NoError(t, err)
 
@@ -76,7 +82,7 @@ func TestMomentValue(t *testing.T) {
 	})
 
 	t.Run("pass: String() returns string representation", func(t *testing.T) {
-		moment := &Moment{K: 2, Window: 3}
+		moment := NewMoment(2, 3)
 		expectedString := "moment.Moment_{k:2,window:3}"
 		assert.Equal(t, expectedString, moment.String())
 	})

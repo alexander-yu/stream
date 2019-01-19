@@ -15,8 +15,8 @@ func TestNewSkewness(t *testing.T) {
 	window := 3
 	skewness := NewSkewness(window)
 	assert.Equal(t, &Skewness{
-		variance: &Moment{K: 2, Window: window},
-		moment3:  &Moment{K: 3, Window: window},
+		variance: NewMoment(2, window),
+		moment3:  NewMoment(3, window),
 		config: &CoreConfig{
 			Sums: SumsConfig{
 				2: true,

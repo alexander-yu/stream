@@ -12,6 +12,11 @@ type Mean struct {
 	core   *Core
 }
 
+// NewMean instantiates a Mean struct.
+func NewMean(window uint64) *Mean {
+	return &Mean{window: window}
+}
+
 // Subscribe subscribes the Mean to a Core object.
 func (m *Mean) Subscribe(c *Core) {
 	m.core = c
@@ -20,14 +25,14 @@ func (m *Mean) Subscribe(c *Core) {
 // Config returns the CoreConfig needed.
 func (m *Mean) Config() *CoreConfig {
 	return &CoreConfig{
-		Window: &m.Window,
+		Window: &m.window,
 	}
 }
 
 // String returns a string representation of the metric.
 func (m *Mean) String() string {
 	name := "moment.Mean"
-	window := fmt.Sprintf("window:%v", m.Window)
+	window := fmt.Sprintf("window:%v", m.window)
 	return fmt.Sprintf("%s_{%s}", name, window)
 }
 

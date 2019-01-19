@@ -14,6 +14,14 @@ type Moment struct {
 	core   *Core
 }
 
+// NewMoment instantiates a Moment struct.
+func NewMoment(k int, window uint64) *Moment {
+	return &Moment{
+		k:      k,
+		window: window,
+	}
+}
+
 // Subscribe subscribes the Moment to a Core object.
 func (m *Moment) Subscribe(c *Core) {
 	m.core = c
@@ -22,8 +30,8 @@ func (m *Moment) Subscribe(c *Core) {
 // Config returns the CoreConfig needed.
 func (m *Moment) Config() *CoreConfig {
 	return &CoreConfig{
-		Sums:   SumsConfig{m.K: true},
-		Window: &m.Window,
+		Sums:   SumsConfig{m.k: true},
+		Window: &m.window,
 	}
 }
 
@@ -31,8 +39,8 @@ func (m *Moment) Config() *CoreConfig {
 func (m *Moment) String() string {
 	name := "moment.Moment"
 	params := []string{
-		fmt.Sprintf("k:%v", m.K),
-		fmt.Sprintf("window:%v", m.Window),
+		fmt.Sprintf("k:%v", m.k),
+		fmt.Sprintf("window:%v", m.window),
 	}
 	return fmt.Sprintf("%s_{%s}", name, strings.Join(params, ","))
 }
@@ -51,7 +59,7 @@ func (m *Moment) Value() (float64, error) {
 	m.core.RLock()
 	defer m.core.RUnlock()
 
-	moment, err := m.core.Sum(m.K)
+	moment, err := m.core.Sum(m.k)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum")
 	}

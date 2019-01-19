@@ -13,7 +13,7 @@ import (
 
 func TestNewStd(t *testing.T) {
 	std := NewStd(3)
-	assert.Equal(t, &Moment{K: 2, Window: 3}, std.variance)
+	assert.Equal(t, NewMoment(2, 3), std.variance)
 }
 
 func TestStdValue(t *testing.T) {
