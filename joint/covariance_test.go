@@ -12,7 +12,7 @@ import (
 
 func TestNewCovariance(t *testing.T) {
 	covariance := NewCovariance(3)
-	assert.Equal(t, uint64(3), covariance.window)
+	assert.Equal(t, 3, covariance.window)
 }
 
 func TestCovarianceValue(t *testing.T) {

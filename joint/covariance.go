@@ -8,12 +8,12 @@ import (
 
 // Covariance is a metric that tracks the sample covariance.
 type Covariance struct {
-	Window int
+	window int
 	core   *Core
 }
 
 // NewCovariance instantiates a Covariance struct.
-func NewCovariance(window uint64) *Covariance {
+func NewCovariance(window int) *Covariance {
 	return &Covariance{window: window}
 }
 

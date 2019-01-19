@@ -9,12 +9,12 @@ import (
 
 // Correlation is a metric that tracks the sample Pearson correlation coefficient.
 type Correlation struct {
-	Window int
+	window int
 	core   *Core
 }
 
 // NewCorrelation instantiates a Correlation struct.
-func NewCorrelation(window uint64) *Correlation {
+func NewCorrelation(window int) *Correlation {
 	return &Correlation{window: window}
 }
 

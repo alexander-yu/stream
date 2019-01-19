@@ -13,7 +13,7 @@ import (
 
 func TestNewCorrelation(t *testing.T) {
 	correlation := NewCorrelation(3)
-	assert.Equal(t, uint64(3), correlation.window)
+	assert.Equal(t, 3, correlation.window)
 }
 
 func TestCorrelation(t *testing.T) {

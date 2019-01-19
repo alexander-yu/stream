@@ -17,8 +17,9 @@ type Autocorrelation struct {
 }
 
 // NewAutocorrelation instantiates an Autocorrelation struct.
+// The lag parameter is of type uint64 due to the internal queue.RingBuffer
+// used, whose constructor requires uint64 as input.
 func NewAutocorrelation(lag uint64, window int) *Autocorrelation {
-	correlation := &Correlation{Window: window}
 	autocorrelation := &Autocorrelation{
 		lag:         lag,
 		queue:       queue.NewRingBuffer(lag),
