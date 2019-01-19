@@ -72,6 +72,14 @@ func TestInit(t *testing.T) {
 		testutil.ContainsError(t, err, "error creating Core")
 		assert.False(t, metric.subscribed)
 	})
+
+	t.Run("pass: valid config subscribes metric to new Core", func(t *testing.T) {
+		metric := &mockMetric{}
+		err := Init(metric)
+		require.NoError(t, err)
+
+		assert.NotNil(t, metric.core)
+	})
 }
 
 func TestPush(t *testing.T) {
