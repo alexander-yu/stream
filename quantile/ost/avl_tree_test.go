@@ -28,7 +28,7 @@ func (s *AVLTreeSuite) SetupTest() {
 	s.tree.Add(1)
 }
 
-func (s *AVLTreeSuite) TestAVLTreeAdd() {
+func (s *AVLTreeSuite) TestAdd() {
 	s.Equal(8, s.tree.Size())
 	s.Equal(3, s.tree.Height())
 	s.Equal(
@@ -70,7 +70,7 @@ func (s *AVLTreeSuite) TestAVLTreeAdd() {
 	)
 }
 
-func (s *AVLTreeSuite) TestAVLTreeRemove() {
+func (s *AVLTreeSuite) TestRemove() {
 	s.Run("pass: successfully removes values", func() {
 		s.SetupTest()
 		s.tree.Remove(5)
@@ -144,7 +144,7 @@ func (s *AVLTreeSuite) TestAVLTreeRemove() {
 	})
 }
 
-func (s *AVLTreeSuite) TestAVLTreeRank() {
+func (s *AVLTreeSuite) TestRank() {
 	rank := s.tree.Rank(3)
 	s.Equal(3, rank)
 
@@ -155,7 +155,7 @@ func (s *AVLTreeSuite) TestAVLTreeRank() {
 	s.Equal(0, rank)
 }
 
-func (s *AVLTreeSuite) TestAVLTreeSelect() {
+func (s *AVLTreeSuite) TestSelect() {
 	node := s.tree.Select(5)
 	s.Equal(float64(5), node.Value())
 
@@ -166,7 +166,7 @@ func (s *AVLTreeSuite) TestAVLTreeSelect() {
 	s.Nil(node)
 }
 
-func (s *AVLTreeSuite) TestAVLTreeClear() {
+func (s *AVLTreeSuite) TestClear() {
 	s.tree.Clear()
 	s.Equal(&AVLTree{}, s.tree)
 }

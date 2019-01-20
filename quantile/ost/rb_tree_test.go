@@ -12,7 +12,7 @@ type RBTreeSuite struct {
 	tree *RBTree
 }
 
-func TestRBTreeSuite(t *testing.T) {
+func TestRBSuite(t *testing.T) {
 	suite.Run(t, &RBTreeSuite{})
 }
 
@@ -28,7 +28,7 @@ func (s *RBTreeSuite) SetupTest() {
 	s.tree.Add(1)
 }
 
-func (s *RBTreeSuite) TestRBTreeAdd() {
+func (s *RBTreeSuite) TestAdd() {
 	s.Equal(8, s.tree.Size())
 	s.Equal(
 		strings.Join([]string{
@@ -68,7 +68,7 @@ func (s *RBTreeSuite) TestRBTreeAdd() {
 	)
 }
 
-func (s *RBTreeSuite) TestRBTreeRemove() {
+func (s *RBTreeSuite) TestRemove() {
 	s.Run("pass: successfully removes values", func() {
 		s.SetupTest()
 		s.tree.Add(6.5)
@@ -148,7 +148,7 @@ func (s *RBTreeSuite) TestRBTreeRemove() {
 	})
 }
 
-func (s *RBTreeSuite) TestRBTreeRank() {
+func (s *RBTreeSuite) TestRank() {
 	rank := s.tree.Rank(3)
 	s.Equal(3, rank)
 
@@ -159,7 +159,7 @@ func (s *RBTreeSuite) TestRBTreeRank() {
 	s.Equal(0, rank)
 }
 
-func (s *RBTreeSuite) TestRBTreeSelect() {
+func (s *RBTreeSuite) TestSelect() {
 	node := s.tree.Select(5)
 	s.Equal(float64(5), node.Value())
 
@@ -170,7 +170,7 @@ func (s *RBTreeSuite) TestRBTreeSelect() {
 	s.Nil(node)
 }
 
-func (s *RBTreeSuite) TestRBTreeClear() {
+func (s *RBTreeSuite) TestClear() {
 	s.tree.Clear()
 	s.Equal(&RBTree{}, s.tree)
 }
