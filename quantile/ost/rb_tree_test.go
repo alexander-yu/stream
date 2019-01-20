@@ -4,28 +4,33 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func rbTestData() *RBTree {
-	tree := &RBTree{}
-	tree.Add(5)
-	tree.Add(6)
-	tree.Add(7)
-	tree.Add(3)
-	tree.Add(4)
-	tree.Add(1)
-	tree.Add(2)
-	tree.Add(1)
-	return tree
+type RBTreeSuite struct {
+	suite.Suite
+	tree *RBTree
 }
 
-func TestRBTreeAdd(t *testing.T) {
-	tree := rbTestData()
+func TestRBTreeSuite(t *testing.T) {
+	suite.Run(t, &RBTreeSuite{})
+}
 
-	assert.Equal(t, 8, tree.Size())
-	assert.Equal(
-		t,
+func (s *RBTreeSuite) SetupTest() {
+	s.tree = &RBTree{}
+	s.tree.Add(5)
+	s.tree.Add(6)
+	s.tree.Add(7)
+	s.tree.Add(3)
+	s.tree.Add(4)
+	s.tree.Add(1)
+	s.tree.Add(2)
+	s.tree.Add(1)
+}
+
+func (s *RBTreeSuite) TestRBTreeAdd() {
+	s.Equal(8, s.tree.Size())
+	s.Equal(
 		strings.Join([]string{
 			"│       ┌── 7.000000",
 			"│   ┌── 6.000000",
@@ -37,15 +42,14 @@ func TestRBTreeAdd(t *testing.T) {
 			"            └── 1.000000",
 			"",
 		}, "\n"),
-		tree.String(),
+		s.tree.String(),
 	)
 
-	tree.Add(6.5)
-	tree.Add(6.75)
-	tree.Add(6.25)
-	assert.Equal(t, 11, tree.Size())
-	assert.Equal(
-		t,
+	s.tree.Add(6.5)
+	s.tree.Add(6.75)
+	s.tree.Add(6.25)
+	s.Equal(11, s.tree.Size())
+	s.Equal(
 		strings.Join([]string{
 			"│       ┌── 7.000000",
 			"│   ┌── 6.750000",
@@ -60,26 +64,25 @@ func TestRBTreeAdd(t *testing.T) {
 			"            └── 1.000000",
 			"",
 		}, "\n"),
-		tree.String(),
+		s.tree.String(),
 	)
 }
 
-func TestRBTreeRemove(t *testing.T) {
-	t.Run("pass: successfully removes values", func(t *testing.T) {
-		tree := rbTestData()
-		tree.Add(6.5)
-		tree.Add(6.75)
-		tree.Add(6.25)
+func (s *RBTreeSuite) TestRBTreeRemove() {
+	s.Run("pass: successfully removes values", func() {
+		s.SetupTest()
+		s.tree.Add(6.5)
+		s.tree.Add(6.75)
+		s.tree.Add(6.25)
 
-		tree.Remove(4)
-		tree.Remove(1)
-		tree.Remove(6.5)
-		tree.Remove(6.75)
-		tree.Remove(6.25)
+		s.tree.Remove(4)
+		s.tree.Remove(1)
+		s.tree.Remove(6.5)
+		s.tree.Remove(6.75)
+		s.tree.Remove(6.25)
 
-		assert.Equal(t, 6, tree.Size())
-		assert.Equal(
-			t,
+		s.Equal(6, s.tree.Size())
+		s.Equal(
 			strings.Join([]string{
 				"│   ┌── 7.000000",
 				"│   │   └── 6.000000",
@@ -89,14 +92,13 @@ func TestRBTreeRemove(t *testing.T) {
 				"        └── 1.000000",
 				"",
 			}, "\n"),
-			tree.String(),
+			s.tree.String(),
 		)
 
-		tree.Remove(5)
+		s.tree.Remove(5)
 
-		assert.Equal(t, 5, tree.Size())
-		assert.Equal(
-			t,
+		s.Equal(5, s.tree.Size())
+		s.Equal(
 			strings.Join([]string{
 				"│   ┌── 7.000000",
 				"└── 6.000000",
@@ -105,33 +107,31 @@ func TestRBTreeRemove(t *testing.T) {
 				"        └── 1.000000",
 				"",
 			}, "\n"),
-			tree.String(),
+			s.tree.String(),
 		)
 
-		tree.Remove(6)
-		tree.Remove(2)
-		tree.Remove(3)
-		tree.Remove(7)
+		s.tree.Remove(6)
+		s.tree.Remove(2)
+		s.tree.Remove(3)
+		s.tree.Remove(7)
 
-		assert.Equal(t, 1, tree.Size())
-		assert.Equal(
-			t,
+		s.Equal(1, s.tree.Size())
+		s.Equal(
 			strings.Join([]string{
 				"└── 1.000000",
 				"",
 			}, "\n"),
-			tree.String(),
+			s.tree.String(),
 		)
 
 	})
 
-	t.Run("pass: removing non-existent value is a no-op", func(t *testing.T) {
-		tree := rbTestData()
-		tree.Remove(8)
+	s.Run("pass: removing non-existent value is a no-op", func() {
+		s.SetupTest()
+		s.tree.Remove(8)
 
-		assert.Equal(t, 8, tree.Size())
-		assert.Equal(
-			t,
+		s.Equal(8, s.tree.Size())
+		s.Equal(
 			strings.Join([]string{
 				"│       ┌── 7.000000",
 				"│   ┌── 6.000000",
@@ -143,37 +143,34 @@ func TestRBTreeRemove(t *testing.T) {
 				"            └── 1.000000",
 				"",
 			}, "\n"),
-			tree.String(),
+			s.tree.String(),
 		)
 	})
 }
 
-func TestRBTreeRank(t *testing.T) {
-	tree := rbTestData()
-	rank := tree.Rank(3)
-	assert.Equal(t, 3, rank)
+func (s *RBTreeSuite) TestRBTreeRank() {
+	rank := s.tree.Rank(3)
+	s.Equal(3, rank)
 
-	rank = tree.Rank(5.5)
-	assert.Equal(t, 6, rank)
+	rank = s.tree.Rank(5.5)
+	s.Equal(6, rank)
 
-	rank = tree.Rank(-1)
-	assert.Equal(t, 0, rank)
+	rank = s.tree.Rank(-1)
+	s.Equal(0, rank)
 }
 
-func TestRBTreeSelect(t *testing.T) {
-	tree := rbTestData()
-	node := tree.Select(5)
-	assert.Equal(t, float64(5), node.Value())
+func (s *RBTreeSuite) TestRBTreeSelect() {
+	node := s.tree.Select(5)
+	s.Equal(float64(5), node.Value())
 
-	node = tree.Select(-1)
-	assert.Nil(t, node)
+	node = s.tree.Select(-1)
+	s.Nil(node)
 
-	node = tree.Select(9)
-	assert.Nil(t, node)
+	node = s.tree.Select(9)
+	s.Nil(node)
 }
 
-func TestRBTreeClear(t *testing.T) {
-	tree := rbTestData()
-	tree.Clear()
-	assert.Equal(t, &RBTree{}, tree)
+func (s *RBTreeSuite) TestRBTreeClear() {
+	s.tree.Clear()
+	s.Equal(&RBTree{}, s.tree)
 }

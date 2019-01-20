@@ -5,6 +5,6 @@ require (
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/pkg/errors v0.8.0
 	github.com/sirupsen/logrus v1.3.0
-	github.com/stretchr/testify v1.2.2
+	github.com/stretchr/testify v1.3.0
 	github.com/workiva/go-datastructures v1.0.50
 )
