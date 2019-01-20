@@ -4,7 +4,7 @@ import (
 	heapops "container/heap"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 func fmax(x float64, y float64) bool {
@@ -15,52 +15,61 @@ func fmin(x float64, y float64) bool {
 	return x < y
 }
 
-func TestNewHeap(t *testing.T) {
-	heap := NewHeap("a", []float64{1, 2, 3, 4}, fmax)
-	assert.Equal(t, "a", heap.ID)
-	assert.Equal(t, 4., heapops.Pop(heap).(*Item).Val)
-
-	heap = NewHeap("", []float64{1, 2, 3, 4}, fmin)
-	assert.Equal(t, "", heap.ID)
-	assert.Equal(t, 1., heapops.Pop(heap).(*Item).Val)
+type HeapSuite struct {
+	suite.Suite
+	maxHeap *Heap
+	minHeap *Heap
 }
 
-func TestPeek(t *testing.T) {
-	heap := NewHeap("a", []float64{1, 2, 3, 4}, fmax)
-	heapops.Push(heap, &Item{Val: 5})
-	heapops.Push(heap, &Item{Val: 4})
-	assert.Equal(t, 5., heap.Peek())
+func TestHeapSuite(t *testing.T) {
+	suite.Run(t, &HeapSuite{})
 }
 
-func TestValues(t *testing.T) {
-	heap := NewHeap("a", []float64{1, 2, 3, 4}, fmax)
-	heapops.Push(heap, &Item{Val: 5})
-	heapops.Push(heap, &Item{Val: 4})
-	assert.Equal(t, []float64{5, 4, 4, 1, 2, 3}, heap.Values())
+func (s *HeapSuite) SetupTest() {
+	s.maxHeap = NewHeap("a", []float64{1, 2, 3, 4}, fmax)
+	s.minHeap = NewHeap("", []float64{1, 2, 3, 4}, fmin)
 }
 
-func TestUpdate(t *testing.T) {
-	heap := NewHeap("a", []float64{1, 2, 3, 4}, fmax)
+func (s *HeapSuite) TestNewHeap() {
+	s.Equal("a", s.maxHeap.ID)
+	s.Equal(4., heapops.Pop(s.maxHeap).(*Item).Val)
+
+	s.Equal("", s.minHeap.ID)
+	s.Equal(1., heapops.Pop(s.minHeap).(*Item).Val)
+}
+
+func (s *HeapSuite) TestPeek() {
+	heapops.Push(s.maxHeap, &Item{Val: 5})
+	heapops.Push(s.maxHeap, &Item{Val: 4})
+	s.Equal(5., s.maxHeap.Peek())
+}
+
+func (s *HeapSuite) TestValues() {
+	heapops.Push(s.maxHeap, &Item{Val: 5})
+	heapops.Push(s.maxHeap, &Item{Val: 4})
+	s.Equal([]float64{5, 4, 4, 1, 2, 3}, s.maxHeap.Values())
+}
+
+func (s *HeapSuite) TestUpdate() {
 	item := &Item{
 		Val:    5,
 		HeapID: "b",
 	}
 
-	heapops.Push(heap, item)
-	assert.Equal(t, []float64{5, 4, 3, 1, 2}, heap.Values())
-	assert.Equal(t, "a", item.HeapID)
+	heapops.Push(s.maxHeap, item)
+	s.Equal([]float64{5, 4, 3, 1, 2}, s.maxHeap.Values())
+	s.Equal("a", item.HeapID)
 
-	heap.Update(item, 2)
-	assert.Equal(t, []float64{4, 2, 3, 1, 2}, heap.Values())
+	s.maxHeap.Update(item, 2)
+	s.Equal([]float64{4, 2, 3, 1, 2}, s.maxHeap.Values())
 }
 
-func TestRemove(t *testing.T) {
-	heap := NewHeap("a", []float64{1, 2, 3, 4}, fmax)
+func (s *HeapSuite) TestRemove() {
 	item := &Item{Val: 5}
 
-	heapops.Push(heap, item)
-	assert.Equal(t, []float64{5, 4, 3, 1, 2}, heap.Values())
+	heapops.Push(s.maxHeap, item)
+	s.Equal([]float64{5, 4, 3, 1, 2}, s.maxHeap.Values())
 
-	heap.Remove(item)
-	assert.Equal(t, []float64{4, 2, 3, 1}, heap.Values())
+	s.maxHeap.Remove(item)
+	s.Equal([]float64{4, 2, 3, 1}, s.maxHeap.Values())
 }
