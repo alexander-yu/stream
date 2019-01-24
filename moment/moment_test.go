@@ -1,11 +1,11 @@
 package moment
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 
 	testutil "github.com/alexander-yu/stream/util/test"
 )
@@ -16,84 +16,116 @@ func TestNewMoment(t *testing.T) {
 	assert.Equal(t, 3, moment.window)
 }
 
-func TestMomentValue(t *testing.T) {
-	t.Run("pass: returns the kth moment", func(t *testing.T) {
-		moment := NewMoment(2, 3)
-		err := Init(moment)
+type MomentPushSuite struct {
+	suite.Suite
+	moment *Moment
+}
+
+func TestMomentPushSuite(t *testing.T) {
+	suite.Run(t, &MomentPushSuite{})
+}
+
+func (s *MomentPushSuite) SetupTest() {
+	s.moment = NewMoment(2, 3)
+	err := Init(s.moment)
+	s.Require().NoError(err)
+}
+
+func (s *MomentPushSuite) TestPushSuccess() {
+	err := s.moment.Push(3.)
+	s.NoError(err)
+}
+
+func (s *MomentPushSuite) TestPushFailOnNullCore() {
+	moment := NewMoment(2, 3)
+	err := moment.Push(0.)
+	testutil.ContainsError(s.T(), err, "Core is not set")
+}
+
+func (s *MomentPushSuite) TestPushFailOnQueueInsertionFailure() {
+	// dispose the queue to simulate an error when we try to insert into the queue
+	s.moment.core.queue.Dispose()
+
+	err := s.moment.Push(3.)
+	testutil.ContainsError(s.T(), err, "error pushing to core")
+}
+
+func (s *MomentPushSuite) TestPushFailOnQueueRetrievalFailure() {
+	xs := []float64{1, 2, 3}
+	for _, x := range xs {
+		err := s.moment.Push(x)
+		s.Require().NoError(err)
+	}
+
+	// dispose the queue to simulate an error when we try to retrieve from the queue
+	s.moment.core.queue.Dispose()
+
+	err := s.moment.Push(3.)
+	testutil.ContainsError(s.T(), err, "error pushing to core")
+}
+
+type MomentValueSuite struct {
+	suite.Suite
+	moment *Moment
+}
+
+func TestMomentValueSuite(t *testing.T) {
+	suite.Run(t, &MomentValueSuite{})
+}
+
+func (s *MomentValueSuite) SetupTest() {
+	s.moment = NewMoment(2, 3)
+	err := Init(s.moment)
+	s.Require().NoError(err)
+
+	xs := []float64{1, 2, 3, 4, 8}
+	for _, x := range xs {
+		err := s.moment.Push(x)
+		s.Require().NoError(err)
+	}
+}
+
+func (s *MomentValueSuite) TestValueSuccess() {
+	value, err := s.moment.Value()
+	s.Require().NoError(err)
+	testutil.Approx(s.T(), 7, value)
+}
+
+func (s *MomentValueSuite) TestValueFailOnNullCore() {
+	moment := NewMoment(2, 3)
+	_, err := moment.Value()
+	testutil.ContainsError(s.T(), err, "Core is not set")
+}
+
+func (s *MomentValueSuite) TestValueFailIfNoValuesSeen() {
+	moment := NewMoment(2, 3)
+	err := Init(moment)
+	s.Require().NoError(err)
+
+	_, err = moment.Value()
+	testutil.ContainsError(s.T(), err, "no values seen yet")
+}
+
+func TestMomentClear(t *testing.T) {
+	moment := NewMoment(2, 3)
+	err := Init(moment)
+	require.NoError(t, err)
+
+	xs := []float64{1, 2, 3, 4, 8}
+	for _, x := range xs {
+		err := moment.Push(x)
 		require.NoError(t, err)
+	}
 
-		err = testData(moment)
-		require.NoError(t, err)
+	moment.Clear()
+	expectedSums := []float64{0, 0, 0}
+	assert.Equal(t, expectedSums, moment.core.sums)
+	assert.Equal(t, int(0), moment.core.count)
+	assert.Equal(t, uint64(0), moment.core.queue.Len())
+}
 
-		value, err := moment.Value()
-		require.NoError(t, err)
-
-		testutil.Approx(t, 7, value)
-	})
-
-	t.Run("fail: if Core is not set, return error", func(t *testing.T) {
-		moment := NewMoment(2, 3)
-
-		err := moment.Push(0.)
-		testutil.ContainsError(t, err, "Core is not set")
-
-		_, err = moment.Value()
-		testutil.ContainsError(t, err, "Core is not set")
-	})
-
-	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		moment := NewMoment(2, 3)
-		err := Init(moment)
-		require.NoError(t, err)
-
-		_, err = moment.Value()
-		testutil.ContainsError(t, err, "no values seen yet")
-	})
-
-	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		moment := NewMoment(1, 3)
-		err := Init(moment)
-		require.NoError(t, err)
-
-		err = testData(moment)
-		require.NoError(t, err)
-
-		// dispose the queue to simulate an error when we try to retrieve from the queue
-		moment.core.queue.Dispose()
-		err = moment.Push(3.)
-		testutil.ContainsError(t, err, "error pushing to core: error popping item from queue")
-	})
-
-	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		moment := NewMoment(1, 3)
-		err := Init(moment)
-		require.NoError(t, err)
-
-		// dispose the queue to simulate an error when we try to insert into the queue
-		moment.core.queue.Dispose()
-		val := 3.
-		err = moment.Push(val)
-		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
-	})
-
-	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		moment := NewMoment(1, 3)
-		err := Init(moment)
-		require.NoError(t, err)
-
-		err = testData(moment)
-		require.NoError(t, err)
-
-		moment.Clear()
-		expectedSums := []float64{0, 0}
-		assert.Equal(t, expectedSums, moment.core.sums)
-		assert.Equal(t, int(0), moment.core.count)
-		assert.Equal(t, uint64(0), moment.core.queue.Len())
-	})
-
-	t.Run("pass: String() returns string representation", func(t *testing.T) {
-		moment := NewMoment(2, 3)
-		expectedString := "moment.Moment_{k:2,window:3}"
-		assert.Equal(t, expectedString, moment.String())
-	})
+func TestMomentString(t *testing.T) {
+	moment := NewMoment(2, 3)
+	expectedString := "moment.Moment_{k:2,window:3}"
+	assert.Equal(t, expectedString, moment.String())
 }

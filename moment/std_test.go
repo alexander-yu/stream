@@ -1,12 +1,12 @@
 package moment
 
 import (
-	"fmt"
 	"math"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 
 	testutil "github.com/alexander-yu/stream/util/test"
 )
@@ -16,84 +16,116 @@ func TestNewStd(t *testing.T) {
 	assert.Equal(t, NewMoment(2, 3), std.variance)
 }
 
-func TestStdValue(t *testing.T) {
-	t.Run("pass: returns the standard deviation", func(t *testing.T) {
-		std := NewStd(3)
-		err := Init(std)
+type StdPushSuite struct {
+	suite.Suite
+	std *Std
+}
+
+func TestStdPushSuite(t *testing.T) {
+	suite.Run(t, &StdPushSuite{})
+}
+
+func (s *StdPushSuite) SetupTest() {
+	s.std = NewStd(3)
+	err := Init(s.std)
+	s.Require().NoError(err)
+}
+
+func (s *StdPushSuite) TestPushSuccess() {
+	err := s.std.Push(3.)
+	s.NoError(err)
+}
+
+func (s *StdPushSuite) TestPushFailOnNullCore() {
+	std := NewStd(3)
+	err := std.Push(0.)
+	testutil.ContainsError(s.T(), err, "Core is not set")
+}
+
+func (s *StdPushSuite) TestPushFailOnQueueInsertionFailure() {
+	// dispose the queue to simulate an error when we try to insert into the queue
+	s.std.variance.core.queue.Dispose()
+
+	err := s.std.Push(3.)
+	testutil.ContainsError(s.T(), err, "error pushing to core")
+}
+
+func (s *StdPushSuite) TestPushFailOnQueueRetrievalFailure() {
+	xs := []float64{1, 2, 3}
+	for _, x := range xs {
+		err := s.std.Push(x)
+		s.Require().NoError(err)
+	}
+
+	// dispose the queue to simulate an error when we try to retrieve from the queue
+	s.std.variance.core.queue.Dispose()
+
+	err := s.std.Push(3.)
+	testutil.ContainsError(s.T(), err, "error pushing to core")
+}
+
+type StdValueSuite struct {
+	suite.Suite
+	std *Std
+}
+
+func TestStdValueSuite(t *testing.T) {
+	suite.Run(t, &StdValueSuite{})
+}
+
+func (s *StdValueSuite) SetupTest() {
+	s.std = NewStd(3)
+	err := Init(s.std)
+	s.Require().NoError(err)
+
+	xs := []float64{1, 2, 3, 4, 8}
+	for _, x := range xs {
+		err := s.std.Push(x)
+		s.Require().NoError(err)
+	}
+}
+
+func (s *StdValueSuite) TestValueSuccess() {
+	value, err := s.std.Value()
+	s.Require().NoError(err)
+	testutil.Approx(s.T(), math.Sqrt(7.), value)
+}
+
+func (s *StdValueSuite) TestValueFailOnNullCore() {
+	std := NewStd(3)
+	_, err := std.Value()
+	testutil.ContainsError(s.T(), err, "Core is not set")
+}
+
+func (s *StdValueSuite) TestValueFailIfNoValuesSeen() {
+	std := NewStd(3)
+	err := Init(std)
+	s.Require().NoError(err)
+
+	_, err = std.Value()
+	testutil.ContainsError(s.T(), err, "no values seen yet")
+}
+
+func TestStdClear(t *testing.T) {
+	std := NewStd(3)
+	err := Init(std)
+	require.NoError(t, err)
+
+	xs := []float64{1, 2, 3, 4, 8}
+	for _, x := range xs {
+		err := std.Push(x)
 		require.NoError(t, err)
+	}
 
-		err = testData(std)
-		require.NoError(t, err)
+	std.Clear()
+	expectedSums := []float64{0, 0, 0}
+	assert.Equal(t, expectedSums, std.variance.core.sums)
+	assert.Equal(t, int(0), std.variance.core.count)
+	assert.Equal(t, uint64(0), std.variance.core.queue.Len())
+}
 
-		value, err := std.Value()
-		require.NoError(t, err)
-
-		testutil.Approx(t, math.Sqrt(7.), value)
-	})
-
-	t.Run("fail: if Core is not set, return error", func(t *testing.T) {
-		Std := NewStd(3)
-
-		err := Std.Push(0.)
-		testutil.ContainsError(t, err, "Core is not set")
-
-		_, err = Std.Value()
-		testutil.ContainsError(t, err, "Core is not set")
-	})
-
-	t.Run("fail: error if no values are seen", func(t *testing.T) {
-		std := NewStd(3)
-		err := Init(std)
-		require.NoError(t, err)
-
-		_, err = std.Value()
-		testutil.ContainsError(t, err, "no values seen yet")
-	})
-
-	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		std := NewStd(3)
-		err := Init(std)
-		require.NoError(t, err)
-
-		err = testData(std)
-		require.NoError(t, err)
-
-		// dispose the queue to simulate an error when we try to retrieve from the queue
-		std.variance.core.queue.Dispose()
-		err = std.Push(3.)
-		testutil.ContainsError(t, err, "error pushing to core: error popping item from queue")
-	})
-
-	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		std := NewStd(3)
-		err := Init(std)
-		require.NoError(t, err)
-
-		// dispose the queue to simulate an error when we try to insert into the queue
-		std.variance.core.queue.Dispose()
-		val := 3.
-		err = std.Push(val)
-		testutil.ContainsError(t, err, fmt.Sprintf("error pushing to core: error pushing %f to queue", val))
-	})
-
-	t.Run("pass: Clear() resets the metric", func(t *testing.T) {
-		std := NewStd(3)
-		err := Init(std)
-		require.NoError(t, err)
-
-		err = testData(std)
-		require.NoError(t, err)
-
-		std.Clear()
-		expectedSums := []float64{0, 0, 0}
-		assert.Equal(t, expectedSums, std.variance.core.sums)
-		assert.Equal(t, int(0), std.variance.core.count)
-		assert.Equal(t, uint64(0), std.variance.core.queue.Len())
-	})
-
-	t.Run("pass: String() returns string representation", func(t *testing.T) {
-		std := NewStd(3)
-		expectedString := "moment.Std_{window:3}"
-		assert.Equal(t, expectedString, std.String())
-	})
+func TestStdString(t *testing.T) {
+	std := NewStd(3)
+	expectedString := "moment.Std_{window:3}"
+	assert.Equal(t, expectedString, std.String())
 }

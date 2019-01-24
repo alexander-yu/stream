@@ -1,15 +1,60 @@
 package moment
 
 import (
-	"fmt"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 
 	"github.com/alexander-yu/stream"
 	testutil "github.com/alexander-yu/stream/util/test"
 )
+
+type mockMetric struct {
+	vals []float64
+	core *Core
+}
+
+func (m *mockMetric) SetCore(c *Core) {
+	m.core = c
+}
+
+func (m *mockMetric) Config() *CoreConfig {
+	return &CoreConfig{
+		Sums: SumsConfig{
+			1: true,
+			2: true,
+			3: true,
+			4: true,
+		},
+		Window: stream.IntPtr(3),
+	}
+}
+
+func (m *mockMetric) String() string {
+	return "mockMetric"
+}
+
+func (m *mockMetric) Push(x float64) error {
+	m.vals = append(m.vals, x)
+	err := m.core.Push(x)
+	if err != nil {
+		return errors.Wrap(err, "error pushing to core")
+	}
+
+	return nil
+}
+
+func (m *mockMetric) Value() (float64, error) {
+	return 0, nil
+}
+
+func (m *mockMetric) Clear() {
+	m.vals = nil
+	m.core.Clear()
+}
 
 type invalidMetric struct {
 	coreSet bool
@@ -82,83 +127,103 @@ func TestInit(t *testing.T) {
 	})
 }
 
-func TestPush(t *testing.T) {
-	t.Run("pass: successfully pushes values", func(t *testing.T) {
-		m := newMockMetric()
-		err := testData(m)
-		require.NoError(t, err)
+type CorePushSuite struct {
+	suite.Suite
+	metric *mockMetric
+}
 
-		expectedSums := []float64{0., 0., 14., 18., 98.}
+func TestCorePushSuite(t *testing.T) {
+	suite.Run(t, &CorePushSuite{})
+}
 
-		assert.Equal(t, len(expectedSums), len(m.core.sums))
-		for k, expectedSum := range expectedSums {
-			actualSum := m.core.sums[k]
-			testutil.Approx(t, expectedSum, actualSum)
-		}
+func (s *CorePushSuite) SetupTest() {
+	s.metric = &mockMetric{}
+	err := Init(s.metric)
+	s.Require().NoError(err)
 
-		// Check that Push also pushes the value to the metric
-		expectedVals := []float64{1., 2., 3., 4., 8.}
-		for i := range expectedVals {
-			testutil.Approx(t, expectedVals[i], m.vals[i])
-		}
+	xs := []float64{1, 2, 3, 4, 8}
+	for _, x := range xs {
+		err := s.metric.Push(x)
+		s.Require().NoError(err)
+	}
+}
+
+func (s *CorePushSuite) TestPushSuccess() {
+	expectedSums := []float64{0., 0., 14., 18., 98.}
+
+	s.Equal(len(expectedSums), len(s.metric.core.sums))
+	for k, expectedSum := range expectedSums {
+		actualSum := s.metric.core.sums[k]
+		testutil.Approx(s.T(), expectedSum, actualSum)
+	}
+
+	// Check that Push also pushes the value to the metric
+	expectedVals := []float64{1., 2., 3., 4., 8.}
+	for i := range expectedVals {
+		testutil.Approx(s.T(), expectedVals[i], s.metric.vals[i])
+	}
+}
+
+func (s *CorePushSuite) TestPushSuccessForWindow1() {
+	// this time, set a window of 1; the Core should really just keep the
+	// most recent value. This is to test the case where we should clear out
+	// any stats upon removing the last item from the queue, which only happens
+	// in the special case of the queue having a size of 1.
+	core, err := NewCore(&CoreConfig{
+		Sums: SumsConfig{
+			1: true,
+			2: true,
+			3: true,
+			4: true,
+		},
+		Window: stream.IntPtr(1),
 	})
+	s.Require().NoError(err)
 
-	t.Run("pass: successfully pushes values for window of 1", func(t *testing.T) {
-		// this time, set a window of 1; the Core should really just keep the
-		// most recent value. This is to test the case where we should clear out
-		// any stats upon removing the last item from the queue, which only happens
-		// in the special case of the queue having a size of 1.
-		core, err := NewCore(&CoreConfig{
-			Sums: SumsConfig{
-				1: true,
-				2: true,
-				3: true,
-				4: true,
-			},
-			Window: stream.IntPtr(1),
-		})
-		require.NoError(t, err)
+	err = core.Push(1.)
+	s.Require().NoError(err)
 
-		err = core.Push(1.)
-		require.NoError(t, err)
+	err = core.Push(2.)
+	s.Require().NoError(err)
 
-		err = core.Push(2.)
-		require.NoError(t, err)
+	expectedSums := []float64{0., 0., 0., 0., 0.}
+	s.Equal(len(expectedSums), len(core.sums))
+	for k, expectedSum := range expectedSums {
+		actualSum := core.sums[k]
+		testutil.Approx(s.T(), expectedSum, actualSum)
+	}
+}
 
-		expectedSums := []float64{0., 0., 0., 0., 0.}
-		assert.Equal(t, len(expectedSums), len(core.sums))
-		for k, expectedSum := range expectedSums {
-			actualSum := core.sums[k]
-			testutil.Approx(t, expectedSum, actualSum)
-		}
-	})
+func (s *CorePushSuite) TestPushFailOnQueueInsertionFailure() {
+	// dispose the queue to simulate an error when we try to retrieve from the queue
+	s.metric.core.queue.Dispose()
+	err := s.metric.Push(3.)
+	testutil.ContainsError(s.T(), err, "error popping item from queue")
+}
 
-	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		m := newMockMetric()
-		err := testData(m)
-		require.NoError(t, err)
+func (s *CorePushSuite) TestPushFailOnQueueRetrievalFailure() {
+	xs := []float64{1, 2, 3}
+	for _, x := range xs {
+		err := s.metric.Push(x)
+		s.Require().NoError(err)
+	}
 
-		// dispose the queue to simulate an error when we try to retrieve from the queue
-		m.core.queue.Dispose()
-		err = m.Push(3.)
-		testutil.ContainsError(t, err, "error popping item from queue")
-	})
-
-	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		m := newMockMetric()
-
-		// dispose the queue to simulate an error when we try to insert into the queue
-		m.core.queue.Dispose()
-		val := 3.
-		err := m.Push(val)
-		testutil.ContainsError(t, err, fmt.Sprintf("error pushing %f to queue", val))
-	})
+	// dispose the queue to simulate an error when we try to retrieve from the queue
+	s.metric.core.queue.Dispose()
+	err := s.metric.Push(3.)
+	testutil.ContainsError(s.T(), err, "error popping item from queue")
 }
 
 func TestClear(t *testing.T) {
-	m := newMockMetric()
-	err := testData(m)
+	m := &mockMetric{}
+	err := Init(m)
 	require.NoError(t, err)
+
+	xs := []float64{1, 2, 3, 4, 8}
+	for _, x := range xs {
+		err := m.Push(x)
+		require.NoError(t, err)
+	}
 
 	m.core.Clear()
 
@@ -170,71 +235,109 @@ func TestClear(t *testing.T) {
 }
 
 func TestCount(t *testing.T) {
-	m := newMockMetric()
-	err := testData(m)
+	m := &mockMetric{}
+	err := Init(m)
 	require.NoError(t, err)
+
+	xs := []float64{1, 2, 3, 4, 8}
+	for _, x := range xs {
+		err := m.Push(x)
+		require.NoError(t, err)
+	}
 
 	assert.Equal(t, 3, m.core.Count())
 }
 
-func TestMean(t *testing.T) {
-	t.Run("pass: Mean returns the correct mean", func(t *testing.T) {
-		m := newMockMetric()
-		err := testData(m)
-		require.NoError(t, err)
-
-		mean, err := m.core.Mean()
-		require.NoError(t, err)
-
-		testutil.Approx(t, 5., mean)
-	})
-
-	t.Run("fail: Mean fails if no elements consumed yet", func(t *testing.T) {
-		core, err := NewCore(&CoreConfig{})
-		require.NoError(t, err)
-
-		_, err = core.Mean()
-		assert.EqualError(t, err, "no values seen yet")
-	})
+type CoreMeanSuite struct {
+	suite.Suite
+	metric *mockMetric
 }
 
-func TestSum(t *testing.T) {
-	t.Run("pass: Sum returns the correct sum", func(t *testing.T) {
-		m := newMockMetric()
-		err := testData(m)
-		require.NoError(t, err)
+func TestCoreMeanSuite(t *testing.T) {
+	suite.Run(t, &CorePushSuite{})
+}
 
-		expectedSums := []float64{0., 0., 14., 18., 98.}
+func (s *CoreMeanSuite) SetupTest() {
+	s.metric = &mockMetric{}
+	err := Init(s.metric)
+	s.Require().NoError(err)
 
-		for i := 1; i <= 4; i++ {
-			sum, err := m.core.Sum(i)
-			require.Nil(t, err)
-			testutil.Approx(t, expectedSums[i], sum)
-		}
-	})
+	xs := []float64{1, 2, 3, 4, 8}
+	for _, x := range xs {
+		err := s.metric.Push(x)
+		s.Require().NoError(err)
+	}
+}
 
-	t.Run("fail: Sum fails if no elements consumed yet", func(t *testing.T) {
-		core, err := NewCore(&CoreConfig{})
-		require.NoError(t, err)
+func (s *CoreMeanSuite) TestMeanSuccess() {
+	mean, err := s.metric.core.Mean()
+	s.Require().NoError(err)
 
-		_, err = core.Sum(1)
-		assert.EqualError(t, err, "no values seen yet")
-	})
+	testutil.Approx(s.T(), 5., mean)
+}
 
-	t.Run("fail: Sum fails for untracked power sum", func(t *testing.T) {
-		m := newMockMetric()
-		err := testData(m)
-		require.NoError(t, err)
+func (s *CoreMeanSuite) TestMeanFailIfNoValuesSeen() {
+	core, err := NewCore(&CoreConfig{})
+	s.Require().NoError(err)
 
-		_, err = m.core.Sum(10)
-		assert.EqualError(t, err, "10 is not a tracked power sum")
-	})
+	_, err = core.Mean()
+	s.EqualError(err, "no values seen yet")
+}
+
+type CoreSumSuite struct {
+	suite.Suite
+	metric *mockMetric
+}
+
+func TestCoreSumSuite(t *testing.T) {
+	suite.Run(t, &CoreSumSuite{})
+}
+
+func (s *CoreSumSuite) SetupTest() {
+	s.metric = &mockMetric{}
+	err := Init(s.metric)
+	s.Require().NoError(err)
+
+	xs := []float64{1, 2, 3, 4, 8}
+	for _, x := range xs {
+		err := s.metric.Push(x)
+		s.Require().NoError(err)
+	}
+}
+
+func (s *CoreSumSuite) TestSumSuccess() {
+	expectedSums := []float64{0., 0., 14., 18., 98.}
+
+	for i := 1; i <= 4; i++ {
+		sum, err := s.metric.core.Sum(i)
+		s.Require().NoError(err)
+		testutil.Approx(s.T(), expectedSums[i], sum)
+	}
+}
+
+func (s *CoreSumSuite) TestFailIfNoValuesSeen() {
+	core, err := NewCore(&CoreConfig{})
+	s.Require().NoError(err)
+
+	_, err = core.Sum(1)
+	s.EqualError(err, "no values seen yet")
+}
+
+func (s *CoreSumSuite) TestFailForUntrackedSum() {
+	_, err := s.metric.core.Sum(10)
+	s.EqualError(err, "10 is not a tracked power sum")
 }
 
 func TestLock(t *testing.T) {
-	m := newMockMetric()
-	err := testData(m)
+	m := &mockMetric{}
+	err := Init(m)
 	require.NoError(t, err)
+
+	xs := []float64{1, 2, 3, 4, 8}
+	for _, x := range xs {
+		err := m.Push(x)
+		require.NoError(t, err)
+	}
 
 	done := make(chan bool)
 
