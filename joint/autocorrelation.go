@@ -79,7 +79,7 @@ func (a *Autocorrelation) Push(xs ...float64) error {
 	if a.lag == 0 {
 		err := a.core.UnsafePush(x, x)
 		if err != nil {
-			return errors.Wrapf(err, "error pushing (%f, %f) to core", x, x)
+			return errors.Wrap(err, "error pushing to core")
 		}
 		return nil
 	}
@@ -93,7 +93,7 @@ func (a *Autocorrelation) Push(xs ...float64) error {
 		val := tail.(float64)
 		err = a.core.UnsafePush(x, val)
 		if err != nil {
-			return errors.Wrapf(err, "error pushing (%f, %f) to core", x, val)
+			return errors.Wrap(err, "error pushing to core")
 		}
 	}
 

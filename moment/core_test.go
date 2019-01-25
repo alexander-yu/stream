@@ -1,6 +1,7 @@
 package moment
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -195,19 +196,17 @@ func (s *CorePushSuite) TestPushSuccessForWindow1() {
 }
 
 func (s *CorePushSuite) TestPushFailOnQueueInsertionFailure() {
+	metric := &mockMetric{}
+	err := Init(metric)
+	s.Require().NoError(err)
+
 	// dispose the queue to simulate an error when we try to retrieve from the queue
-	s.metric.core.queue.Dispose()
-	err := s.metric.Push(3.)
-	testutil.ContainsError(s.T(), err, "error popping item from queue")
+	metric.core.queue.Dispose()
+	err = metric.Push(3.)
+	testutil.ContainsError(s.T(), err, fmt.Sprintf("error pushing %f to queue", 3.))
 }
 
 func (s *CorePushSuite) TestPushFailOnQueueRetrievalFailure() {
-	xs := []float64{1, 2, 3}
-	for _, x := range xs {
-		err := s.metric.Push(x)
-		s.Require().NoError(err)
-	}
-
 	// dispose the queue to simulate an error when we try to retrieve from the queue
 	s.metric.core.queue.Dispose()
 	err := s.metric.Push(3.)
@@ -254,7 +253,7 @@ type CoreMeanSuite struct {
 }
 
 func TestCoreMeanSuite(t *testing.T) {
-	suite.Run(t, &CorePushSuite{})
+	suite.Run(t, &CoreMeanSuite{})
 }
 
 func (s *CoreMeanSuite) SetupTest() {
