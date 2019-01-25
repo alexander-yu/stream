@@ -9,6 +9,9 @@ import (
 )
 
 // Autocorrelation is a metric that tracks the sample autocorrelation.
+// It does not satisfy the JointMetric interface, but rather the univariate
+// Metric interface (SimpleMetric in particular), since it only tracks a single
+// variable.
 type Autocorrelation struct {
 	lag         int
 	queue       *queue.RingBuffer

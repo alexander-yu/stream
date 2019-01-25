@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
@@ -40,16 +39,7 @@ func push(metrics []joint.Metric) error {
 
 	for _, metric := range metrics {
 		for i := 0.; i < 100; i++ {
-			var xs []float64
-			// in the case of Autocorrelation, it actually
-			// only takes one variable, since it's calculating
-			// the correlation against itself (but at a lag)
-			if strings.HasPrefix(metric.String(), "joint.Autocorrelation") {
-				xs = []float64{i * i}
-			} else {
-				xs = []float64{i, i * i}
-			}
-
+			xs := []float64{i, i * i}
 			err := metric.Push(xs...)
 			if err != nil {
 				errs = append(errs, err)
@@ -106,9 +96,15 @@ func main() {
 	// tracks the covariance over a rolling window of size 5
 	cov := joint.NewCovariance(5)
 
-	metrics := []joint.Metric{corr, autocorr, cov}
-
+	metrics := []joint.Metric{corr, cov}
 	err = initialize(metrics)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Autocorrelation is not a joint.Metric, since it does not satisfy
+	// the JointMetric interface
+	err = joint.Init(autocorr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -118,9 +114,23 @@ func main() {
 		log.Fatal(err)
 	}
 
+	for i := 0.; i < 100; i++ {
+		err = autocorr.Push(i * i)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	values, err := values(metrics)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	val, err := autocorr.Value()
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		values[autocorr.String()] = val
 	}
 
 	result, err := json.MarshalIndent(values, "", "  ")
