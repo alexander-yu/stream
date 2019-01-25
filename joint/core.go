@@ -23,15 +23,15 @@ type Core struct {
 	queue   *queue.RingBuffer
 }
 
-// Init sets a Metric up with a Core for consuming.
-func Init(metric Metric) error {
-	config := metric.Config()
+// Init sets a CoreWrapper up with a core for consuming.
+func Init(wrapper CoreWrapper) error {
+	config := wrapper.Config()
 	core, err := NewCore(config)
 	if err != nil {
 		return errors.Wrap(err, "error creating Core")
 	}
 
-	metric.SetCore(core)
+	wrapper.SetCore(core)
 	return nil
 }
 

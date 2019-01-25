@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -13,16 +12,15 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
-type mockMetric struct {
-	vals [][]float64
+type mockWrapper struct {
 	core *Core
 }
 
-func (m *mockMetric) SetCore(c *Core) {
-	m.core = c
+func (w *mockWrapper) SetCore(c *Core) {
+	w.core = c
 }
 
-func (m *mockMetric) Config() *CoreConfig {
+func (w *mockWrapper) Config() *CoreConfig {
 	return &CoreConfig{
 		Sums: SumsConfig{
 			{2, 2},
@@ -31,52 +29,15 @@ func (m *mockMetric) Config() *CoreConfig {
 	}
 }
 
-func (m *mockMetric) String() string {
-	return ""
-}
-
-func (m *mockMetric) Push(xs ...float64) error {
-	m.vals = append(m.vals, xs)
-	err := m.core.Push(xs...)
-	if err != nil {
-		return errors.Wrap(err, "error pushing to core")
-	}
-
-	return nil
-}
-
-func (m *mockMetric) Value() (float64, error) {
-	return 0, nil
-}
-
-func (m *mockMetric) Clear() {
-	m.core.Clear()
-	m.vals = nil
-}
-
-type invalidMetric struct {
+type invalidWrapper struct {
 	coreSet bool
 }
 
-func (m *invalidMetric) String() string {
-	return ""
+func (w *invalidWrapper) SetCore(c *Core) {
+	w.coreSet = true
 }
 
-func (m *invalidMetric) Push(xs ...float64) error {
-	return nil
-}
-
-func (m *invalidMetric) Value() (float64, error) {
-	return 0, nil
-}
-
-func (m *invalidMetric) Clear() {}
-
-func (m *invalidMetric) SetCore(c *Core) {
-	m.coreSet = true
-}
-
-func (m *invalidMetric) Config() *CoreConfig {
+func (w *invalidWrapper) Config() *CoreConfig {
 	return &CoreConfig{Vars: stream.IntPtr(-1)}
 }
 
@@ -115,25 +76,25 @@ func TestNewCore(t *testing.T) {
 
 func TestInit(t *testing.T) {
 	t.Run("fail: invalid config returns error", func(t *testing.T) {
-		metric := &invalidMetric{}
-		err := Init(metric)
+		wrapper := &invalidWrapper{}
+		err := Init(wrapper)
 
 		testutil.ContainsError(t, err, "error creating Core")
-		assert.False(t, metric.coreSet)
+		assert.False(t, wrapper.coreSet)
 	})
 
-	t.Run("pass: valid config sets Core for metric", func(t *testing.T) {
-		metric := &mockMetric{}
-		err := Init(metric)
+	t.Run("pass: valid config sets Core for wrapper", func(t *testing.T) {
+		wrapper := &mockWrapper{}
+		err := Init(wrapper)
 		require.NoError(t, err)
 
-		assert.NotNil(t, metric.core)
+		assert.NotNil(t, wrapper.core)
 	})
 }
 
 type CorePushSuite struct {
 	suite.Suite
-	metric *mockMetric
+	wrapper *mockWrapper
 }
 
 func TestCorePushSuite(t *testing.T) {
@@ -141,13 +102,13 @@ func TestCorePushSuite(t *testing.T) {
 }
 
 func (s *CorePushSuite) SetupTest() {
-	s.metric = &mockMetric{}
-	err := Init(s.metric)
+	s.wrapper = &mockWrapper{}
+	err := Init(s.wrapper)
 	s.Require().NoError(err)
 
 	xs := []float64{1, 2, 3, 4, 8}
 	for _, x := range xs {
-		err := s.metric.Push(x, x*x)
+		err := s.wrapper.core.Push(x, x*x)
 		s.Require().NoError(err)
 	}
 }
@@ -165,24 +126,10 @@ func (s *CorePushSuite) TestPushSuccess() {
 		64: 112538. / 9.,
 	}
 
-	s.Equal(len(expectedSums), len(s.metric.core.sums))
+	s.Equal(len(expectedSums), len(s.wrapper.core.sums))
 	for hash, expectedSum := range expectedSums {
-		actualSum := s.metric.core.sums[hash]
+		actualSum := s.wrapper.core.sums[hash]
 		testutil.Approx(s.T(), expectedSum, actualSum)
-	}
-
-	// Check that Push also pushes the value to the metric
-	expectedVals := [][]float64{
-		{1., 1.},
-		{2., 4.},
-		{3., 9.},
-		{4., 16.},
-		{8., 64.},
-	}
-	for i := range expectedVals {
-		for j := range expectedVals[0] {
-			testutil.Approx(s.T(), expectedVals[i][j], s.metric.vals[i][j])
-		}
 	}
 }
 
@@ -223,50 +170,50 @@ func (s *CorePushSuite) TestPushSuccessForWindow1() {
 }
 
 func (s *CorePushSuite) TestPushFailOnQueueInsertionFailure() {
-	metric := &mockMetric{}
-	err := Init(metric)
+	wrapper := &mockWrapper{}
+	err := Init(wrapper)
 	s.Require().NoError(err)
 
 	// dispose the queue to simulate an error when we try to retrieve from the queue
-	metric.core.queue.Dispose()
+	wrapper.core.queue.Dispose()
 	vals := []float64{3., 3.}
-	err = metric.Push(vals...)
+	err = wrapper.core.Push(vals...)
 	testutil.ContainsError(s.T(), err, fmt.Sprintf("error pushing %v to queue", vals))
 }
 
 func (s *CorePushSuite) TestPushFailOnQueueRetrievalFailure() {
 	// dispose the queue to simulate an error when we try to retrieve from the queue
-	s.metric.core.queue.Dispose()
-	err := s.metric.Push(3., 3.)
+	s.wrapper.core.queue.Dispose()
+	err := s.wrapper.core.Push(3., 3.)
 	testutil.ContainsError(s.T(), err, "error popping item from queue")
 }
 
 func (s *CorePushSuite) TestPushFailOnWrongNumberOfValues() {
-	metric := &mockMetric{}
-	err := Init(metric)
+	wrapper := &mockWrapper{}
+	err := Init(wrapper)
 	s.Require().NoError(err)
 
 	vals := []float64{3., 4., 5.}
-	err = metric.Push(vals...)
+	err = wrapper.core.Push(vals...)
 	testutil.ContainsError(s.T(), err, fmt.Sprintf(
 		"tried to push %d values when core is tracking %d variables",
 		len(vals),
-		len(metric.core.means),
+		len(wrapper.core.means),
 	))
 }
 
 func TestClear(t *testing.T) {
-	m := &mockMetric{}
-	err := Init(m)
+	wrapper := &mockWrapper{}
+	err := Init(wrapper)
 	require.NoError(t, err)
 
 	xs := []float64{1, 2, 3, 4, 8}
 	for _, x := range xs {
-		err := m.Push(x, x*x)
+		err := wrapper.core.Push(x, x*x)
 		require.NoError(t, err)
 	}
 
-	m.core.Clear()
+	wrapper.core.Clear()
 
 	expectedSums := map[uint64]float64{
 		0:  0.,
@@ -279,32 +226,32 @@ func TestClear(t *testing.T) {
 		63: 0.,
 		64: 0.,
 	}
-	assert.Equal(t, expectedSums, m.core.sums)
-	assert.Equal(t, expectedSums, m.core.newSums)
+	assert.Equal(t, expectedSums, wrapper.core.sums)
+	assert.Equal(t, expectedSums, wrapper.core.newSums)
 
 	expectedMeans := []float64{0, 0}
-	assert.Equal(t, expectedMeans, m.core.means)
-	assert.Equal(t, 0, m.core.count)
-	assert.Equal(t, uint64(0), m.core.queue.Len())
+	assert.Equal(t, expectedMeans, wrapper.core.means)
+	assert.Equal(t, 0, wrapper.core.count)
+	assert.Equal(t, uint64(0), wrapper.core.queue.Len())
 }
 
 func TestCount(t *testing.T) {
-	m := &mockMetric{}
-	err := Init(m)
+	wrapper := &mockWrapper{}
+	err := Init(wrapper)
 	require.NoError(t, err)
 
 	xs := []float64{1, 2, 3, 4, 8}
 	for _, x := range xs {
-		err := m.Push(x, x*x)
+		err := wrapper.core.Push(x, x*x)
 		require.NoError(t, err)
 	}
 
-	assert.Equal(t, 3, m.core.Count())
+	assert.Equal(t, 3, wrapper.core.Count())
 }
 
 type CoreMeanSuite struct {
 	suite.Suite
-	metric *mockMetric
+	wrapper *mockWrapper
 }
 
 func TestCoreMeanSuite(t *testing.T) {
@@ -312,19 +259,19 @@ func TestCoreMeanSuite(t *testing.T) {
 }
 
 func (s *CoreMeanSuite) SetupTest() {
-	s.metric = &mockMetric{}
-	err := Init(s.metric)
+	s.wrapper = &mockWrapper{}
+	err := Init(s.wrapper)
 	s.Require().NoError(err)
 
 	xs := []float64{1, 2, 3, 4, 8}
 	for _, x := range xs {
-		err := s.metric.Push(x, x*x)
+		err := s.wrapper.core.Push(x, x*x)
 		s.Require().NoError(err)
 	}
 }
 
 func (s *CoreMeanSuite) TestMeanSuccess() {
-	mean, err := s.metric.core.Mean(0)
+	mean, err := s.wrapper.core.Mean(0)
 	s.Require().NoError(err)
 
 	testutil.Approx(s.T(), 5., mean)
@@ -341,16 +288,16 @@ func (s *CoreMeanSuite) TestMeanFailIfNoValuesSeen() {
 }
 
 func (s *CoreMeanSuite) TestMeanFailForInvalidVariable() {
-	_, err := s.metric.core.Mean(-1)
+	_, err := s.wrapper.core.Mean(-1)
 	s.EqualError(err, fmt.Sprintf("%d is not a tracked variable", -1))
 
-	_, err = s.metric.core.Mean(2)
+	_, err = s.wrapper.core.Mean(2)
 	s.EqualError(err, fmt.Sprintf("%d is not a tracked variable", 2))
 }
 
 type CoreSumSuite struct {
 	suite.Suite
-	metric *mockMetric
+	wrapper *mockWrapper
 }
 
 func TestCoreSumSuite(t *testing.T) {
@@ -358,13 +305,13 @@ func TestCoreSumSuite(t *testing.T) {
 }
 
 func (s *CoreSumSuite) SetupTest() {
-	s.metric = &mockMetric{}
-	err := Init(s.metric)
+	s.wrapper = &mockWrapper{}
+	err := Init(s.wrapper)
 	s.Require().NoError(err)
 
 	xs := []float64{1, 2, 3, 4, 8}
 	for _, x := range xs {
-		err := s.metric.Push(x, x*x)
+		err := s.wrapper.core.Push(x, x*x)
 		s.Require().NoError(err)
 	}
 }
@@ -384,7 +331,7 @@ func (s *CoreSumSuite) TestSumSuccess() {
 
 	iter(Tuple{2, 2}, false, func(xs ...int) {
 		tuple := Tuple(xs)
-		sum, err := s.metric.core.Sum(tuple...)
+		sum, err := s.wrapper.core.Sum(tuple...)
 		s.Require().NoError(err)
 		testutil.Approx(s.T(), expectedSums[tuple.hash()], sum)
 	})
@@ -402,47 +349,47 @@ func (s *CoreSumSuite) TestFailIfNoValuesSeen() {
 
 func (s *CoreSumSuite) TestFailForUntrackedSum() {
 	tuple := Tuple{3, 2}
-	_, err := s.metric.core.Sum(tuple...)
+	_, err := s.wrapper.core.Sum(tuple...)
 	s.EqualError(err, fmt.Sprintf("%v is not a tracked power sum", tuple))
 }
 
 func TestLock(t *testing.T) {
-	m := &mockMetric{}
-	err := Init(m)
+	wrapper := &mockWrapper{}
+	err := Init(wrapper)
 	require.NoError(t, err)
 
 	xs := []float64{1, 2, 3, 4, 8}
 	for _, x := range xs {
-		err := m.Push(x, x*x)
+		err := wrapper.core.Push(x, x*x)
 		require.NoError(t, err)
 	}
 
 	done := make(chan bool)
 
 	// Lock for reading
-	m.core.RLock()
+	wrapper.core.RLock()
 
 	// Spawn a goroutine to write; should be blocked
 	go func() {
-		m.core.Lock()
-		defer m.core.Unlock()
-		err := m.core.UnsafePush(5., 25.)
+		wrapper.core.Lock()
+		defer wrapper.core.Unlock()
+		err := wrapper.core.UnsafePush(5., 25.)
 		require.NoError(t, err)
 		done <- true
 	}()
 
 	// Read the sum; note that Sum also uses the RLock/RUnlock of the lock internally,
 	// and this should not be blocked by the earlier RLock call
-	sum, err := m.core.Sum(2, 0)
+	sum, err := wrapper.core.Sum(2, 0)
 	require.NoError(t, err)
 	testutil.Approx(t, 14., sum)
 
 	// Undo RLock call
-	m.core.RUnlock()
+	wrapper.core.RUnlock()
 
 	// New Push call should now be unblocked
 	<-done
-	sum, err = m.core.Sum(2, 0)
+	sum, err = wrapper.core.Sum(2, 0)
 	require.NoError(t, err)
 	testutil.Approx(t, 26./3., sum)
 }
