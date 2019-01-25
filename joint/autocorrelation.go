@@ -56,22 +56,12 @@ func (a *Autocorrelation) String() string {
 }
 
 // Push adds a new value for Autocorrelation to consume.
-// Autocorrelation actually only takes one value, because we're
-// calculating the lagged correlation of a series of data against itself.
-func (a *Autocorrelation) Push(xs ...float64) error {
+// Autocorrelation only takes one value, because we're calculating
+// the lagged correlation of a series of data against itself.
+func (a *Autocorrelation) Push(x float64) error {
 	if !a.IsSetCore() {
 		return errors.New("Core is not set")
 	}
-
-	if len(xs) != 1 {
-		return errors.Errorf(
-			"Autocorrelation expected 1 argument: got %d (%v)",
-			len(xs),
-			xs,
-		)
-	}
-
-	x := xs[0]
 
 	a.core.Lock()
 	defer a.core.Unlock()

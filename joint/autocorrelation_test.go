@@ -118,29 +118,6 @@ func (s *AutocorrelationPushSuite) TestPushFailOnLagQueueRetrievalFailure() {
 	testutil.ContainsError(s.T(), err, "error popping item from lag queue")
 }
 
-func (s *AutocorrelationPushSuite) TestPushFailOnWrongNumberOfValues() {
-	autocorr, err := NewAutocorrelation(1, 3)
-	s.Require().NoError(err)
-	err = Init(autocorr)
-	s.Require().NoError(err)
-
-	vals := []float64{3., 9.}
-	err = autocorr.Push(vals...)
-	testutil.ContainsError(s.T(), err, fmt.Sprintf(
-		"Autocorrelation expected 1 argument: got %d (%v)",
-		len(vals),
-		vals,
-	))
-
-	vals = []float64{}
-	err = autocorr.Push(vals...)
-	testutil.ContainsError(s.T(), err, fmt.Sprintf(
-		"Autocorrelation expected 1 argument: got %d (%v)",
-		len(vals),
-		vals,
-	))
-}
-
 type AutocorrelationValueSuite struct {
 	suite.Suite
 	autocorr  *Autocorrelation
