@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 
 	testutil "github.com/alexander-yu/stream/util/test"
 )
@@ -35,70 +36,131 @@ func TestMinString(t *testing.T) {
 	assert.Equal(t, expectedString, min.String())
 }
 
-func TestMinValue(t *testing.T) {
-	t.Run("pass: returns global minimum for a window of 0", func(t *testing.T) {
-		min, err := NewMin(0)
-		require.NoError(t, err)
+type MinPushSuite struct {
+	suite.Suite
+	windowMin *Min
+	globalMin *Min
+}
 
-		vals := []float64{9, 4, 6, 1, 8, 2, 2, 5, 5, 3}
-		for _, val := range vals {
-			err := min.Push(val)
-			require.NoError(t, err)
-		}
+func TestMinPushSuite(t *testing.T) {
+	suite.Run(t, &MinPushSuite{})
+}
 
-		val, err := min.Value()
-		require.NoError(t, err)
-		testutil.Approx(t, 1., val)
-	})
+func (s *MinPushSuite) SetupTest() {
+	var err error
+	s.globalMin, err = NewMin(0)
+	s.Require().NoError(err)
+	s.windowMin, err = NewMin(5)
+	s.Require().NoError(err)
+}
 
-	t.Run("pass: returns minimum for a provided window", func(t *testing.T) {
-		min, err := NewMin(5)
-		require.NoError(t, err)
+func (s *MinPushSuite) TestPushGlobalSuccess() {
+	for i := 3; i > 0; i-- {
+		err := s.globalMin.Push(float64(i))
+		s.Require().NoError(err)
 
-		vals := []float64{9, 4, 6, 1, 8, 2, 2, 5, 5, 3}
-		for _, val := range vals {
-			err = min.Push(val)
-			require.NoError(t, err)
-		}
+		s.Equal(4-i, s.globalMin.count)
+		testutil.Approx(s.T(), float64(i), s.globalMin.min)
+	}
+}
 
-		val, err := min.Value()
-		require.NoError(t, err)
-		testutil.Approx(t, 2., val)
-	})
+func (s *MinPushSuite) TestPushWindowSuccess() {
+	vals := []float64{9, 4, 6, 1, 8, 2, 2, 5, 5, 3}
+	maxes := []float64{9, 4, 4, 1, 1, 1, 1, 1, 2, 2}
 
-	t.Run("fail: if no values seen, return error", func(t *testing.T) {
-		min, err := NewMin(3)
-		require.NoError(t, err)
+	for i, val := range vals {
+		err := s.windowMin.Push(val)
+		s.Require().NoError(err)
+		s.Equal(maxes[i], *s.windowMin.deque.Front().(*float64))
+	}
 
-		_, err = min.Value()
-		assert.EqualError(t, err, "no values seen yet")
-	})
+	// reset test
+	s.SetupTest()
+	vals = []float64{1, 2, 3, 4, 5, 6, 7}
+	maxes = []float64{1, 1, 1, 1, 1, 2, 3}
 
-	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		min, err := NewMin(3)
-		require.NoError(t, err)
+	for i, val := range vals {
+		err := s.windowMin.Push(val)
+		s.Require().NoError(err)
+		s.Equal(maxes[i], *s.windowMin.deque.Front().(*float64))
+	}
 
-		for i := 0.; i < 3; i++ {
-			err = min.Push(i)
-			require.NoError(t, err)
-		}
+	// reset test
+	s.SetupTest()
+	vals = []float64{7, 6, 5, 4, 3, 2, 1}
+	maxes = []float64{7, 6, 5, 4, 3, 2, 1}
 
-		// dispose the queue to simulate an error when we try to retrieve from the queue
-		min.queue.Dispose()
-		err = min.Push(3.)
-		testutil.ContainsError(t, err, "error popping item from queue")
-	})
+	for i, val := range vals {
+		err := s.windowMin.Push(val)
+		s.Require().NoError(err)
+		s.Equal(maxes[i], *s.windowMin.deque.Front().(*float64))
+	}
+}
 
-	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		min, err := NewMin(3)
-		require.NoError(t, err)
+func (s *MinPushSuite) TestPushFailOnQueueInsertionFailure() {
+	// dispose the queue to simulate an error when we try to insert into the queue
+	s.windowMin.queue.Dispose()
+	val := 3.
+	err := s.windowMin.Push(val)
+	testutil.ContainsError(s.T(), err, fmt.Sprintf("error pushing %f to queue", val))
+}
 
-		// dispose the queue to simulate an error when we try to insert into the queue
-		min.queue.Dispose()
-		val := 3.
-		err = min.Push(val)
-		testutil.ContainsError(t, err, fmt.Sprintf("error pushing %f to queue", val))
-	})
+func (s *MinPushSuite) TestPushFailOnQueueRetrievalFailure() {
+	for i := 0.; i < 5; i++ {
+		err := s.windowMin.Push(i)
+		s.Require().NoError(err)
+	}
+
+	// dispose the queue to simulate an error when we try to retrieve from the queue
+	s.windowMin.queue.Dispose()
+	err := s.windowMin.Push(3.)
+	testutil.ContainsError(s.T(), err, "error popping item from queue")
+}
+
+type MinValueSuite struct {
+	suite.Suite
+	windowMin *Min
+	globalMin *Min
+}
+
+func TestMinValueSuite(t *testing.T) {
+	suite.Run(t, &MinValueSuite{})
+}
+
+func (s *MinValueSuite) SetupTest() {
+	var err error
+	s.globalMin, err = NewMin(0)
+	s.Require().NoError(err)
+	s.windowMin, err = NewMin(5)
+	s.Require().NoError(err)
+
+	vals := []float64{9, 4, 6, 1, 8, 2, 2, 5, 5, 3}
+	for _, val := range vals {
+		err = s.globalMin.Push(val)
+		s.Require().NoError(err)
+		err = s.windowMin.Push(val)
+		s.Require().NoError(err)
+	}
+}
+
+func (s *MinValueSuite) TestValueGlobalSuccess() {
+	val, err := s.globalMin.Value()
+	s.Require().NoError(err)
+	testutil.Approx(s.T(), 1., val)
+}
+
+func (s *MinValueSuite) TestValueWindowSuccess() {
+	val, err := s.windowMin.Value()
+	s.Require().NoError(err)
+	testutil.Approx(s.T(), 2., val)
+}
+
+func (s *MinValueSuite) TestValueFailIfNoValuesSeen() {
+	max, err := NewMin(3)
+	s.Require().NoError(err)
+
+	_, err = max.Value()
+	assert.EqualError(s.T(), err, "no values seen yet")
 }
 
 func TestMinClear(t *testing.T) {
