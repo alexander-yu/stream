@@ -3,13 +3,13 @@ package aggregate
 import (
 	"sync"
 
-	"github.com/hashicorp/go-multierror"
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 
 	"github.com/alexander-yu/stream"
 )
 
-// SimpleAggregateMetric is a wrapper metric that tracks multiple single-value metrics simultaneously.
+// SimpleAggregateMetric is a wrapper metric that tracks multiple univariate single-value metrics simultaneously.
 // Note that it simply stores multiple metrics and pushes to all of them; this can be inefficient
 // for metrics that could make use of shared data.
 type SimpleAggregateMetric struct {

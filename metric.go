@@ -19,7 +19,7 @@ type SimpleMetric interface {
 	Value() (float64, error)
 }
 
-// AggregateMetric is the interface for a metric that tracks multiple single-value metrics simultaneously.
+// AggregateMetric is the interface for a metric that tracks multiple univariate single-value metrics simultaneously.
 // Values() returns a map of metrics to their corresponding values at that given
 // time. The keys are the string representations of the metrics (by calling the String() method).
 type AggregateMetric interface {
@@ -41,4 +41,13 @@ type JointMetric interface {
 type SimpleJointMetric interface {
 	JointMetric
 	Value() (float64, error)
+}
+
+// JointAggregateMetric is the interface for a metric that tracks multiple multivariate single-value metrics simultaneously.
+// Values() returns a map of metrics to their corresponding values at that given
+// time. The keys are the string representations of the metrics (by calling the String() method).
+type JointAggregateMetric interface {
+	Push(...float64) error
+	Values() (map[string]interface{}, error)
+	Clear()
 }
