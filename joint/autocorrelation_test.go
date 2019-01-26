@@ -169,14 +169,20 @@ func (s *AutocorrelationValueSuite) TestValueFailOnNullCore() {
 	testutil.ContainsError(s.T(), err, "Core is not set")
 }
 
-func (s *AutocorrelationValueSuite) TestValueFailIfNoValuesSeen() {
+func (s *AutocorrelationValueSuite) TestValueFailIfNotEnoughValuesSeen() {
 	autocorr, err := NewAutocorrelation(1, 3)
 	s.Require().NoError(err)
 	err = Init(autocorr)
 	s.Require().NoError(err)
 
+	err = autocorr.Push(1)
+	s.Require().NoError(err)
+
 	_, err = autocorr.Value()
-	testutil.ContainsError(s.T(), err, "no values seen yet")
+	testutil.ContainsError(s.T(), err, fmt.Sprintf(
+		"Not enough values seen; at least %d observations must be made",
+		2,
+	))
 }
 
 func TestAutocorrelationClear(t *testing.T) {

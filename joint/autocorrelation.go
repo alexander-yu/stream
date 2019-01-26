@@ -102,6 +102,11 @@ func (a *Autocorrelation) Push(x float64) error {
 func (a *Autocorrelation) Value() (float64, error) {
 	if !a.IsSetCore() {
 		return 0, errors.New("Core is not set")
+	} else if a.correlation.core.Count() == 0 {
+		return 0, errors.New(fmt.Sprintf(
+			"Not enough values seen; at least %d observations must be made",
+			a.lag+1,
+		))
 	}
 
 	return a.correlation.Value()
