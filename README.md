@@ -37,6 +37,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
       - [Core (Multivariate)](#core-multivariate)
     - [Aggregate Statistics](#aggregate-statistics)
       - [SimpleAggregateMetric](#simpleaggregatemetric)
+      - [SimpleJointAggregateMetric](#simplejointaggregatemetric)
 
 ## Installation
 
@@ -194,4 +195,8 @@ See the [godoc](https://godoc.org/github.com/alexander-yu/stream/joint#Core) ent
 
 #### SimpleAggregateMetric
 
-SimpleAggregateMetric is a convenience wrapper that stores multiple metrics and will push a value to all metrics simultaneously; instead of returning a single scalar, it returns a map of metrics to their corresponding values.
+SimpleAggregateMetric is a convenience wrapper that stores multiple univariate metrics and will push a value to all metrics simultaneously; instead of returning a single scalar, it returns a map of metrics to their corresponding values.
+
+#### SimpleJointAggregateMetric
+
+SimpleJointAggregateMetric is a convenience wrapper that stores multiple multivariate metrics and will push a value to all metrics simultaneously; instead of returning a single scalar, it returns a map of metrics to their corresponding values.
