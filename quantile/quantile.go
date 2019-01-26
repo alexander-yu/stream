@@ -11,8 +11,8 @@ import (
 	"github.com/workiva/go-datastructures/queue"
 )
 
-// OSTQuantile keeps track of the quantile of a stream using order statistic trees.
-type OSTQuantile struct {
+// Quantile keeps track of the quantile of a stream using order statistic trees.
+type Quantile struct {
 	window        int
 	interpolation Interpolation
 	queue         *queue.RingBuffer
@@ -20,8 +20,8 @@ type OSTQuantile struct {
 	mux           sync.Mutex
 }
 
-// NewOSTQuantile instantiates an OSTQuantile struct.
-func NewOSTQuantile(config *Config) (*OSTQuantile, error) {
+// NewQuantile instantiates an Quantile struct.
+func NewQuantile(config *Config) (*Quantile, error) {
 	// set defaults for any remaining unset fields
 	config = setConfigDefaults(config)
 
@@ -36,7 +36,7 @@ func NewOSTQuantile(config *Config) (*OSTQuantile, error) {
 		return nil, errors.Wrap(err, "error instantiating order.Statistic")
 	}
 
-	return &OSTQuantile{
+	return &Quantile{
 		window:        *config.Window,
 		interpolation: *config.Interpolation,
 		queue:         queue.NewRingBuffer(uint64(*config.Window)),
@@ -45,8 +45,8 @@ func NewOSTQuantile(config *Config) (*OSTQuantile, error) {
 }
 
 // String returns a string representation of the metric.
-func (q *OSTQuantile) String() string {
-	name := "quantile.OSTQuantile"
+func (q *Quantile) String() string {
+	name := "quantile.Quantile"
 	params := []string{
 		fmt.Sprintf("window:%v", q.window),
 		fmt.Sprintf("interpolation:%v", q.interpolation),
@@ -55,7 +55,7 @@ func (q *OSTQuantile) String() string {
 }
 
 // Push adds a number for calculating the quantile.
-func (q *OSTQuantile) Push(x float64) error {
+func (q *Quantile) Push(x float64) error {
 	q.mux.Lock()
 	defer q.mux.Unlock()
 
@@ -81,7 +81,7 @@ func (q *OSTQuantile) Push(x float64) error {
 }
 
 // Value returns the value of the quantile.
-func (q *OSTQuantile) Value(quantile float64) (float64, error) {
+func (q *Quantile) Value(quantile float64) (float64, error) {
 	if quantile <= 0 || quantile >= 1 {
 		return 0, errors.Errorf("quantile %f not in (0, 1)", quantile)
 	}
@@ -133,7 +133,7 @@ func (q *OSTQuantile) Value(quantile float64) (float64, error) {
 }
 
 // Clear resets the metric.
-func (q *OSTQuantile) Clear() {
+func (q *Quantile) Clear() {
 	q.mux.Lock()
 	defer q.mux.Unlock()
 	q.queue.Dispose()

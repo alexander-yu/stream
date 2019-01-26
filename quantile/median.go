@@ -8,45 +8,45 @@ import (
 	"github.com/alexander-yu/stream"
 )
 
-// OSTMedian keeps track of the median of a stream using order statistic trees.
-type OSTMedian struct {
-	quantile *OSTQuantile
+// Median keeps track of the median of a stream using order statistic trees.
+type Median struct {
+	quantile *Quantile
 }
 
-// NewOSTMedian instantiates an OSTMedian struct. The implementation of the
+// NewMedian instantiates an Median struct. The implementation of the
 // underlying order statistic tree can be configured by passing in a constant
 // of type Impl.
-func NewOSTMedian(window int, impl Impl) (*OSTMedian, error) {
-	quantile, err := NewOSTQuantile(&Config{
+func NewMedian(window int, impl Impl) (*Median, error) {
+	quantile, err := NewQuantile(&Config{
 		Window:        stream.IntPtr(window),
 		Interpolation: Midpoint.Ptr(),
 		Impl:          impl.Ptr(),
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating OSTQuantile")
+		return nil, errors.Wrap(err, "error creating Quantile")
 	}
 
-	return &OSTMedian{quantile: quantile}, nil
+	return &Median{quantile: quantile}, nil
 }
 
 // String returns a string representation of the metric.
-func (m *OSTMedian) String() string {
-	name := "quantile.OSTMedian"
+func (m *Median) String() string {
+	name := "quantile.Median"
 	quantile := fmt.Sprintf("quantile:%v", m.quantile.String())
 	return fmt.Sprintf("%s_{%s}", name, quantile)
 }
 
 // Push adds a number for calculating the median.
-func (m *OSTMedian) Push(x float64) error {
+func (m *Median) Push(x float64) error {
 	err := m.quantile.Push(x)
 	if err != nil {
-		return errors.Wrapf(err, "error pushing %f to OSTQuantile", x)
+		return errors.Wrapf(err, "error pushing %f to Quantile", x)
 	}
 	return nil
 }
 
 // Value returns the value of the median.
-func (m *OSTMedian) Value() (float64, error) {
+func (m *Median) Value() (float64, error) {
 	value, err := m.quantile.Value(0.5)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving quantile value")
@@ -55,6 +55,6 @@ func (m *OSTMedian) Value() (float64, error) {
 }
 
 // Clear resets the metric.
-func (m *OSTMedian) Clear() {
+func (m *Median) Clear() {
 	m.quantile.Clear()
 }

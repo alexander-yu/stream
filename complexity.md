@@ -9,7 +9,8 @@ provided in the library.
   - [Table of Contents](#table-of-contents)
   - [Statistics](#statistics)
     - [Quantile](#quantile)
-      - [OSTQuantile/OSTMedian](#ostquantileostmedian)
+      - [Quantile](#quantile-1)
+      - [Median](#median)
       - [HeapMedian](#heapmedian)
     - [Min/Max](#minmax)
       - [Min](#min)
@@ -33,7 +34,7 @@ provided in the library.
 
 ### [Quantile](https://godoc.org/github.com/alexander-yu/stream/quantile)
 
-#### OSTQuantile/OSTMedian
+#### Quantile
 
 Let `n` be the size of the window, or the stream if tracking the global quantile. Then we have the following complexities:
 
@@ -41,9 +42,17 @@ Let `n` be the size of the window, or the stream if tracking the global quantile
 | :---------: | :----------: | :----: |
 | `O(log n)`  | `O(log n)`   | `O(n)` |
 
+#### Median
+
+Let `n` be the size of the window, or the stream if tracking the global median. Then we have the following complexities:
+
+| Push (time) | Value (time) | Space  |
+| :---------: | :----------: | :----: |
+| `O(log n)`  | `O(log n)`   | `O(n)` |
+
 #### HeapMedian
 
-Let `n` be the size of the window, or the stream if tracking the global quantile. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global median. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space  |
 | :---------: | :----------: | :----: |
@@ -71,7 +80,7 @@ Let `n` be the size of the window, or the stream if tracking the global maximum.
 
 #### Mean
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global mean. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
@@ -79,7 +88,7 @@ Let `n` be the size of the window, or the stream if tracking the global minimum.
 
 #### Moment
 
-Let `n` be the size of the window, or the stream if tracking the global minimum; let `k` be the moment being tracked. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global moment; let `k` be the moment being tracked. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
@@ -89,7 +98,7 @@ See [Core](#Core) for an explanation of why `Push` has a time complexity of `O(k
 
 #### Variance
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global variance. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
@@ -97,7 +106,7 @@ Let `n` be the size of the window, or the stream if tracking the global minimum.
 
 #### Std
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global standard deviation. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
@@ -105,7 +114,7 @@ Let `n` be the size of the window, or the stream if tracking the global minimum.
 
 #### Skewness
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global skewness. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
@@ -113,7 +122,7 @@ Let `n` be the size of the window, or the stream if tracking the global minimum.
 
 #### Kurtosis
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global kurtosis. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
@@ -121,7 +130,7 @@ Let `n` be the size of the window, or the stream if tracking the global minimum.
 
 #### Core (Univariate)
 
-Let `n` be the size of the window, or the stream if tracking the global minimum; let `k` be the maximum exponent of the power sums that is being tracked. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global sums; let `k` be the maximum exponent of the power sums that is being tracked. Then we have the following complexities:
 
 | Push (time) | Sum (time) | Count (time) | Space                                     |
 | :---------: | :--------: | :----------: | :---------------------------------------: |
@@ -133,7 +142,7 @@ The reason that the `Push` method has a time complexity of `O(k^2)` is due to th
 
 #### Covariance
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global covariance. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
@@ -141,7 +150,7 @@ Let `n` be the size of the window, or the stream if tracking the global minimum.
 
 #### Correlation
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global correlation. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
@@ -149,7 +158,7 @@ Let `n` be the size of the window, or the stream if tracking the global minimum.
 
 #### Autocorrelation
 
-Let `n` be the size of the window, or the stream if tracking the global minimum; let `l` be the lag of the autocorrelation. Then we have the following complexities:
+Let `n` be the size of the window, or the stream if tracking the global autocorrelation; let `l` be the lag of the autocorrelation. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                             |
 | :---------: | :----------: | :-------------------------------: |
@@ -157,7 +166,7 @@ Let `n` be the size of the window, or the stream if tracking the global minimum;
 
 #### Core (Multivariate)
 
-Let `n` be the size of the window, or the stream if tracking the global minimum. Moreover, let `t` be the number of tuples that are configured, let `d` be the number of variables being tracked. Now for a given tuple `m`, define
+Let `n` be the size of the window, or the stream if tracking the global sums. Moreover, let `t` be the number of tuples that are configured, let `d` be the number of variables being tracked. Now for a given tuple `m`, define
 
     p(m) = (m_1 + 1) * ... * (m_k + 1)
 

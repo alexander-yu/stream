@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hashicorp/go-multierror"
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
@@ -38,14 +38,14 @@ func push(metrics []stream.Metric) error {
 
 func main() {
 	// tracks the global median via a red-black tree
-	ostMedian, err := quantile.NewOSTMedian(0, quantile.RB)
+	median, err := quantile.NewMedian(0, quantile.RB)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// tracks quantiles via an AVL tree over a rolling window of size 3
 	// and with linear interpolation
-	ostQuantile, err := quantile.NewOSTQuantile(
+	avlQuantile, err := quantile.NewQuantile(
 		&quantile.Config{
 			Window:        stream.IntPtr(3),
 			Interpolation: quantile.Linear.Ptr(),
@@ -62,20 +62,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	metrics := []stream.Metric{ostMedian, ostQuantile, heapMedian}
+	metrics := []stream.Metric{median, avlQuantile, heapMedian}
 
 	err = push(metrics)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ostMedianVal, err := ostMedian.Value()
+	medianVal, err := median.Value()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// retrieve the 25% quantile
-	ostQuantileVal, err := ostQuantile.Value(0.25)
+	avlQuantileval, err := avlQuantile.Value(0.25)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,8 +86,8 @@ func main() {
 	}
 
 	values := map[string]float64{
-		ostMedian.String():   ostMedianVal,
-		ostQuantile.String(): ostQuantileVal,
+		median.String():      medianVal,
+		avlQuantile.String(): avlQuantileval,
 		heapMedian.String():  heapMedianVal,
 	}
 

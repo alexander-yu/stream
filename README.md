@@ -16,8 +16,8 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
   - [Example Usage](#example-usage)
   - [Statistics](#statistics)
     - [Quantile](#quantile)
-      - [OSTQuantile](#ostquantile)
-      - [OSTMedian](#ostmedian)
+      - [Quantile](#quantile-1)
+      - [Median](#median)
       - [HeapMedian](#heapmedian)
     - [Min/Max](#minmax)
       - [Min](#min)
@@ -89,13 +89,13 @@ For time/space complexity details on the algorithms listed below, see [here](com
 
 ### [Quantile](https://godoc.org/github.com/alexander-yu/stream/quantile)
 
-#### OSTQuantile
+#### Quantile
 
-OSTQuantile keeps track of a given quantile of a stream with an [order statistic tree](https://en.wikipedia.org/wiki/Order_statistic_tree) as the underlying data structure. OSTQuantile can calculate the global quantile of a stream, or over a rolling window. You can also configure which implementation to use for the underlying order statistic tree (see the [godoc](https://godoc.org/github.com/alexander-yu/stream/quantile#NewOSTQuantile) entry for details), as well as which interpolation method to use in the case that the quantile actually lies in between two elements. For now only [AVL trees](https://en.wikipedia.org/wiki/AVL_tree) and [red black trees](https://en.wikipedia.org/wiki/Red-black_tree) are supported.
+Quantile keeps track of a given quantile of a stream with an [order statistic tree](https://en.wikipedia.org/wiki/Order_statistic_tree) as the underlying data structure. Quantile can calculate the global quantile of a stream, or over a rolling window. You can also configure which implementation to use for the underlying order statistic tree (see the [godoc](https://godoc.org/github.com/alexander-yu/stream/quantile#NewQuantile) entry for details), as well as which interpolation method to use in the case that the quantile actually lies in between two elements. For now only [AVL trees](https://en.wikipedia.org/wiki/AVL_tree) and [red black trees](https://en.wikipedia.org/wiki/Red-black_tree) are supported.
 
-#### OSTMedian
+#### Median
 
-OSTMedian keeps track of the median of a stream; this is simply a convenient wrapper over [OSTQuantile](#OSTQuantile), that automatically sets the quantile to be 0.5 and the interpolation method to be the midpoint method.
+Median keeps track of the median of a stream; this is simply a convenient wrapper over [Quantile](#Quantile), that automatically sets the quantile to be 0.5 and the interpolation method to be the midpoint method.
 
 #### HeapMedian
 
