@@ -18,6 +18,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
     - [Quantile](#quantile)
       - [Quantile](#quantile-1)
       - [Median](#median)
+      - [IQR](#iqr)
       - [HeapMedian](#heapmedian)
     - [Min/Max](#minmax)
       - [Min](#min)
@@ -97,6 +98,10 @@ Quantile keeps track of a given quantile of a stream with an [order statistic tr
 #### Median
 
 Median keeps track of the median of a stream; this is simply a convenient wrapper over [Quantile](#Quantile), that automatically sets the quantile to be 0.5 and the interpolation method to be the midpoint method.
+
+#### IQR
+
+IQR keeps track of the [interquartile range](https://en.wikipedia.org/wiki/Interquartile_range) of a stream; this is simply a convenient wrapper over [Quantile](#Quantile), that retrieves the 1st and 3rd quartiles and sets the interpolation method to be the midpoint method.
 
 #### HeapMedian
 

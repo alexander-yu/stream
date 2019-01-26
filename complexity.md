@@ -11,6 +11,7 @@ provided in the library.
     - [Quantile](#quantile)
       - [Quantile](#quantile-1)
       - [Median](#median)
+      - [IQR](#iqr)
       - [HeapMedian](#heapmedian)
     - [Min/Max](#minmax)
       - [Min](#min)
@@ -45,6 +46,14 @@ Let `n` be the size of the window, or the stream if tracking the global quantile
 #### Median
 
 Let `n` be the size of the window, or the stream if tracking the global median. Then we have the following complexities:
+
+| Push (time) | Value (time) | Space  |
+| :---------: | :----------: | :----: |
+| `O(log n)`  | `O(log n)`   | `O(n)` |
+
+#### IQR
+
+Let `n` be the size of the window, or the stream if tracking the global interquartile range. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space  |
 | :---------: | :----------: | :----: |
