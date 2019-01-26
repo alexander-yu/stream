@@ -322,3 +322,41 @@ func TestQuantileClear(t *testing.T) {
 	assert.Equal(t, uint64(0), quantile.queue.Len())
 	assert.Equal(t, 0, quantile.statistic.Size())
 }
+
+func TestQuantileRLock(t *testing.T) {
+	config := &Config{
+		Window:        stream.IntPtr(3),
+		Interpolation: Linear.Ptr(),
+		Impl:          AVL.Ptr(),
+	}
+	quantile, err := NewQuantile(config)
+	require.NoError(t, err)
+
+	done := make(chan bool)
+
+	err = quantile.Push(1.)
+	require.NoError(t, err)
+
+	// Lock for reading
+	quantile.RLock()
+
+	// spawn a goroutine to push; should be blocked until RUnlock() is called
+	go func() {
+		err := quantile.Push(3.)
+		require.NoError(t, err)
+		done <- true
+	}()
+
+	val, err := quantile.Value(0.5)
+	require.NoError(t, err)
+	testutil.Approx(t, 1., val)
+
+	// Undo RLock call
+	quantile.RUnlock()
+
+	// New Push call should now be unblocked
+	<-done
+	val, err = quantile.Value(0.5)
+	require.NoError(t, err)
+	testutil.Approx(t, 2., val)
+}

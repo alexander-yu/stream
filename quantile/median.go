@@ -8,13 +8,13 @@ import (
 	"github.com/alexander-yu/stream"
 )
 
-// Median keeps track of the median of a stream using order statistic trees.
+// Median keeps track of the median of a stream using order statistics.
 type Median struct {
 	quantile *Quantile
 }
 
-// NewMedian instantiates an Median struct. The implementation of the
-// underlying order statistic tree can be configured by passing in a constant
+// NewMedian instantiates a Median struct. The implementation of the underlying data
+// structure for tracking order statistics can be configured by passing in a constant
 // of type Impl.
 func NewMedian(window int, impl Impl) (*Median, error) {
 	quantile, err := NewQuantile(&Config{

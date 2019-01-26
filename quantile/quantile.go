@@ -11,16 +11,16 @@ import (
 	"github.com/workiva/go-datastructures/queue"
 )
 
-// Quantile keeps track of the quantile of a stream using order statistic trees.
+// Quantile keeps track of the quantile of a stream using order statistics.
 type Quantile struct {
 	window        int
 	interpolation Interpolation
 	queue         *queue.RingBuffer
 	statistic     order.Statistic
-	mux           sync.Mutex
+	mux           sync.RWMutex
 }
 
-// NewQuantile instantiates an Quantile struct.
+// NewQuantile instantiates a Quantile struct.
 func NewQuantile(config *Config) (*Quantile, error) {
 	// set defaults for any remaining unset fields
 	config = setConfigDefaults(config)
@@ -86,8 +86,8 @@ func (q *Quantile) Value(quantile float64) (float64, error) {
 		return 0, errors.Errorf("quantile %f not in (0, 1)", quantile)
 	}
 
-	q.mux.Lock()
-	defer q.mux.Unlock()
+	q.mux.RLock()
+	defer q.mux.RUnlock()
 
 	size := int(q.statistic.Size())
 	if size == 0 {
@@ -139,4 +139,14 @@ func (q *Quantile) Clear() {
 	q.queue.Dispose()
 	q.queue = queue.NewRingBuffer(uint64(q.window))
 	q.statistic.Clear()
+}
+
+// RLock locks the quantile for reading.
+func (q *Quantile) RLock() {
+	q.mux.RLock()
+}
+
+// RUnlock undoes an RLock call.
+func (q *Quantile) RUnlock() {
+	q.mux.RUnlock()
 }
