@@ -103,22 +103,18 @@ func (c *Core) add(x float64) {
 	delta := x - c.mean
 	c.mean += delta / count
 	for k := len(c.sums) - 1; k >= 2; k-- {
-		switch k {
-		case 2:
-			c.sums[k] += (count - 1) / count * math.Pow(delta, float64(k))
-		default:
+		c.sums[k] +=
+			(count - 1) / math.Pow(count, float64(k)) *
+				(math.Pow(count-1, float64(k-1)) + float64(mathutil.Sign(k))) *
+				math.Pow(delta, float64(k))
+		for i := 1; i <= k-2; i++ {
 			c.sums[k] +=
-				(count - 1) / math.Pow(count, float64(k)) *
-					(math.Pow(count-1, float64(k-1)) + float64(mathutil.Sign(k))) *
-					math.Pow(delta, float64(k))
-			for i := 1; i <= k-2; i++ {
-				c.sums[k] +=
-					float64(mathutil.Binom(k, i)*mathutil.Sign(i)) *
-						math.Pow(delta/count, float64(i)) *
-						c.sums[k-i]
-			}
+				float64(mathutil.Binom(k, i)*mathutil.Sign(i)) *
+					math.Pow(delta/count, float64(i)) *
+					c.sums[k-i]
 		}
 	}
+
 }
 
 // remove simply undoes the result of an add() call, and clears out the stats
@@ -131,21 +127,17 @@ func (c *Core) remove(x float64) {
 		c.mean -= (x - c.mean) / count
 		delta := x - c.mean
 		for k := 2; k <= len(c.sums)-1; k++ {
-			switch k {
-			case 2:
-				c.sums[k] -= count / (count + 1) * math.Pow(delta, float64(k))
-			default:
+			c.sums[k] -=
+				count / math.Pow(count+1, float64(k)) *
+					(math.Pow(count, float64(k-1)) + float64(mathutil.Sign(k))) *
+					math.Pow(delta, float64(k))
+			for i := 1; i <= k-2; i++ {
 				c.sums[k] -=
-					count / math.Pow(count+1, float64(k)) *
-						(math.Pow(count, float64(k-1)) + float64(mathutil.Sign(k))) *
-						math.Pow(delta, float64(k))
-				for i := 1; i <= k-2; i++ {
-					c.sums[k] -=
-						float64(mathutil.Binom(k, i)*mathutil.Sign(i)) *
-							math.Pow(delta/(count+1), float64(i)) *
-							c.sums[k-i]
-				}
+					float64(mathutil.Binom(k, i)*mathutil.Sign(i)) *
+						math.Pow(delta/(count+1), float64(i)) *
+						c.sums[k-i]
 			}
+
 		}
 	} else {
 		c.mean = 0
