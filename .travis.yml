@@ -21,23 +21,17 @@ git:
 before_install:
   - go get github.com/golang/lint/golint
 
-# Skip the install step. Don't `go get` dependencies. Only build with the code
-# in vendor/
-install: true
-
 # Disable email notifications for build results
 notifications:
   email: false
 
 script:
-  # Ignore vendor/ when linting; golint does not automatically ignore vendor/
-  - golint $(go list ./... | grep -v /vendor/)
+  - golint
   - go vet ./...
-  - go test -v -race -mod=vendor -coverprofile=coverage.txt -covermode=atomic ./...
+  - go test -v -race -mod=readonly -coverprofile=coverage.txt -covermode=atomic ./...
   - go mod tidy
-  - go mod vendor
-  # Check for unused/missing packages
-  - git diff --exit-code go.sum go.mod vendor/
+  # Check for unused packages
+  - git diff --exit-code go.sum go.mod
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

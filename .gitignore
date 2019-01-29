@@ -12,5 +12,8 @@
 *.out
 coverage.txt
 
+# Don't check in vendored code
+vendor/
+
 # Editor configs
 .vscode
