@@ -9,9 +9,9 @@ import (
 // CoreConfig is the struct containing configuration options for
 // instantiating a Core object.
 type CoreConfig struct {
-	Sums   SumsConfig
-	Window *int
-	Decay  *float64
+	Sums   SumsConfig // sums tracked must be positive
+	Window *int       // must be 0 if decay is set, must be nonnegative in general
+	Decay  *float64   // must lie in the interval (0, 1)
 }
 
 var defaultConfig = &CoreConfig{
