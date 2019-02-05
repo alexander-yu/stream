@@ -8,3 +8,6 @@ package stream
 
 // IntPtr returns a pointer to an int.
 func IntPtr(v int) *int { return &v }
+
+// FloatPtr returns a pointer to a float.
+func FloatPtr(v float64) *float64 { return &v }

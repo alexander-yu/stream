@@ -19,6 +19,31 @@ func TestValidateConfig(t *testing.T) {
 		assert.EqualError(t, err, fmt.Sprintf("config has a negative window of %d", -1))
 	})
 
+	t.Run("fail: config with a decay not in (0, 1) is invalid", func(t *testing.T) {
+		config := &CoreConfig{
+			Window: stream.IntPtr(3),
+			Decay:  stream.FloatPtr(0),
+		}
+		err := validateConfig(config)
+		assert.EqualError(t, err, fmt.Sprintf("config has a decay of %f, which is not in (0, 1)", 0.))
+
+		config = &CoreConfig{
+			Window: stream.IntPtr(3),
+			Decay:  stream.FloatPtr(1),
+		}
+		err = validateConfig(config)
+		assert.EqualError(t, err, fmt.Sprintf("config has a decay of %f, which is not in (0, 1)", 1.))
+	})
+
+	t.Run("fail: config with a set decay and nonzero window is invalid", func(t *testing.T) {
+		config := &CoreConfig{
+			Window: stream.IntPtr(3),
+			Decay:  stream.FloatPtr(0.3),
+		}
+		err := validateConfig(config)
+		assert.EqualError(t, err, "config cannot have Decay set with a nonzero window")
+	})
+
 	t.Run("fail: config with a nonpositive central moment is invalid", func(t *testing.T) {
 		config := &CoreConfig{
 			Sums:   map[int]bool{-1: true},
@@ -34,12 +59,20 @@ func TestValidateConfig(t *testing.T) {
 		assert.EqualError(t, err, "config Window is not set")
 	})
 
-	t.Run("pass: config with positive window is valid", func(t *testing.T) {
+	t.Run("pass: valid config is valid", func(t *testing.T) {
 		config := &CoreConfig{
 			Sums:   SumsConfig{2: true},
 			Window: stream.IntPtr(3),
 		}
 		err := validateConfig(config)
+		assert.NoError(t, err)
+
+		config = &CoreConfig{
+			Sums:   SumsConfig{2: true},
+			Window: stream.IntPtr(0),
+			Decay:  stream.FloatPtr(0.3),
+		}
+		err = validateConfig(config)
 		assert.NoError(t, err)
 	})
 }
@@ -58,12 +91,14 @@ func TestSetConfigDefaults(t *testing.T) {
 		config := &CoreConfig{
 			Sums:   SumsConfig{3: true},
 			Window: stream.IntPtr(3),
+			Decay:  stream.FloatPtr(0.3),
 		}
 		config = setConfigDefaults(config)
 
 		expectedConfig := &CoreConfig{
 			Sums:   SumsConfig{3: true},
 			Window: stream.IntPtr(3),
+			Decay:  stream.FloatPtr(0.3),
 		}
 
 		assert.Equal(t, expectedConfig, config)
@@ -80,6 +115,7 @@ func TestMergeConfigs(t *testing.T) {
 		config := &CoreConfig{
 			Sums:   SumsConfig{3: true},
 			Window: stream.IntPtr(3),
+			Decay:  stream.FloatPtr(0.3),
 		}
 		mergedConfig, err := MergeConfigs(config)
 		require.NoError(t, err)
@@ -91,6 +127,7 @@ func TestMergeConfigs(t *testing.T) {
 		config1 := &CoreConfig{
 			Sums:   SumsConfig{1: true, 2: true},
 			Window: stream.IntPtr(3),
+			Decay:  stream.FloatPtr(0.3),
 		}
 		config2 := &CoreConfig{
 			Sums:   SumsConfig{2: true, 3: true},
@@ -104,6 +141,7 @@ func TestMergeConfigs(t *testing.T) {
 		expectedConfig := &CoreConfig{
 			Sums:   SumsConfig{1: true, 2: true, 3: true},
 			Window: stream.IntPtr(3),
+			Decay:  stream.FloatPtr(0.3),
 		}
 
 		assert.Equal(t, expectedConfig, mergedConfig)
@@ -113,13 +151,31 @@ func TestMergeConfigs(t *testing.T) {
 		config1 := &CoreConfig{
 			Sums:   SumsConfig{1: true, 2: true},
 			Window: stream.IntPtr(3),
+			Decay:  stream.FloatPtr(0.3),
 		}
 		config2 := &CoreConfig{
 			Sums:   SumsConfig{2: true, 3: true},
 			Window: stream.IntPtr(2),
+			Decay:  stream.FloatPtr(0.3),
 		}
 
 		_, err := MergeConfigs(config1, config2)
 		assert.EqualError(t, err, "configs have differing windows")
+	})
+
+	t.Run("fail: multiple configs passed fails if decays are not compatible", func(t *testing.T) {
+		config1 := &CoreConfig{
+			Sums:   SumsConfig{1: true, 2: true},
+			Window: stream.IntPtr(3),
+			Decay:  stream.FloatPtr(0.3),
+		}
+		config2 := &CoreConfig{
+			Sums:   SumsConfig{2: true, 3: true},
+			Window: stream.IntPtr(3),
+			Decay:  stream.FloatPtr(0.5),
+		}
+
+		_, err := MergeConfigs(config1, config2)
+		assert.EqualError(t, err, "configs have differing decays")
 	})
 }

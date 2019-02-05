@@ -17,6 +17,7 @@ type Core struct {
 	sums   []float64
 	count  int
 	window int
+	decay  *float64
 	queue  *queue.RingBuffer
 }
 
@@ -46,6 +47,7 @@ func NewCore(config *CoreConfig) (*Core, error) {
 	// initialize and create core
 	c := &Core{}
 	c.window = *config.Window
+	c.decay = config.Decay
 
 	maxSum := -1
 	for k := range config.Sums {
@@ -87,7 +89,11 @@ func (c *Core) UnsafePush(x float64) error {
 		}
 	}
 
-	c.add(x)
+	if c.decay == nil {
+		c.add(x)
+	} else {
+		c.addDecay(x)
+	}
 	return nil
 }
 
@@ -114,7 +120,39 @@ func (c *Core) add(x float64) {
 					c.sums[k-i]
 		}
 	}
+}
 
+// addDecay updates the mean, count, and centralized power sums (with exponential decay)
+// in an efficient and stable (numerically speaking) way, which allows for more accurate
+// reporting of moments. See the following paper for details on the algorithm used:
+// P. Pebay, T. B. Terriberry, H. Kolla, J. Bennett, Numerically stable, scalable
+// formulas for parallel and online computation of higher-order multivariate central
+// moments with arbitrary weights, Computational Statistics 31 (2016) 1305–1325.
+func (c *Core) addDecay(x float64) {
+	c.count++
+
+	var decay float64
+	if c.count == 1 {
+		decay = 1
+	} else {
+		decay = *c.decay
+	}
+
+	delta := x - c.mean
+	c.mean += decay * delta
+	for k := len(c.sums) - 1; k >= 2; k-- {
+		old := (1 - decay) * c.sums[k]
+		coeff := (1-decay)*math.Pow(-decay, float64(k)) + decay*math.Pow(1-decay, float64(k))
+		term := math.Pow(delta, float64(k))
+		old += coeff * term
+		for i := 1; i <= k-2; i++ {
+			old +=
+				float64(mathutil.Binom(k, i)*mathutil.Sign(i)) *
+					math.Pow(decay*delta, float64(i)) *
+					(1 - decay) * c.sums[k-i]
+		}
+		c.sums[k] = old
+	}
 }
 
 // remove simply undoes the result of an add() call, and clears out the stats
@@ -137,7 +175,6 @@ func (c *Core) remove(x float64) {
 						math.Pow(delta/(count+1), float64(i)) *
 						c.sums[k-i]
 			}
-
 		}
 	} else {
 		c.mean = 0
