@@ -29,6 +29,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
       - [Moment](#moment)
       - [EWMMoment](#ewmmoment)
       - [Std](#std)
+      - [EWMStd](#ewmstd)
       - [Skewness](#skewness)
       - [Kurtosis](#kurtosis)
       - [Core (Univariate)](#core-univariate)
@@ -142,6 +143,14 @@ Std keeps track of the sample [standard deviation](https://en.wikipedia.org/wiki
 
 ```go
 variance := NewMoment(2, window)
+```
+
+#### EWMStd
+
+EWMStd keeps track of the global [exponentially weighted moving standard deviation](https://en.wikipedia.org/wiki/Moving_average#Exponentially_weighted_moving_variance_and_standard_deviation). To track the exponentially weighted moving variance instead, you should use [EWMMoment](#EWMMoment), i.e.
+
+```go
+variance := NewEWMMoment(2, decay)
 ```
 
 #### Skewness

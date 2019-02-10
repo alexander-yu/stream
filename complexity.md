@@ -22,6 +22,7 @@ provided in the library.
       - [Moment](#moment)
       - [EWMMoment](#ewmmoment)
       - [Std](#std)
+      - [EWMStd](#ewmstd)
       - [Skewness](#skewness)
       - [Kurtosis](#kurtosis)
       - [Core (Univariate)](#core-univariate)
@@ -129,6 +130,12 @@ Let `n` be the size of the window, or the stream if tracking the global standard
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
+
+#### EWMStd
+
+| Push (time) | Value (time) | Space  |
+| :---------: | :----------: | :----: |
+| `O(1)`      | `O(1)`       | `O(1)` |
 
 #### Skewness
 
