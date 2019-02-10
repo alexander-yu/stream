@@ -25,6 +25,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
       - [Max](#max)
     - [Moment-Based Statistics](#moment-based-statistics)
       - [Mean](#mean)
+      - [EWMA](#ewma)
       - [Moment](#moment)
       - [Variance](#variance)
       - [Std](#std)
@@ -122,6 +123,10 @@ Max keeps track of the maximum of a stream; it can track either the global maxim
 #### Mean
 
 Mean keeps track of the mean of a stream; it can track either the global mean, or over a rolling window.
+
+#### EWMA
+
+EWMA keeps track of the global [exponentially weighted moving average](https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average).
 
 #### Moment
 

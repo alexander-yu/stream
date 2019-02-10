@@ -18,6 +18,7 @@ provided in the library.
       - [Max](#max)
     - [Moment-Based Statistics](#moment-based-statistics)
       - [Mean](#mean)
+      - [EWMA](#ewma)
       - [Moment](#moment)
       - [Variance](#variance)
       - [Std](#std)
@@ -94,6 +95,12 @@ Let `n` be the size of the window, or the stream if tracking the global mean. Th
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
+
+#### EWMA
+
+| Push (time) | Value (time) | Space  |
+| :---------: | :----------: | :----: |
+| `O(1)`      | `O(1)`       | `O(1)` |
 
 #### Moment
 
