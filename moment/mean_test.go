@@ -121,7 +121,7 @@ func TestMeanClear(t *testing.T) {
 	assert.Equal(t, uint64(0), mean.core.queue.Len())
 }
 
-func TestMeanValue(t *testing.T) {
+func TestMeanString(t *testing.T) {
 	mean := NewMean(3)
 	expectedString := "moment.Mean_{window:3}"
 	assert.Equal(t, expectedString, mean.String())
