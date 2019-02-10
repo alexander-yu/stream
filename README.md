@@ -28,7 +28,6 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
       - [EWMA](#ewma)
       - [Moment](#moment)
       - [EWMoment](#ewmoment)
-      - [Variance](#variance)
       - [Std](#std)
       - [Skewness](#skewness)
       - [Kurtosis](#kurtosis)
@@ -137,13 +136,13 @@ Moment keeps track of the `k`-th sample [central moment](https://en.wikipedia.or
 
 EWMoment keeps track of the global exponentially weighted moving central moment. This uses the exponentially weighted moving average as its center of mass, and uses the same exponential weights for its power terms.
 
-#### Variance
-
-Variance keeps track of the sample [variance](https://en.wikipedia.org/wiki/Variance) of a stream; it can track either the global variance, or over a rolling window.
-
 #### Std
 
-Std keeps track of the sample [standard deviation](https://en.wikipedia.org/wiki/Standard_deviation) of a stream; it can track either the global standard deviation, or over a rolling window.
+Std keeps track of the sample [standard deviation](https://en.wikipedia.org/wiki/Standard_deviation) of a stream; it can track either the global standard deviation, or over a rolling window. To track the sample [variance](https://en.wikipedia.org/wiki/Variance) instead, you should use [Moment](#Moment), i.e.
+
+```go
+variance := NewMoment(2, window)
+```
 
 #### Skewness
 

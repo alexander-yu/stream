@@ -21,7 +21,6 @@ provided in the library.
       - [EWMA](#ewma)
       - [Moment](#moment)
       - [EWMoment](#ewmoment)
-      - [Variance](#variance)
       - [Std](#std)
       - [Skewness](#skewness)
       - [Kurtosis](#kurtosis)
@@ -122,14 +121,6 @@ Let `k` be the moment being tracked. Then we have the following complexities:
 | `O(k^2)`    | `O(1)`       | `O(1)` |
 
 See [Core](#Core) for an explanation of why `Push` has a time complexity of `O(k^2)`, rather than `O(k)`.
-
-#### Variance
-
-Let `n` be the size of the window, or the stream if tracking the global variance. Then we have the following complexities:
-
-| Push (time) | Value (time) | Space                         |
-| :---------: | :----------: | :---------------------------: |
-| `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
 #### Std
 
