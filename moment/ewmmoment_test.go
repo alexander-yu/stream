@@ -10,49 +10,49 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
-func TestNewEWMoment(t *testing.T) {
-	moment := NewEWMoment(2, 0.3)
+func TestNewEWMMoment(t *testing.T) {
+	moment := NewEWMMoment(2, 0.3)
 	assert.Equal(t, 2, moment.k)
 	testutil.Approx(t, 0.3, moment.decay)
 }
 
-type EWMomentPushSuite struct {
+type EWMMomentPushSuite struct {
 	suite.Suite
-	moment *EWMoment
+	moment *EWMMoment
 }
 
-func TestEWMomentPushSuite(t *testing.T) {
-	suite.Run(t, &EWMomentPushSuite{})
+func TestEWMMomentPushSuite(t *testing.T) {
+	suite.Run(t, &EWMMomentPushSuite{})
 }
 
-func (s *EWMomentPushSuite) SetupTest() {
-	s.moment = NewEWMoment(2, 0.3)
+func (s *EWMMomentPushSuite) SetupTest() {
+	s.moment = NewEWMMoment(2, 0.3)
 	err := Init(s.moment)
 	s.Require().NoError(err)
 }
 
-func (s *EWMomentPushSuite) TestPushSuccess() {
+func (s *EWMMomentPushSuite) TestPushSuccess() {
 	err := s.moment.Push(3.)
 	s.NoError(err)
 }
 
-func (s *EWMomentPushSuite) TestPushFailOnNullCore() {
-	moment := NewEWMoment(2, 0.3)
+func (s *EWMMomentPushSuite) TestPushFailOnNullCore() {
+	moment := NewEWMMoment(2, 0.3)
 	err := moment.Push(0.)
 	testutil.ContainsError(s.T(), err, "Core is not set")
 }
 
-type EWMomentValueSuite struct {
+type EWMMomentValueSuite struct {
 	suite.Suite
-	moment *EWMoment
+	moment *EWMMoment
 }
 
-func TestEWMomentValueSuite(t *testing.T) {
-	suite.Run(t, &EWMomentValueSuite{})
+func TestEWMMomentValueSuite(t *testing.T) {
+	suite.Run(t, &EWMMomentValueSuite{})
 }
 
-func (s *EWMomentValueSuite) SetupTest() {
-	s.moment = NewEWMoment(2, 0.3)
+func (s *EWMMomentValueSuite) SetupTest() {
+	s.moment = NewEWMMoment(2, 0.3)
 	err := Init(s.moment)
 	s.Require().NoError(err)
 
@@ -63,20 +63,20 @@ func (s *EWMomentValueSuite) SetupTest() {
 	}
 }
 
-func (s *EWMomentValueSuite) TestValueSuccess() {
+func (s *EWMMomentValueSuite) TestValueSuccess() {
 	value, err := s.moment.Value()
 	s.Require().NoError(err)
 	testutil.Approx(s.T(), 1.8758490975, value)
 }
 
-func (s *EWMomentValueSuite) TestValueFailOnNullCore() {
-	moment := NewEWMoment(2, 0.3)
+func (s *EWMMomentValueSuite) TestValueFailOnNullCore() {
+	moment := NewEWMMoment(2, 0.3)
 	_, err := moment.Value()
 	testutil.ContainsError(s.T(), err, "Core is not set")
 }
 
-func (s *EWMomentValueSuite) TestValueFailIfNoValuesSeen() {
-	moment := NewEWMoment(2, 0.3)
+func (s *EWMMomentValueSuite) TestValueFailIfNoValuesSeen() {
+	moment := NewEWMMoment(2, 0.3)
 	err := Init(moment)
 	s.Require().NoError(err)
 
@@ -84,8 +84,8 @@ func (s *EWMomentValueSuite) TestValueFailIfNoValuesSeen() {
 	testutil.ContainsError(s.T(), err, "no values seen yet")
 }
 
-func TestEWMomentClear(t *testing.T) {
-	moment := NewEWMoment(2, 0.3)
+func TestEWMMomentClear(t *testing.T) {
+	moment := NewEWMMoment(2, 0.3)
 	err := Init(moment)
 	require.NoError(t, err)
 
@@ -101,8 +101,8 @@ func TestEWMomentClear(t *testing.T) {
 	assert.Equal(t, int(0), moment.core.count)
 }
 
-func TestEWMomentString(t *testing.T) {
-	moment := NewEWMoment(2, 0.3)
-	expectedString := "moment.EWMoment_{k:2,decay:0.3}"
+func TestEWMMomentString(t *testing.T) {
+	moment := NewEWMMoment(2, 0.3)
+	expectedString := "moment.EWMMoment_{k:2,decay:0.3}"
 	assert.Equal(t, expectedString, moment.String())
 }

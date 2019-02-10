@@ -20,7 +20,7 @@ provided in the library.
       - [Mean](#mean)
       - [EWMA](#ewma)
       - [Moment](#moment)
-      - [EWMoment](#ewmoment)
+      - [EWMMoment](#ewmmoment)
       - [Std](#std)
       - [Skewness](#skewness)
       - [Kurtosis](#kurtosis)
@@ -112,7 +112,7 @@ Let `n` be the size of the window, or the stream if tracking the global moment; 
 
 See [Core](#Core) for an explanation of why `Push` has a time complexity of `O(k^2)`, rather than `O(k)`.
 
-#### EWMoment
+#### EWMMoment
 
 Let `k` be the moment being tracked. Then we have the following complexities:
 

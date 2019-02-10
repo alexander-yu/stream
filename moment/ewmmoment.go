@@ -7,33 +7,33 @@ import (
 	"github.com/pkg/errors"
 )
 
-// EWMoment is a metric that tracks the kth exponentially weighted sample central moment.
-type EWMoment struct {
+// EWMMoment is a metric that tracks the kth exponentially weighted sample central moment.
+type EWMMoment struct {
 	k     int
 	decay float64
 	core  *Core
 }
 
-// NewEWMoment instantiates a EWMoment struct.
-func NewEWMoment(k int, decay float64) *EWMoment {
-	return &EWMoment{
+// NewEWMMoment instantiates a EWMMoment struct.
+func NewEWMMoment(k int, decay float64) *EWMMoment {
+	return &EWMMoment{
 		k:     k,
 		decay: decay,
 	}
 }
 
 // SetCore sets the Core.
-func (m *EWMoment) SetCore(c *Core) {
+func (m *EWMMoment) SetCore(c *Core) {
 	m.core = c
 }
 
 // IsSetCore returns if the core has been set.
-func (m *EWMoment) IsSetCore() bool {
+func (m *EWMMoment) IsSetCore() bool {
 	return m.core != nil
 }
 
 // Config returns the CoreConfig needed.
-func (m *EWMoment) Config() *CoreConfig {
+func (m *EWMMoment) Config() *CoreConfig {
 	return &CoreConfig{
 		Sums:  SumsConfig{m.k: true},
 		Decay: &m.decay,
@@ -41,8 +41,8 @@ func (m *EWMoment) Config() *CoreConfig {
 }
 
 // String returns a string representation of the metric.
-func (m *EWMoment) String() string {
-	name := "moment.EWMoment"
+func (m *EWMMoment) String() string {
+	name := "moment.EWMMoment"
 	params := []string{
 		fmt.Sprintf("k:%v", m.k),
 		fmt.Sprintf("decay:%v", m.decay),
@@ -50,8 +50,8 @@ func (m *EWMoment) String() string {
 	return fmt.Sprintf("%s_{%s}", name, strings.Join(params, ","))
 }
 
-// Push adds a new value for EWMoment to consume.
-func (m *EWMoment) Push(x float64) error {
+// Push adds a new value for EWMMoment to consume.
+func (m *EWMMoment) Push(x float64) error {
 	if !m.IsSetCore() {
 		return errors.New("Core is not set")
 	}
@@ -64,7 +64,7 @@ func (m *EWMoment) Push(x float64) error {
 }
 
 // Value returns the value of the kth exponentially weighted sample central moment.
-func (m *EWMoment) Value() (float64, error) {
+func (m *EWMMoment) Value() (float64, error) {
 	if !m.IsSetCore() {
 		return 0, errors.New("Core is not set")
 	}
@@ -84,7 +84,7 @@ func (m *EWMoment) Value() (float64, error) {
 }
 
 // Clear resets the metric.
-func (m *EWMoment) Clear() {
+func (m *EWMMoment) Clear() {
 	if m.IsSetCore() {
 		m.core.Clear()
 	}

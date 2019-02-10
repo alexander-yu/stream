@@ -27,7 +27,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
       - [Mean](#mean)
       - [EWMA](#ewma)
       - [Moment](#moment)
-      - [EWMoment](#ewmoment)
+      - [EWMMoment](#ewmmoment)
       - [Std](#std)
       - [Skewness](#skewness)
       - [Kurtosis](#kurtosis)
@@ -132,9 +132,9 @@ EWMA keeps track of the global [exponentially weighted moving average](https://e
 
 Moment keeps track of the `k`-th sample [central moment](https://en.wikipedia.org/wiki/Central_moment); it can track either the global moment, or over a rolling window.
 
-#### EWMoment
+#### EWMMoment
 
-EWMoment keeps track of the global exponentially weighted moving central moment. This uses the exponentially weighted moving average as its center of mass, and uses the same exponential weights for its power terms.
+EWMMoment keeps track of the global exponentially weighted moving central moment. This uses the exponentially weighted moving average as its center of mass, and uses the same exponential weights for its power terms.
 
 #### Std
 
