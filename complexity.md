@@ -20,6 +20,7 @@ provided in the library.
       - [Mean](#mean)
       - [EWMA](#ewma)
       - [Moment](#moment)
+      - [EWMoment](#ewmoment)
       - [Variance](#variance)
       - [Std](#std)
       - [Skewness](#skewness)
@@ -109,6 +110,16 @@ Let `n` be the size of the window, or the stream if tracking the global moment; 
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
 | `O(k^2)`    | `O(1)`       | `O(1)` if global, else `O(n)` |
+
+See [Core](#Core) for an explanation of why `Push` has a time complexity of `O(k^2)`, rather than `O(k)`.
+
+#### EWMoment
+
+Let `k` be the moment being tracked. Then we have the following complexities:
+
+| Push (time) | Value (time) | Space  |
+| :---------: | :----------: | :----: |
+| `O(k^2)`    | `O(1)`       | `O(1)` |
 
 See [Core](#Core) for an explanation of why `Push` has a time complexity of `O(k^2)`, rather than `O(k)`.
 
