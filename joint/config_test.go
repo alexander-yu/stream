@@ -39,6 +39,28 @@ func TestValidateConfig(t *testing.T) {
 		assert.EqualError(t, err, fmt.Sprintf("config has a Tuple with a negative exponent of %d", -1))
 	})
 
+	t.Run("fail: config with Tuples of different lengths is invalid", func(t *testing.T) {
+		config := &CoreConfig{
+			Sums:   SumsConfig{{0, 2, 3}, {2, 3}},
+			Window: stream.IntPtr(3),
+			Vars:   stream.IntPtr(3),
+		}
+		err := validateConfig(config)
+		assert.EqualError(t, err, "sums have differing length")
+	})
+
+	t.Run("fail: config with Tuple of length < 2 is invalid", func(t *testing.T) {
+		tuple := Tuple{3}
+		config := &CoreConfig{
+			Sums:   SumsConfig{tuple},
+			Window: stream.IntPtr(3),
+		}
+		err := validateConfig(config)
+		assert.EqualError(t, err, fmt.Sprintf(
+			"config has a Tuple (%v) with length %d < 2", tuple, len(tuple),
+		))
+	})
+
 	t.Run("fail: Tuple with length != Vars is invalid", func(t *testing.T) {
 		tuple := Tuple{0, 2, 3}
 		config := &CoreConfig{

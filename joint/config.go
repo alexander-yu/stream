@@ -19,9 +19,9 @@ func (s1 *SumsConfig) add(s2 SumsConfig) {
 // CoreConfig is the struct containing configuration options for
 // instantiating a Core object.
 type CoreConfig struct {
-	Sums   SumsConfig
-	Window *int
-	Vars   *int
+	Sums   SumsConfig // sums tracked must be positive, and must track > 1 variables
+	Window *int       // must be 0 if decay is set, must be nonnegative in general
+	Vars   *int       // must be inferrable from Sums if not set; otherwise must be > 1
 }
 
 var defaultConfig = &CoreConfig{
@@ -123,6 +123,12 @@ func validateConfig(config *CoreConfig) error {
 	}
 
 	for _, tuple := range config.Sums {
+		if len(tuple) != len(config.Sums[0]) {
+			return errors.New("sums have differing length")
+		} else if len(tuple) < 2 {
+			return errors.Errorf("config has a Tuple (%v) with length %d < 2", tuple, len(tuple))
+		}
+
 		if config.Vars != nil && len(tuple) != *config.Vars {
 			return errors.Errorf(
 				"config has a Tuple (%v) with length %d but Vars = %d",
