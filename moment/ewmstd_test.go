@@ -56,7 +56,7 @@ func (s *EWMStdValueSuite) SetupTest() {
 	err := Init(s.std)
 	s.Require().NoError(err)
 
-	xs := []float64{1, 2, 3, 4, 8}
+	xs := []float64{3, 4, 8}
 	for _, x := range xs {
 		err := s.std.Push(x)
 		s.Require().NoError(err)
@@ -66,7 +66,7 @@ func (s *EWMStdValueSuite) SetupTest() {
 func (s *EWMStdValueSuite) TestValueSuccess() {
 	value, err := s.std.Value()
 	s.Require().NoError(err)
-	testutil.Approx(s.T(), math.Sqrt(1.8758490975), value)
+	testutil.Approx(s.T(), math.Sqrt(4.7859), value)
 }
 
 func (s *EWMStdValueSuite) TestValueFailOnNullCore() {
@@ -89,7 +89,7 @@ func TestEWMStdClear(t *testing.T) {
 	err := Init(std)
 	require.NoError(t, err)
 
-	xs := []float64{1, 2, 3, 4, 8}
+	xs := []float64{3, 4, 8}
 	for _, x := range xs {
 		err := std.Push(x)
 		require.NoError(t, err)

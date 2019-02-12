@@ -56,7 +56,7 @@ func (s *EWMMomentValueSuite) SetupTest() {
 	err := Init(s.moment)
 	s.Require().NoError(err)
 
-	xs := []float64{1, 2, 3, 4, 8}
+	xs := []float64{3, 4, 8}
 	for _, x := range xs {
 		err := s.moment.Push(x)
 		s.Require().NoError(err)
@@ -66,7 +66,7 @@ func (s *EWMMomentValueSuite) SetupTest() {
 func (s *EWMMomentValueSuite) TestValueSuccess() {
 	value, err := s.moment.Value()
 	s.Require().NoError(err)
-	testutil.Approx(s.T(), 1.8758490975, value)
+	testutil.Approx(s.T(), 4.7859, value)
 }
 
 func (s *EWMMomentValueSuite) TestValueFailOnNullCore() {
@@ -89,7 +89,7 @@ func TestEWMMomentClear(t *testing.T) {
 	err := Init(moment)
 	require.NoError(t, err)
 
-	xs := []float64{1, 2, 3, 4, 8}
+	xs := []float64{3, 4, 8}
 	for _, x := range xs {
 		err := moment.Push(x)
 		require.NoError(t, err)

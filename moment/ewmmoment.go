@@ -69,16 +69,10 @@ func (m *EWMMoment) Value() (float64, error) {
 		return 0, errors.New("Core is not set")
 	}
 
-	m.core.RLock()
-	defer m.core.RUnlock()
-
 	moment, err := m.core.Sum(m.k)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum")
 	}
-
-	count := m.core.Count()
-	moment /= (float64(count) - 1.)
 
 	return moment, nil
 }

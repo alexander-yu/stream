@@ -55,7 +55,7 @@ func (s *EWMAValueSuite) SetupTest() {
 	err := Init(s.ewma)
 	s.Require().NoError(err)
 
-	xs := []float64{1, 2, 3, 4, 8}
+	xs := []float64{3, 4, 8}
 	for _, x := range xs {
 		err := s.ewma.Push(x)
 		s.Require().NoError(err)
@@ -65,7 +65,7 @@ func (s *EWMAValueSuite) SetupTest() {
 func (s *EWMAValueSuite) TestValueSuccess() {
 	value, err := s.ewma.Value()
 	s.Require().NoError(err)
-	testutil.Approx(s.T(), 4.1269, value)
+	testutil.Approx(s.T(), 4.71, value)
 }
 
 func (s *EWMAValueSuite) TestValueFailOnNullCore() {
@@ -88,7 +88,7 @@ func TestEWMAClear(t *testing.T) {
 	err := Init(ewma)
 	require.NoError(t, err)
 
-	xs := []float64{1, 2, 3, 4, 8}
+	xs := []float64{3, 4, 8}
 	for _, x := range xs {
 		err := ewma.Push(x)
 		require.NoError(t, err)
