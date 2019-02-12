@@ -85,16 +85,16 @@ func values(metrics []joint.Metric) (map[string]float64, error) {
 
 func main() {
 	// tracks the global correlation
-	corr := joint.NewCorrelation(0)
+	corr := joint.NewCorr(0)
 
 	// tracks the autocorrelation over a rolling window of size 10 and a lag of 4
-	autocorr, err := joint.NewAutocorrelation(4, 10)
+	autocorr, err := joint.NewAutocorr(4, 10)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// tracks the covariance over a rolling window of size 5
-	cov := joint.NewCovariance(5)
+	cov := joint.NewCov(5)
 
 	metrics := []joint.Metric{corr, cov}
 	err = initialize(metrics)
@@ -102,7 +102,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Autocorrelation is not a joint.Metric, since it does not satisfy
+	// Autocorr is not a joint.Metric, since it does not satisfy
 	// the JointMetric interface
 	err = joint.Init(autocorr)
 	if err != nil {

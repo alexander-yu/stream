@@ -27,9 +27,9 @@ provided in the library.
       - [Kurtosis](#kurtosis)
       - [Core (Univariate)](#core-univariate)
     - [Joint Distribution Statistics](#joint-distribution-statistics)
-      - [Covariance](#covariance)
-      - [Correlation](#correlation)
-      - [Autocorrelation](#autocorrelation)
+      - [Cov](#cov)
+      - [Corr](#corr)
+      - [Autocorr](#autocorr)
       - [Core (Multivariate)](#core-multivariate)
   - [References](#references)
 
@@ -165,7 +165,7 @@ The reason that the `Push` method has a time complexity of `O(k^2)` is due to th
 
 ### [Joint Distribution Statistics](https://godoc.org/github.com/alexander-yu/stream/joint)
 
-#### Covariance
+#### Cov
 
 Let `n` be the size of the window, or the stream if tracking the global covariance. Then we have the following complexities:
 
@@ -173,7 +173,7 @@ Let `n` be the size of the window, or the stream if tracking the global covarian
 | :---------: | :----------: | :---------------------------: |
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
-#### Correlation
+#### Corr
 
 Let `n` be the size of the window, or the stream if tracking the global correlation. Then we have the following complexities:
 
@@ -181,7 +181,7 @@ Let `n` be the size of the window, or the stream if tracking the global correlat
 | :---------: | :----------: | :---------------------------: |
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
-#### Autocorrelation
+#### Autocorr
 
 Let `n` be the size of the window, or the stream if tracking the global autocorrelation; let `l` be the lag of the autocorrelation. Then we have the following complexities:
 

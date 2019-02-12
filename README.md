@@ -34,9 +34,9 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
       - [Kurtosis](#kurtosis)
       - [Core (Univariate)](#core-univariate)
     - [Joint Distribution Statistics](#joint-distribution-statistics)
-      - [Covariance](#covariance)
-      - [Correlation](#correlation)
-      - [Autocorrelation](#autocorrelation)
+      - [Cov](#cov)
+      - [Corr](#corr)
+      - [Autocorr](#autocorr)
       - [Core (Multivariate)](#core-multivariate)
     - [Aggregate Statistics](#aggregate-statistics)
       - [SimpleAggregateMetric](#simpleaggregatemetric)
@@ -57,7 +57,7 @@ In-depth examples are provided in the [examples](https://github.com/alexander-yu
 ```go
 // tracks the autocorrelation over a
 // rolling window of size 15 and lag of 5
-autocorr, err := joint.NewAutocorrelation(5, 15)
+autocorr, err := joint.NewAutocorr(5, 15)
 // handle err
 
 // all metrics in the joint package must be passed
@@ -183,17 +183,17 @@ See the [godoc](https://godoc.org/github.com/alexander-yu/stream/moment#Core) en
 
 ### [Joint Distribution Statistics](https://godoc.org/github.com/alexander-yu/stream/joint)
 
-#### Covariance
+#### Cov
 
-Covariance keeps track of the sample [covariance](https://en.wikipedia.org/wiki/Covariance) of a stream; it can track either the global covariance, or over a rolling window.
+Cov keeps track of the sample [covariance](https://en.wikipedia.org/wiki/Covariance) of a stream; it can track either the global covariance, or over a rolling window.
 
-#### Correlation
+#### Corr
 
-Correlation keeps track of the sample [correlation](https://en.wikipedia.org/wiki/Correlation) of a stream (in particular, the [sample Pearson correlation coefficient](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient#For_a_sample)); it can track either the global correlation, or over a rolling window.
+Corr keeps track of the sample [correlation](https://en.wikipedia.org/wiki/Correlation) of a stream (in particular, the [sample Pearson correlation coefficient](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient#For_a_sample)); it can track either the global correlation, or over a rolling window.
 
-#### Autocorrelation
+#### Autocorr
 
-Autocorrelation keeps track of the sample [autocorrelation](https://en.wikipedia.org/wiki/Autocorrelation) of a stream (in particular, the [sample autocorrelation](https://en.wikipedia.org/wiki/Autocorrelation#Estimation)) for a given lag; it can track either the global autocorrelation, or over a rolling window.
+Autocorr keeps track of the sample [autocorrelation](https://en.wikipedia.org/wiki/Autocorrelation) of a stream (in particular, the [sample autocorrelation](https://en.wikipedia.org/wiki/Autocorrelation#Estimation)) for a given lag; it can track either the global autocorrelation, or over a rolling window.
 
 #### Core (Multivariate)
 

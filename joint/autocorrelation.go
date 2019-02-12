@@ -8,60 +8,60 @@ import (
 	"github.com/workiva/go-datastructures/queue"
 )
 
-// Autocorrelation is a metric that tracks the sample autocorrelation.
+// Autocorr is a metric that tracks the sample autocorrelation.
 // It does not satisfy the JointMetric interface, but rather the univariate
 // Metric interface (SimpleMetric in particular), since it only tracks a single
 // variable.
-type Autocorrelation struct {
-	lag         int
-	queue       *queue.RingBuffer
-	correlation *Correlation
-	core        *Core
+type Autocorr struct {
+	lag   int
+	queue *queue.RingBuffer
+	corr  *Corr
+	core  *Core
 }
 
-// NewAutocorrelation instantiates an Autocorrelation struct.
-func NewAutocorrelation(lag int, window int) (*Autocorrelation, error) {
+// NewAutocorr instantiates an Autocorr struct.
+func NewAutocorr(lag int, window int) (*Autocorr, error) {
 	if lag < 0 {
 		return nil, errors.Errorf("%d is a negative lag", lag)
 	}
 
-	return &Autocorrelation{
-		lag:         lag,
-		queue:       queue.NewRingBuffer(uint64(lag)),
-		correlation: NewCorrelation(window),
+	return &Autocorr{
+		lag:   lag,
+		queue: queue.NewRingBuffer(uint64(lag)),
+		corr:  NewCorr(window),
 	}, nil
 }
 
 // SetCore sets the Core.
-func (a *Autocorrelation) SetCore(c *Core) {
-	a.correlation.SetCore(c)
+func (a *Autocorr) SetCore(c *Core) {
+	a.corr.SetCore(c)
 	a.core = c
 }
 
 // IsSetCore returns if the core has been set.
-func (a *Autocorrelation) IsSetCore() bool {
+func (a *Autocorr) IsSetCore() bool {
 	return a.core != nil
 }
 
 // Config returns the CoreConfig needed.
-func (a *Autocorrelation) Config() *CoreConfig {
-	return a.correlation.Config()
+func (a *Autocorr) Config() *CoreConfig {
+	return a.corr.Config()
 }
 
 // String returns a string representation of the metric.
-func (a *Autocorrelation) String() string {
-	name := "joint.Autocorrelation"
+func (a *Autocorr) String() string {
+	name := "joint.Autocorr"
 	params := []string{
 		fmt.Sprintf("lag:%v", a.lag),
-		fmt.Sprintf("window:%v", a.correlation.window),
+		fmt.Sprintf("window:%v", a.corr.window),
 	}
 	return fmt.Sprintf("%s_{%s}", name, strings.Join(params, ","))
 }
 
-// Push adds a new value for Autocorrelation to consume.
-// Autocorrelation only takes one value, because we're calculating
+// Push adds a new value for Autocorr to consume.
+// Autocorr only takes one value, because we're calculating
 // the lagged correlation of a series of data against itself.
-func (a *Autocorrelation) Push(x float64) error {
+func (a *Autocorr) Push(x float64) error {
 	if !a.IsSetCore() {
 		return errors.New("Core is not set")
 	}
@@ -99,25 +99,25 @@ func (a *Autocorrelation) Push(x float64) error {
 }
 
 // Value returns the value of the sample autocorrelation.
-func (a *Autocorrelation) Value() (float64, error) {
+func (a *Autocorr) Value() (float64, error) {
 	if !a.IsSetCore() {
 		return 0, errors.New("Core is not set")
-	} else if a.correlation.core.Count() == 0 {
+	} else if a.corr.core.Count() == 0 {
 		return 0, errors.New(fmt.Sprintf(
 			"Not enough values seen; at least %d observations must be made",
 			a.lag+1,
 		))
 	}
 
-	return a.correlation.Value()
+	return a.corr.Value()
 }
 
 // Clear resets the metric.
-func (a *Autocorrelation) Clear() {
+func (a *Autocorr) Clear() {
 	if a.IsSetCore() {
-		a.correlation.core.Lock()
-		defer a.correlation.core.Unlock()
-		a.correlation.core.UnsafeClear()
+		a.corr.core.Lock()
+		defer a.corr.core.Unlock()
+		a.corr.core.UnsafeClear()
 		a.queue.Dispose()
 		a.queue = queue.NewRingBuffer(uint64(a.lag))
 	}

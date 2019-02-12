@@ -11,135 +11,135 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
-func TestNewCovariance(t *testing.T) {
-	covariance := NewCovariance(3)
-	assert.Equal(t, 3, covariance.window)
+func TestNewCov(t *testing.T) {
+	cov := NewCov(3)
+	assert.Equal(t, 3, cov.window)
 }
 
-type CovariancePushSuite struct {
+type CovPushSuite struct {
 	suite.Suite
-	covariance *Covariance
+	cov *Cov
 }
 
-func TestCovariancePushSuite(t *testing.T) {
-	suite.Run(t, &CovariancePushSuite{})
+func TestCovPushSuite(t *testing.T) {
+	suite.Run(t, &CovPushSuite{})
 }
 
-func (s *CovariancePushSuite) SetupTest() {
-	s.covariance = NewCovariance(3)
-	err := Init(s.covariance)
+func (s *CovPushSuite) SetupTest() {
+	s.cov = NewCov(3)
+	err := Init(s.cov)
 	s.Require().NoError(err)
 }
 
-func (s *CovariancePushSuite) TestPushSuccess() {
-	err := s.covariance.Push(3., 9.)
+func (s *CovPushSuite) TestPushSuccess() {
+	err := s.cov.Push(3., 9.)
 	s.NoError(err)
 }
 
-func (s *CovariancePushSuite) TestPushFailOnNullCore() {
-	covariance := NewCovariance(3)
-	err := covariance.Push(0., 0.)
+func (s *CovPushSuite) TestPushFailOnNullCore() {
+	cov := NewCov(3)
+	err := cov.Push(0., 0.)
 	testutil.ContainsError(s.T(), err, "Core is not set")
 }
 
-func (s *CovariancePushSuite) TestPushFailOnQueueInsertionFailure() {
+func (s *CovPushSuite) TestPushFailOnQueueInsertionFailure() {
 	// dispose the queue to simulate an error when we try to insert into the queue
-	s.covariance.core.queue.Dispose()
+	s.cov.core.queue.Dispose()
 
-	err := s.covariance.Push(3., 9.)
+	err := s.cov.Push(3., 9.)
 	testutil.ContainsError(s.T(), err, "error pushing to core")
 }
 
-func (s *CovariancePushSuite) TestPushFailOnQueueRetrievalFailure() {
+func (s *CovPushSuite) TestPushFailOnQueueRetrievalFailure() {
 	xs := []float64{1, 2, 3}
 	for _, x := range xs {
-		err := s.covariance.Push(x, x*x)
+		err := s.cov.Push(x, x*x)
 		s.Require().NoError(err)
 	}
 
 	// dispose the queue to simulate an error when we try to retrieve from the queue
-	s.covariance.core.queue.Dispose()
+	s.cov.core.queue.Dispose()
 
-	err := s.covariance.Push(3., 9.)
+	err := s.cov.Push(3., 9.)
 	testutil.ContainsError(s.T(), err, "error pushing to core")
 }
 
-func (s *CovariancePushSuite) TestPushFailOnWrongNumberOfValues() {
-	covariance := NewCovariance(3)
-	err := Init(covariance)
+func (s *CovPushSuite) TestPushFailOnWrongNumberOfValues() {
+	cov := NewCov(3)
+	err := Init(cov)
 	s.Require().NoError(err)
 
 	vals := []float64{3.}
-	err = covariance.Push(vals...)
+	err = cov.Push(vals...)
 	testutil.ContainsError(s.T(), err, fmt.Sprintf(
-		"Covariance expected 2 arguments: got %d (%v)",
+		"Cov expected 2 arguments: got %d (%v)",
 		len(vals),
 		vals,
 	))
 
 	vals = []float64{3., 9., 27.}
-	err = covariance.Push(vals...)
+	err = cov.Push(vals...)
 	testutil.ContainsError(s.T(), err, fmt.Sprintf(
-		"Covariance expected 2 arguments: got %d (%v)",
+		"Cov expected 2 arguments: got %d (%v)",
 		len(vals),
 		vals,
 	))
 }
 
-type CovarianceValueSuite struct {
+type CovValueSuite struct {
 	suite.Suite
-	covariance *Covariance
+	cov *Cov
 }
 
-func TestCovarianceValueSuite(t *testing.T) {
-	suite.Run(t, &CovarianceValueSuite{})
+func TestCovValueSuite(t *testing.T) {
+	suite.Run(t, &CovValueSuite{})
 }
 
-func (s *CovarianceValueSuite) SetupTest() {
-	s.covariance = NewCovariance(3)
-	err := Init(s.covariance)
+func (s *CovValueSuite) SetupTest() {
+	s.cov = NewCov(3)
+	err := Init(s.cov)
 	s.Require().NoError(err)
 
 	xs := []float64{1, 2, 3, 4, 8}
 	for _, x := range xs {
-		err := s.covariance.Push(x, x*x)
+		err := s.cov.Push(x, x*x)
 		s.Require().NoError(err)
 	}
 }
 
-func (s *CovarianceValueSuite) TestValueSuccess() {
-	value, err := s.covariance.Value()
+func (s *CovValueSuite) TestValueSuccess() {
+	value, err := s.cov.Value()
 	s.Require().NoError(err)
 	testutil.Approx(s.T(), 79., value)
 }
 
-func (s *CovarianceValueSuite) TestValueFailOnNullCore() {
-	covariance := NewCovariance(3)
-	_, err := covariance.Value()
+func (s *CovValueSuite) TestValueFailOnNullCore() {
+	cov := NewCov(3)
+	_, err := cov.Value()
 	testutil.ContainsError(s.T(), err, "Core is not set")
 }
 
-func (s *CovarianceValueSuite) TestValueFailIfNoValuesSeen() {
-	covariance := NewCovariance(3)
-	err := Init(covariance)
+func (s *CovValueSuite) TestValueFailIfNoValuesSeen() {
+	cov := NewCov(3)
+	err := Init(cov)
 	s.Require().NoError(err)
 
-	_, err = covariance.Value()
+	_, err = cov.Value()
 	testutil.ContainsError(s.T(), err, "no values seen yet")
 }
 
-func TestCovarianceClear(t *testing.T) {
-	covariance := NewCovariance(3)
-	err := Init(covariance)
+func TestCovClear(t *testing.T) {
+	cov := NewCov(3)
+	err := Init(cov)
 	require.NoError(t, err)
 
 	xs := []float64{1, 2, 3, 4, 8}
 	for _, x := range xs {
-		err := covariance.Push(x, x*x)
+		err := cov.Push(x, x*x)
 		require.NoError(t, err)
 	}
 
-	covariance.Clear()
+	cov.Clear()
 
 	expectedSums := map[uint64]float64{
 		0:  0.,
@@ -147,14 +147,14 @@ func TestCovarianceClear(t *testing.T) {
 		31: 0.,
 		32: 0.,
 	}
-	assert.Equal(t, expectedSums, covariance.core.sums)
-	assert.Equal(t, expectedSums, covariance.core.newSums)
-	assert.Equal(t, 0, covariance.core.count)
-	assert.Equal(t, uint64(0), covariance.core.queue.Len())
+	assert.Equal(t, expectedSums, cov.core.sums)
+	assert.Equal(t, expectedSums, cov.core.newSums)
+	assert.Equal(t, 0, cov.core.count)
+	assert.Equal(t, uint64(0), cov.core.queue.Len())
 }
 
-func TestCovarianceString(t *testing.T) {
-	covariance := NewCovariance(3)
-	expectedString := "joint.Covariance_{window:3}"
-	assert.Equal(t, expectedString, covariance.String())
+func TestCovString(t *testing.T) {
+	cov := NewCov(3)
+	expectedString := "joint.Cov_{window:3}"
+	assert.Equal(t, expectedString, cov.String())
 }
