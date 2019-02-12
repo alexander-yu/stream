@@ -76,11 +76,16 @@ func (corr *Correlation) Value() (float64, error) {
 	corr.core.RLock()
 	defer corr.core.RUnlock()
 
-	corrariance, err := corr.core.Sum(1, 1)
+	// this is technically not the covariance, as it is not normalized by
+	// the sample size (minus 1), but the denominator is cancelled out
+	// when dividing by the sqrt of the variances, so we can avoid extra
+	// float ops here
+	covariance, err := corr.core.Sum(1, 1)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum for {1, 1}")
 	}
 
+	// ditto with the "variance" variables here, as with above
 	xVar, err := corr.core.Sum(2, 0)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum for {2, 0}")
@@ -91,7 +96,7 @@ func (corr *Correlation) Value() (float64, error) {
 		return 0, errors.Wrap(err, "error retrieving sum for {0, 2}")
 	}
 
-	return corrariance / math.Sqrt(xVar*yVar), nil
+	return covariance / math.Sqrt(xVar*yVar), nil
 }
 
 // Clear resets the metric.
