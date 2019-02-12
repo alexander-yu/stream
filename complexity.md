@@ -28,7 +28,9 @@ provided in the library.
       - [Core (Univariate)](#core-univariate)
     - [Joint Distribution Statistics](#joint-distribution-statistics)
       - [Cov](#cov)
+      - [EWMCov](#ewmcov)
       - [Corr](#corr)
+      - [EWMCorr](#ewmcorr)
       - [Autocorr](#autocorr)
       - [Core (Multivariate)](#core-multivariate)
   - [References](#references)
@@ -173,6 +175,12 @@ Let `n` be the size of the window, or the stream if tracking the global covarian
 | :---------: | :----------: | :---------------------------: |
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
 
+#### EWMCov
+
+| Push (time) | Value (time) | Space  |
+| :---------: | :----------: | :----: |
+| `O(1)`      | `O(1)`       | `O(1)` |
+
 #### Corr
 
 Let `n` be the size of the window, or the stream if tracking the global correlation. Then we have the following complexities:
@@ -180,6 +188,12 @@ Let `n` be the size of the window, or the stream if tracking the global correlat
 | Push (time) | Value (time) | Space                         |
 | :---------: | :----------: | :---------------------------: |
 | `O(1)`      | `O(1)`       | `O(1)` if global, else `O(n)` |
+
+#### EWMCorr
+
+| Push (time) | Value (time) | Space  |
+| :---------: | :----------: | :----: |
+| `O(1)`      | `O(1)`       | `O(1)` |
 
 #### Autocorr
 

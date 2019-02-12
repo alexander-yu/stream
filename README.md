@@ -35,7 +35,9 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
       - [Core (Univariate)](#core-univariate)
     - [Joint Distribution Statistics](#joint-distribution-statistics)
       - [Cov](#cov)
+      - [EWMCov](#ewmcov)
       - [Corr](#corr)
+      - [EWMCorr](#ewmcorr)
       - [Autocorr](#autocorr)
       - [Core (Multivariate)](#core-multivariate)
     - [Aggregate Statistics](#aggregate-statistics)
@@ -135,7 +137,7 @@ Moment keeps track of the `k`-th sample [central moment](https://en.wikipedia.or
 
 #### EWMMoment
 
-EWMMoment keeps track of the global exponentially weighted moving central moment. This uses the exponentially weighted moving average as its center of mass, and uses the same exponential weights for its power terms.
+EWMMoment keeps track of the global `k`-sample exponentially weighted moving sample [central moment](https://en.wikipedia.org/wiki/Central_moment). This uses the exponentially weighted moving average as its center of mass, and uses the same exponential weights for its power terms.
 
 #### Std
 
@@ -187,9 +189,17 @@ See the [godoc](https://godoc.org/github.com/alexander-yu/stream/moment#Core) en
 
 Cov keeps track of the sample [covariance](https://en.wikipedia.org/wiki/Covariance) of a stream; it can track either the global covariance, or over a rolling window.
 
+#### EWMCov
+
+EWMCov keeps track of the global exponentially weighted sample [covariance](https://en.wikipedia.org/wiki/Covariance) of a stream. This uses the exponentially weighted moving average as its center of mass, and uses the same exponential weights for its power terms.
+
 #### Corr
 
 Corr keeps track of the sample [correlation](https://en.wikipedia.org/wiki/Correlation) of a stream (in particular, the [sample Pearson correlation coefficient](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient#For_a_sample)); it can track either the global correlation, or over a rolling window.
+
+#### EWMCorr
+
+EWMCorr keeps track of the global sample exponentially weighted [correlation](https://en.wikipedia.org/wiki/Correlation) of a stream (in particular, the exponentially weighted [sample Pearson correlation coefficient](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient#For_a_sample)). This uses the exponentially weighted moving average as its center of mass, and uses the same exponential weights for its power terms.
 
 #### Autocorr
 
