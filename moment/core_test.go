@@ -147,6 +147,8 @@ func (s *CorePushSuite) TestPushSuccess() {
 	s.Run("pass: updates sums without decay", func() {
 		expectedSums := []float64{0., 0., 14., 18., 98.}
 
+		testutil.Approx(s.T(), 5., s.wrapper.core.mean)
+
 		s.Equal(len(expectedSums), len(s.wrapper.core.sums))
 		for k, expectedSum := range expectedSums {
 			actualSum := s.wrapper.core.sums[k]

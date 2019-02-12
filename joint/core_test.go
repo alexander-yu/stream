@@ -13,7 +13,9 @@ import (
 )
 
 type mockWrapper struct {
-	core *Core
+	core   *Core
+	window *int
+	decay  *float64
 }
 
 func (w *mockWrapper) SetCore(c *Core) {
@@ -25,7 +27,8 @@ func (w *mockWrapper) Config() *CoreConfig {
 		Sums: SumsConfig{
 			{2, 2},
 		},
-		Window: stream.IntPtr(3),
+		Window: w.window,
+		Decay:  w.decay,
 	}
 }
 
@@ -71,6 +74,31 @@ func TestNewCore(t *testing.T) {
 				assert.Equal(t, 0., core.newSums[Tuple(xs).hash()])
 			})
 		}
+
+		config = &CoreConfig{
+			Sums: SumsConfig{
+				{2, 2},
+				{3, 1},
+			},
+			Window: stream.IntPtr(0),
+			Decay:  stream.FloatPtr(0.3),
+		}
+		core, err = NewCore(config)
+		require.NoError(t, err)
+
+		assert.Equal(t, 0, core.window)
+		assert.Equal(t, config.Sums, SumsConfig(core.tuples))
+		assert.Equal(t, make([]float64, 2), core.means)
+		assert.Equal(t, 0.3, *core.decay)
+
+		for _, tuple := range config.Sums {
+			iter(tuple, false, func(xs ...int) {
+				assert.Equal(t, 0., core.sums[Tuple(xs).hash()])
+			})
+			iter(tuple, false, func(xs ...int) {
+				assert.Equal(t, 0., core.newSums[Tuple(xs).hash()])
+			})
+		}
 	})
 }
 
@@ -84,17 +112,22 @@ func TestInit(t *testing.T) {
 	})
 
 	t.Run("pass: valid config sets Core for wrapper", func(t *testing.T) {
-		wrapper := &mockWrapper{}
+		wrapper := &mockWrapper{decay: stream.FloatPtr(0.3)}
 		err := Init(wrapper)
 		require.NoError(t, err)
+		assert.NotNil(t, wrapper.core)
 
+		wrapper = &mockWrapper{window: stream.IntPtr(3)}
+		err = Init(wrapper)
+		require.NoError(t, err)
 		assert.NotNil(t, wrapper.core)
 	})
 }
 
 type CorePushSuite struct {
 	suite.Suite
-	wrapper *mockWrapper
+	wrapper      *mockWrapper
+	decayWrapper *mockWrapper
 }
 
 func TestCorePushSuite(t *testing.T) {
@@ -102,7 +135,7 @@ func TestCorePushSuite(t *testing.T) {
 }
 
 func (s *CorePushSuite) SetupTest() {
-	s.wrapper = &mockWrapper{}
+	s.wrapper = &mockWrapper{window: stream.IntPtr(3)}
 	err := Init(s.wrapper)
 	s.Require().NoError(err)
 
@@ -111,26 +144,62 @@ func (s *CorePushSuite) SetupTest() {
 		err := s.wrapper.core.Push(x, x*x)
 		s.Require().NoError(err)
 	}
+
+	s.decayWrapper = &mockWrapper{decay: stream.FloatPtr(0.3)}
+	err = Init(s.decayWrapper)
+	s.Require().NoError(err)
+
+	xs = []float64{3, 4, 8}
+	for _, x := range xs {
+		err := s.decayWrapper.core.Push(x, x*x)
+		s.Require().NoError(err)
+	}
 }
 
 func (s *CorePushSuite) TestPushSuccess() {
-	expectedSums := map[uint64]float64{
-		0:  0.,
-		1:  0.,
-		2:  5378. / 3.,
-		31: 0.,
-		32: 158.,
-		33: 7486. / 3.,
-		62: 14.,
-		63: 638. / 3.,
-		64: 112538. / 9.,
-	}
+	s.Run("pass: updates sums without decay", func() {
+		expectedSums := map[uint64]float64{
+			0:  0.,
+			1:  0.,
+			2:  5378. / 3.,
+			31: 0.,
+			32: 158.,
+			33: 7486. / 3.,
+			62: 14.,
+			63: 638. / 3.,
+			64: 112538. / 9.,
+		}
 
-	s.Equal(len(expectedSums), len(s.wrapper.core.sums))
-	for hash, expectedSum := range expectedSums {
-		actualSum := s.wrapper.core.sums[hash]
-		testutil.Approx(s.T(), expectedSum, actualSum)
-	}
+		testutil.ApproxSlice(s.T(), []float64{5., 89. / 3.}, s.wrapper.core.means)
+
+		s.Equal(len(expectedSums), len(s.wrapper.core.sums))
+		for hash, expectedSum := range expectedSums {
+			actualSum := s.wrapper.core.sums[hash]
+			testutil.Approx(s.T(), expectedSum, actualSum)
+		}
+	})
+
+	s.Run("pass: updates sums with decay", func() {
+		expectedSums := map[uint64]float64{
+			0:  0.,
+			1:  0.,
+			2:  594.8691,
+			31: 0.,
+			32: 53.2413,
+			33: 1064.876778,
+			62: 4.7859,
+			63: 93.336054,
+			64: 4928.09302293,
+		}
+
+		testutil.ApproxSlice(s.T(), []float64{4.71, 26.97}, s.decayWrapper.core.means)
+
+		s.Equal(len(expectedSums), len(s.decayWrapper.core.sums))
+		for hash, expectedSum := range expectedSums {
+			actualSum := s.decayWrapper.core.sums[hash]
+			testutil.Approx(s.T(), expectedSum, actualSum)
+		}
+	})
 }
 
 func (s *CorePushSuite) TestPushSuccessForWindow1() {
@@ -170,7 +239,7 @@ func (s *CorePushSuite) TestPushSuccessForWindow1() {
 }
 
 func (s *CorePushSuite) TestPushFailOnQueueInsertionFailure() {
-	wrapper := &mockWrapper{}
+	wrapper := &mockWrapper{window: stream.IntPtr(3)}
 	err := Init(wrapper)
 	s.Require().NoError(err)
 
@@ -189,7 +258,7 @@ func (s *CorePushSuite) TestPushFailOnQueueRetrievalFailure() {
 }
 
 func (s *CorePushSuite) TestPushFailOnWrongNumberOfValues() {
-	wrapper := &mockWrapper{}
+	wrapper := &mockWrapper{window: stream.IntPtr(3)}
 	err := Init(wrapper)
 	s.Require().NoError(err)
 
@@ -203,7 +272,7 @@ func (s *CorePushSuite) TestPushFailOnWrongNumberOfValues() {
 }
 
 func TestClear(t *testing.T) {
-	wrapper := &mockWrapper{}
+	wrapper := &mockWrapper{window: stream.IntPtr(3)}
 	err := Init(wrapper)
 	require.NoError(t, err)
 
@@ -236,7 +305,7 @@ func TestClear(t *testing.T) {
 }
 
 func TestCount(t *testing.T) {
-	wrapper := &mockWrapper{}
+	wrapper := &mockWrapper{window: stream.IntPtr(3)}
 	err := Init(wrapper)
 	require.NoError(t, err)
 
@@ -259,7 +328,7 @@ func TestCoreMeanSuite(t *testing.T) {
 }
 
 func (s *CoreMeanSuite) SetupTest() {
-	s.wrapper = &mockWrapper{}
+	s.wrapper = &mockWrapper{window: stream.IntPtr(3)}
 	err := Init(s.wrapper)
 	s.Require().NoError(err)
 
@@ -305,7 +374,7 @@ func TestCoreSumSuite(t *testing.T) {
 }
 
 func (s *CoreSumSuite) SetupTest() {
-	s.wrapper = &mockWrapper{}
+	s.wrapper = &mockWrapper{window: stream.IntPtr(3)}
 	err := Init(s.wrapper)
 	s.Require().NoError(err)
 
@@ -354,7 +423,7 @@ func (s *CoreSumSuite) TestFailForUntrackedSum() {
 }
 
 func TestLock(t *testing.T) {
-	wrapper := &mockWrapper{}
+	wrapper := &mockWrapper{window: stream.IntPtr(3)}
 	err := Init(wrapper)
 	require.NoError(t, err)
 

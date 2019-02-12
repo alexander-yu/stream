@@ -22,12 +22,14 @@ type CoreConfig struct {
 	Sums   SumsConfig // sums tracked must be positive, and must track > 1 variables
 	Window *int       // must be 0 if decay is set, must be nonnegative in general
 	Vars   *int       // must be inferrable from Sums if not set; otherwise must be > 1
+	Decay  *float64   // must lie in the interval (0, 1)
 }
 
 var defaultConfig = &CoreConfig{
 	Sums:   SumsConfig{},
 	Window: stream.IntPtr(0),
 	Vars:   nil,
+	Decay:  nil,
 }
 
 // MergeConfigs merges CoreConfig objects.
@@ -38,8 +40,11 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 	case 1:
 		return configs[0], nil
 	default:
-		var window *int
-		var vars *int
+		var (
+			window *int
+			vars   *int
+			decay  *float64
+		)
 		mergedConfig := &CoreConfig{
 			Sums: SumsConfig{},
 		}
@@ -62,6 +67,14 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 					vars = config.Vars
 				} else if *vars != *config.Vars {
 					return nil, errors.New("configs have differing vars")
+				}
+			}
+
+			if config.Decay != nil {
+				if decay == nil {
+					decay = config.Decay
+				} else if *decay != *config.Decay {
+					return nil, errors.New("configs have differing decays")
 				}
 			}
 		}
@@ -107,6 +120,7 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 		mergedConfig.Sums = sums
 		mergedConfig.Window = window
 		mergedConfig.Vars = vars
+		mergedConfig.Decay = decay
 		return mergedConfig, nil
 	}
 }
@@ -120,6 +134,14 @@ func validateConfig(config *CoreConfig) error {
 
 	if config.Vars != nil && *config.Vars < 2 {
 		return errors.Errorf("config has less than 2 vars: %d < 2", *config.Vars)
+	}
+
+	if config.Decay != nil {
+		if *config.Decay <= 0 || *config.Decay >= 1 {
+			return errors.Errorf("config has a decay of %f, which is not in (0, 1)", *config.Decay)
+		} else if *config.Window > 0 {
+			return errors.New("config cannot have Decay set with a nonzero window")
+		}
 	}
 
 	for _, tuple := range config.Sums {
@@ -174,6 +196,10 @@ func setConfigDefaults(config *CoreConfig) *CoreConfig {
 
 	if config.Vars == nil {
 		config.Vars = defaultConfig.Vars
+	}
+
+	if config.Decay == nil {
+		config.Decay = defaultConfig.Decay
 	}
 
 	return config

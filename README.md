@@ -173,7 +173,8 @@ config := &moment.CoreConfig{
         2: true, // tracks the sum of squared differences
         3: true, // tracks the sum of cubed differences
     },
-    Window: stream.IntPtr(0), // track global sums
+    Window: stream.IntPtr(0),    // tracks global sums
+    Decay: stream.FloatPtr(0.3), // tracks exponentially weighted sums with a decay factor of 0.3
 }
 core, err := NewCore(config)
 ```
@@ -206,8 +207,9 @@ config := &joint.CoreConfig{
         {1, 1}, // tracks the joint sum of differences
         {2, 0}, // tracks the sum of squared differences of variable 1
     },
-    Vars: stream.IntPtr(2), // declares that there are 2 variables to track (optional if Sums is set)
-    Window: stream.IntPtr(0), // track global sums
+    Vars: stream.IntPtr(2),      // declares that there are 2 variables to track (optional if Sums is set)
+    Window: stream.IntPtr(0),    // tracks global sums
+    Decay: stream.FloatPtr(0.3), // tracks exponentially weighted sums with a decay factor of 0.3
 }
 core, err := NewCore(config)
 ```

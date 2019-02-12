@@ -20,6 +20,7 @@ type Core struct {
 	newSums map[uint64]float64
 	count   int
 	window  int
+	decay   *float64
 	queue   *queue.RingBuffer
 }
 
@@ -53,6 +54,7 @@ func NewCore(config *CoreConfig) (*Core, error) {
 	// initialize and create Core
 	c := &Core{}
 	c.window = *config.Window
+	c.decay = config.Decay
 
 	c.sums = map[uint64]float64{}
 	c.newSums = map[uint64]float64{}
@@ -110,7 +112,12 @@ func (c *Core) UnsafePush(xs ...float64) error {
 		}
 	}
 
-	err := c.add(xs...)
+	var err error
+	if c.decay == nil {
+		err = c.add(xs...)
+	} else {
+		err = c.addDecay(xs...)
+	}
 	if err != nil {
 		return errors.Wrapf(err, "error adding %v to sums", xs)
 	}
@@ -171,6 +178,81 @@ func (c *Core) add(xs ...float64) error {
 
 					c.newSums[hash] += float64(multinomial*mathutil.Sign(abs)) /
 						math.Pow(count, float64(abs)) * deltaPow * c.sums[diff.hash()]
+				}
+			})
+		})
+
+		if err != nil {
+			return errors.Wrapf(err, "error adding %v to sums for tuple %v", xs, tuple)
+		}
+	}
+
+	for hash, sum := range c.newSums {
+		c.sums[hash] = sum
+	}
+
+	return nil
+}
+
+// addDecay updates the mean, count, and joint centralized power sums (with exponential decay)
+// in an efficient and stable (numerically speaking) way, which allows for more accurate
+// reporting of moments. See the following paper for details on the algorithm used:
+// P. Pebay, T. B. Terriberry, H. Kolla, J. Bennett, Numerically stable, scalable
+// formulas for parallel and online computation of higher-order multivariate central
+// moments with arbitrary weights, Computational Statistics 31 (2016) 1305–1325.
+func (c *Core) addDecay(xs ...float64) error {
+	c.count++
+
+	var decay float64
+	if c.count == 1 {
+		decay = 1
+	} else {
+		decay = *c.decay
+	}
+
+	delta := make([]float64, len(c.means))
+	for i, x := range xs {
+		delta[i] = x - c.means[i]
+		c.means[i] += decay * delta[i]
+	}
+
+	for _, tuple := range c.tuples {
+		var err error
+		iter(tuple, true, func(xs ...int) {
+			a := Tuple(xs)
+			hash := a.hash()
+			c.newSums[hash] = 0
+			iter(a, false, func(xs ...int) {
+				b := Tuple(xs)
+
+				var deltaPow float64
+				deltaPow, err = pow(delta, b)
+				if err != nil {
+					return
+				}
+
+				abs := b.abs()
+				if abs == 0 {
+					c.newSums[hash] += (1 - decay) * c.sums[hash]
+				} else if b.eq(a) {
+					coeff := (1-decay)*math.Pow(-decay, float64(abs)) + decay*math.Pow(1-decay, float64(abs))
+					c.newSums[hash] += coeff * deltaPow
+				} else {
+					var multinomial int
+					multinomial, err = multinom(a, b)
+					if err != nil {
+						return
+					}
+
+					var diff Tuple
+					diff, err = sub(a, b)
+					if err != nil {
+						return
+					}
+
+					c.newSums[hash] += float64(multinomial*mathutil.Sign(abs)) *
+						math.Pow(decay, float64(abs)) * deltaPow *
+						(1 - decay) * c.sums[diff.hash()]
 				}
 			})
 		})
