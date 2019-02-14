@@ -71,16 +71,10 @@ func (cov *EWMCov) Value() (float64, error) {
 		return 0, errors.New("Core is not set")
 	}
 
-	cov.core.RLock()
-	defer cov.core.RUnlock()
-
 	covariance, err := cov.core.Sum(1, 1)
 	if err != nil {
 		return 0, errors.Wrap(err, "error retrieving sum")
 	}
-
-	count := cov.core.Count()
-	covariance /= (float64(count) - 1.)
 
 	return covariance, nil
 }

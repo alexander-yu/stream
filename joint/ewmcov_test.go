@@ -65,7 +65,7 @@ func (s *EWMCovValueSuite) SetupTest() {
 func (s *EWMCovValueSuite) TestValueSuccess() {
 	value, err := s.cov.Value()
 	s.Require().NoError(err)
-	testutil.Approx(s.T(), 53.2413/2., value)
+	testutil.Approx(s.T(), 53.2413, value)
 }
 
 func (s *EWMCovValueSuite) TestValueFailOnNullCore() {
