@@ -3,7 +3,8 @@ package avl
 import "github.com/alexander-yu/stream/quantile/order"
 
 // Tree implements an AVL tree data structure,
-// and also satisfies the order.Tree interface.
+// and also satisfies the ost.Tree interface,
+// as well as the order.Statistic interface.
 type Tree struct {
 	root *Node
 }
