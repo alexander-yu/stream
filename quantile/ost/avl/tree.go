@@ -1,49 +1,49 @@
-package ost
+package avl
 
 import "github.com/alexander-yu/stream/quantile/order"
 
-// AVLTree implements an AVL tree data structure,
-// and also satisfies the Tree interface.
-type AVLTree struct {
-	root *AVLNode
+// Tree implements an AVL tree data structure,
+// and also satisfies the order.Tree interface.
+type Tree struct {
+	root *Node
 }
 
 // Size returns the size of the tree.
-func (t *AVLTree) Size() int {
+func (t *Tree) Size() int {
 	return t.root.Size()
 }
 
 // Height returns the height of the tree.
-func (t *AVLTree) Height() int {
+func (t *Tree) Height() int {
 	return t.root.Height()
 }
 
 // Add inserts a value into the tree.
-func (t *AVLTree) Add(val float64) {
+func (t *Tree) Add(val float64) {
 	t.root = t.root.add(val)
 }
 
 // Remove deletes a value from the tree.
-func (t *AVLTree) Remove(val float64) {
+func (t *Tree) Remove(val float64) {
 	t.root = t.root.remove(val)
 }
 
 // Select returns the node with the ith smallest value in the tree.
-func (t *AVLTree) Select(i int) order.Node {
+func (t *Tree) Select(i int) order.Node {
 	return t.root.Select(i)
 }
 
 // Rank returns the number of nodes strictly less than the value.
-func (t *AVLTree) Rank(val float64) int {
+func (t *Tree) Rank(val float64) int {
 	return t.root.Rank(val)
 }
 
 // String returns the string representation of the tree.
-func (t *AVLTree) String() string {
+func (t *Tree) String() string {
 	return t.root.TreeString()
 }
 
 // Clear resets the tree.
-func (t *AVLTree) Clear() {
-	*t = AVLTree{}
+func (t *Tree) Clear() {
+	*t = Tree{}
 }

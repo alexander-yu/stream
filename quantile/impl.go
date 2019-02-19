@@ -4,7 +4,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/alexander-yu/stream/quantile/order"
-	"github.com/alexander-yu/stream/quantile/ost"
+	"github.com/alexander-yu/stream/quantile/ost/avl"
+	"github.com/alexander-yu/stream/quantile/ost/rb"
 )
 
 // Impl represents an enum that enumerates the currently supported implementations
@@ -38,9 +39,9 @@ func (i Impl) Valid() bool {
 func (i Impl) init() (order.Statistic, error) {
 	switch i {
 	case AVL:
-		return &ost.AVLTree{}, nil
+		return &avl.Tree{}, nil
 	case RB:
-		return &ost.RBTree{}, nil
+		return &rb.Tree{}, nil
 	default:
 		return nil, errors.Errorf("%v is not a supported Impl value", i)
 	}

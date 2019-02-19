@@ -1,4 +1,4 @@
-package ost
+package rb
 
 import (
 	"fmt"
@@ -26,18 +26,18 @@ func (c Color) String() string {
 	}
 }
 
-// RBNode represents a node in a red black tree.
-type RBNode struct {
-	left  *RBNode
-	right *RBNode
+// Node represents a node in a red black tree.
+type Node struct {
+	left  *Node
+	right *Node
 	val   float64
 	color Color
 	size  int
 }
 
-// NewRBNode instantiates a RBNode struct with a a provided value.
-func NewRBNode(val float64) *RBNode {
-	return &RBNode{
+// NewNode instantiates a Node struct with a a provided value.
+func NewNode(val float64) *Node {
+	return &Node{
 		val:   val,
 		color: Red,
 		size:  1,
@@ -45,7 +45,7 @@ func NewRBNode(val float64) *RBNode {
 }
 
 // Left returns the left child of the node.
-func (n *RBNode) Left() (Node, error) {
+func (n *Node) Left() (order.Node, error) {
 	if n == nil {
 		return nil, errors.New("tried to retrieve child of nil node")
 	}
@@ -53,7 +53,7 @@ func (n *RBNode) Left() (Node, error) {
 }
 
 // Right returns the right child of the node.
-func (n *RBNode) Right() (Node, error) {
+func (n *Node) Right() (order.Node, error) {
 	if n == nil {
 		return nil, errors.New("tried to retrieve child of nil node")
 	}
@@ -61,7 +61,7 @@ func (n *RBNode) Right() (Node, error) {
 }
 
 // Size returns the size of the subtree rooted at the node.
-func (n *RBNode) Size() int {
+func (n *Node) Size() int {
 	if n == nil {
 		return 0
 	}
@@ -69,13 +69,13 @@ func (n *RBNode) Size() int {
 }
 
 // Value returns the value stored at the node.
-func (n *RBNode) Value() float64 {
+func (n *Node) Value() float64 {
 	return n.val
 }
 
 // Color returns the color of the node.
 // By default, nil nodes are black.
-func (n *RBNode) Color() Color {
+func (n *Node) Color() Color {
 	if n == nil {
 		return Black
 	}
@@ -83,16 +83,16 @@ func (n *RBNode) Color() Color {
 }
 
 // TreeString returns the string representation of the subtree rooted at the node.
-func (n *RBNode) TreeString() string {
+func (n *Node) TreeString() string {
 	if n == nil {
 		return ""
 	}
 	return n.treeString("", "", true)
 }
 
-func (n *RBNode) add(val float64) *RBNode {
+func (n *Node) add(val float64) *Node {
 	if n == nil {
-		return NewRBNode(val)
+		return NewNode(val)
 	} else if val <= n.val {
 		n.left = n.left.add(val)
 	} else {
@@ -101,7 +101,7 @@ func (n *RBNode) add(val float64) *RBNode {
 	return n.addBalance()
 }
 
-func (n *RBNode) remove(val float64) *RBNode {
+func (n *Node) remove(val float64) *Node {
 	if !n.contains(val) {
 		return n
 	}
@@ -133,7 +133,7 @@ func (n *RBNode) remove(val float64) *RBNode {
 	return n.removeBalance()
 }
 
-func (n *RBNode) removeMin() *RBNode {
+func (n *Node) removeMin() *Node {
 	if n.left == nil {
 		return nil
 	}
@@ -145,14 +145,14 @@ func (n *RBNode) removeMin() *RBNode {
 	return n.removeBalance()
 }
 
-func (n *RBNode) min() *RBNode {
+func (n *Node) min() *Node {
 	if n.left == nil {
 		return n
 	}
 	return n.left.min()
 }
 
-func (n *RBNode) contains(val float64) bool {
+func (n *Node) contains(val float64) bool {
 	for n != nil {
 		if val == n.val {
 			return true
@@ -169,7 +169,7 @@ func (n *RBNode) contains(val float64) bool {
  * Rotations
  *****************/
 
-func (n *RBNode) addBalance() *RBNode {
+func (n *Node) addBalance() *Node {
 	if n.left.Color() == Black && n.right.Color() == Red {
 		n = n.rotateLeft()
 	}
@@ -184,7 +184,7 @@ func (n *RBNode) addBalance() *RBNode {
 	return n
 }
 
-func (n *RBNode) removeBalance() *RBNode {
+func (n *Node) removeBalance() *Node {
 	if n.right.Color() == Red {
 		n = n.rotateLeft()
 	}
@@ -199,7 +199,7 @@ func (n *RBNode) removeBalance() *RBNode {
 	return n
 }
 
-func (n *RBNode) rotateLeft() *RBNode {
+func (n *Node) rotateLeft() *Node {
 	x := n.right
 	n.right = x.left
 	x.left = n
@@ -210,7 +210,7 @@ func (n *RBNode) rotateLeft() *RBNode {
 	return x
 }
 
-func (n *RBNode) rotateRight() *RBNode {
+func (n *Node) rotateRight() *Node {
 	x := n.left
 	n.left = x.right
 	x.right = n
@@ -221,13 +221,13 @@ func (n *RBNode) rotateRight() *RBNode {
 	return x
 }
 
-func (n *RBNode) flipColors() {
+func (n *Node) flipColors() {
 	n.color = !n.color
 	n.left.color = !n.left.color
 	n.right.color = !n.right.color
 }
 
-func (n *RBNode) moveRedLeft() *RBNode {
+func (n *Node) moveRedLeft() *Node {
 	n.flipColors()
 	if n.right.left.Color() == Red {
 		n.right = n.right.rotateRight()
@@ -237,7 +237,7 @@ func (n *RBNode) moveRedLeft() *RBNode {
 	return n
 }
 
-func (n *RBNode) moveRedRight() *RBNode {
+func (n *Node) moveRedRight() *Node {
 	n.flipColors()
 	if n.left.left.Color() == Red {
 		n = n.rotateRight()
@@ -252,7 +252,7 @@ func (n *RBNode) moveRedRight() *RBNode {
 
 // Select returns the node with the ith smallest value in the
 // subtree rooted at the node..
-func (n *RBNode) Select(i int) order.Node {
+func (n *Node) Select(i int) order.Node {
 	if n == nil {
 		return nil
 	}
@@ -269,7 +269,7 @@ func (n *RBNode) Select(i int) order.Node {
 
 // Rank returns the number of nodes strictly less than the value that
 // are contained in the subtree rooted at the node.
-func (n *RBNode) Rank(val float64) int {
+func (n *Node) Rank(val float64) int {
 	if n == nil {
 		return 0
 	} else if val < n.val {
@@ -293,7 +293,7 @@ func (n *RBNode) Rank(val float64) int {
 //     └── 2.000000
 //         └── 1.000000
 //             └── 1.000000
-func (n *RBNode) treeString(prefix string, result string, isTail bool) string {
+func (n *Node) treeString(prefix string, result string, isTail bool) string {
 	// isTail indicates whether or not the current node's parent branch needs to be represented
 	// as a "tail", i.e. its branch needs to hang in the string representation, rather than branch upwards.
 	if isTail {

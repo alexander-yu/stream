@@ -1,4 +1,4 @@
-package ost
+package avl
 
 import (
 	"strings"
@@ -10,10 +10,10 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
-func TestAVLNodeLeft(t *testing.T) {
+func TestNodeLeft(t *testing.T) {
 	t.Run("pass: returns left child if node is not nil", func(t *testing.T) {
-		node := NewAVLNode(3)
-		node.left = NewAVLNode(4)
+		node := NewNode(3)
+		node.left = NewNode(4)
 		left, err := node.Left()
 		require.NoError(t, err)
 
@@ -21,16 +21,16 @@ func TestAVLNodeLeft(t *testing.T) {
 	})
 
 	t.Run("fail: return error if node is nil", func(t *testing.T) {
-		var node *AVLNode
+		var node *Node
 		_, err := node.Left()
 		assert.EqualError(t, err, "tried to retrieve child of nil node")
 	})
 }
 
-func TestAVLNodeRight(t *testing.T) {
+func TestNodeRight(t *testing.T) {
 	t.Run("pass: returns right child if node is not nil", func(t *testing.T) {
-		node := NewAVLNode(3)
-		node.right = NewAVLNode(4)
+		node := NewNode(3)
+		node.right = NewNode(4)
 		right, err := node.Right()
 		require.NoError(t, err)
 
@@ -38,46 +38,46 @@ func TestAVLNodeRight(t *testing.T) {
 	})
 
 	t.Run("fail: return error if node is nil", func(t *testing.T) {
-		var node *AVLNode
+		var node *Node
 		_, err := node.Right()
 		assert.EqualError(t, err, "tried to retrieve child of nil node")
 	})
 }
 
-func TestAVLNodeHeight(t *testing.T) {
+func TestNodeHeight(t *testing.T) {
 	t.Run("pass: returns -1 if node is nil", func(t *testing.T) {
-		var node *AVLNode
+		var node *Node
 		assert.Equal(t, -1, node.Height())
 	})
 
 	t.Run("pass: returns height of subtree", func(t *testing.T) {
-		node := NewAVLNode(3)
+		node := NewNode(3)
 		node = node.add(4)
 		assert.Equal(t, 1, node.Height())
 	})
 }
 
-func TestAVLNodeSize(t *testing.T) {
+func TestNodeSize(t *testing.T) {
 	t.Run("pass: returns 0 if node is nil", func(t *testing.T) {
-		var node *AVLNode
+		var node *Node
 		assert.Equal(t, 0, node.Size())
 	})
 
 	t.Run("pass: returns size of subtree", func(t *testing.T) {
-		node := NewAVLNode(3)
+		node := NewNode(3)
 		node = node.add(4)
 		assert.Equal(t, 2, node.Size())
 	})
 }
 
-func TestAVLNodeTreeString(t *testing.T) {
+func TestNodeTreeString(t *testing.T) {
 	t.Run("pass: returns empty string for empty tree", func(t *testing.T) {
-		var node *AVLNode
+		var node *Node
 		assert.Equal(t, "", node.TreeString())
 	})
 
 	t.Run("pass: returns correct format for non-empty tree", func(t *testing.T) {
-		var node *AVLNode
+		var node *Node
 		node = node.add(5)
 		node = node.add(6)
 		node = node.add(7)

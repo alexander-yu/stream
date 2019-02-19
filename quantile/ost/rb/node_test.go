@@ -1,4 +1,4 @@
-package ost
+package rb
 
 import (
 	"strings"
@@ -18,10 +18,10 @@ func TestColorString(t *testing.T) {
 	assert.Equal(t, "Black", c.String())
 }
 
-func TestRBNodeLeft(t *testing.T) {
+func TestNodeLeft(t *testing.T) {
 	t.Run("pass: returns left child if node is not nil", func(t *testing.T) {
-		node := NewRBNode(3)
-		node.left = NewRBNode(4)
+		node := NewNode(3)
+		node.left = NewNode(4)
 		left, err := node.Left()
 		require.NoError(t, err)
 
@@ -29,16 +29,16 @@ func TestRBNodeLeft(t *testing.T) {
 	})
 
 	t.Run("fail: return error if node is nil", func(t *testing.T) {
-		var node *RBNode
+		var node *Node
 		_, err := node.Left()
 		assert.EqualError(t, err, "tried to retrieve child of nil node")
 	})
 }
 
-func TestRBNodeRight(t *testing.T) {
+func TestNodeRight(t *testing.T) {
 	t.Run("pass: returns right child if node is not nil", func(t *testing.T) {
-		node := NewRBNode(3)
-		node.right = NewRBNode(4)
+		node := NewNode(3)
+		node.right = NewNode(4)
 		right, err := node.Right()
 		require.NoError(t, err)
 
@@ -46,46 +46,46 @@ func TestRBNodeRight(t *testing.T) {
 	})
 
 	t.Run("fail: return error if node is nil", func(t *testing.T) {
-		var node *RBNode
+		var node *Node
 		_, err := node.Right()
 		assert.EqualError(t, err, "tried to retrieve child of nil node")
 	})
 }
 
-func TestRBNodeColor(t *testing.T) {
+func TestNodeColor(t *testing.T) {
 	t.Run("pass: returns Black if node is nil", func(t *testing.T) {
-		var node *RBNode
+		var node *Node
 		assert.Equal(t, Black, node.Color())
 	})
 
 	t.Run("pass: returns color of node", func(t *testing.T) {
-		node := NewRBNode(3)
+		node := NewNode(3)
 		node = node.add(4)
 		assert.Equal(t, Red, node.Color())
 	})
 }
 
-func TestRBNodeSize(t *testing.T) {
+func TestNodeSize(t *testing.T) {
 	t.Run("pass: returns 0 if node is nil", func(t *testing.T) {
-		var node *RBNode
+		var node *Node
 		assert.Equal(t, 0, node.Size())
 	})
 
 	t.Run("pass: returns size of subtree", func(t *testing.T) {
-		node := NewRBNode(3)
+		node := NewNode(3)
 		node = node.add(4)
 		assert.Equal(t, 2, node.Size())
 	})
 }
 
-func TestRBNodeTreeString(t *testing.T) {
+func TestNodeTreeString(t *testing.T) {
 	t.Run("pass: returns empty string for empty tree", func(t *testing.T) {
-		var node *RBNode
+		var node *Node
 		assert.Equal(t, "", node.TreeString())
 	})
 
 	t.Run("pass: returns correct format for non-empty tree", func(t *testing.T) {
-		var node *RBNode
+		var node *Node
 		node = node.add(5)
 		node = node.add(6)
 		node = node.add(7)

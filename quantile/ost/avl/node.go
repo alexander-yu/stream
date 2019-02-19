@@ -1,4 +1,4 @@
-package ost
+package avl
 
 import (
 	"fmt"
@@ -8,10 +8,10 @@ import (
 	"github.com/alexander-yu/stream/quantile/order"
 )
 
-// AVLNode represents a node in an AVL tree.
-type AVLNode struct {
-	left   *AVLNode
-	right  *AVLNode
+// Node represents a node in an AVL tree.
+type Node struct {
+	left   *Node
+	right  *Node
 	val    float64
 	height int
 	size   int
@@ -24,9 +24,9 @@ func max(x int, y int) int {
 	return y
 }
 
-// NewAVLNode instantiates a AVLNode struct with a a provided value.
-func NewAVLNode(val float64) *AVLNode {
-	return &AVLNode{
+// NewNode instantiates a Node struct with a a provided value.
+func NewNode(val float64) *Node {
+	return &Node{
 		val:    val,
 		height: 0,
 		size:   1,
@@ -34,7 +34,7 @@ func NewAVLNode(val float64) *AVLNode {
 }
 
 // Left returns the left child of the node.
-func (n *AVLNode) Left() (Node, error) {
+func (n *Node) Left() (order.Node, error) {
 	if n == nil {
 		return nil, errors.New("tried to retrieve child of nil node")
 	}
@@ -42,7 +42,7 @@ func (n *AVLNode) Left() (Node, error) {
 }
 
 // Right returns the right child of the node.
-func (n *AVLNode) Right() (Node, error) {
+func (n *Node) Right() (order.Node, error) {
 	if n == nil {
 		return nil, errors.New("tried to retrieve child of nil node")
 	}
@@ -50,7 +50,7 @@ func (n *AVLNode) Right() (Node, error) {
 }
 
 // Height returns the height of the subtree rooted at the node.
-func (n *AVLNode) Height() int {
+func (n *Node) Height() int {
 	if n == nil {
 		return -1
 	}
@@ -58,7 +58,7 @@ func (n *AVLNode) Height() int {
 }
 
 // Size returns the size of the subtree rooted at the node.
-func (n *AVLNode) Size() int {
+func (n *Node) Size() int {
 	if n == nil {
 		return 0
 	}
@@ -66,21 +66,21 @@ func (n *AVLNode) Size() int {
 }
 
 // Value returns the value stored at the node.
-func (n *AVLNode) Value() float64 {
+func (n *Node) Value() float64 {
 	return n.val
 }
 
 // TreeString returns the string representation of the subtree rooted at the node.
-func (n *AVLNode) TreeString() string {
+func (n *Node) TreeString() string {
 	if n == nil {
 		return ""
 	}
 	return n.treeString("", "", true)
 }
 
-func (n *AVLNode) add(val float64) *AVLNode {
+func (n *Node) add(val float64) *Node {
 	if n == nil {
-		return NewAVLNode(val)
+		return NewNode(val)
 	} else if val <= n.val {
 		n.left = n.left.add(val)
 	} else {
@@ -92,7 +92,7 @@ func (n *AVLNode) add(val float64) *AVLNode {
 	return n.balance()
 }
 
-func (n *AVLNode) remove(val float64) *AVLNode {
+func (n *Node) remove(val float64) *Node {
 	// this case occurs if we attempt to remove a value
 	// that does not exist in the subtree; this will
 	// result in remove() being a no-op
@@ -121,7 +121,7 @@ func (n *AVLNode) remove(val float64) *AVLNode {
 	return root.balance()
 }
 
-func (n *AVLNode) min() *AVLNode {
+func (n *Node) min() *Node {
 	if n.left == nil {
 		return n
 	}
@@ -129,7 +129,7 @@ func (n *AVLNode) min() *AVLNode {
 	return n.left.min()
 }
 
-func (n *AVLNode) removeMin() *AVLNode {
+func (n *Node) removeMin() *Node {
 	if n.left == nil {
 		return n.right
 	}
@@ -144,7 +144,7 @@ func (n *AVLNode) removeMin() *AVLNode {
  * Rotations
  *****************/
 
-func (n *AVLNode) balance() *AVLNode {
+func (n *Node) balance() *Node {
 	if n.heightDiff() < -1 {
 		// Since we've entered this block, we already
 		// know that the right child is not nil
@@ -164,11 +164,11 @@ func (n *AVLNode) balance() *AVLNode {
 	return n
 }
 
-func (n *AVLNode) heightDiff() int {
+func (n *Node) heightDiff() int {
 	return n.left.Height() - n.right.Height()
 }
 
-func (n *AVLNode) rotateLeft() *AVLNode {
+func (n *Node) rotateLeft() *Node {
 	m := n.right
 	n.right = m.left
 	m.left = n
@@ -184,7 +184,7 @@ func (n *AVLNode) rotateLeft() *AVLNode {
 	return m
 }
 
-func (n *AVLNode) rotateRight() *AVLNode {
+func (n *Node) rotateRight() *Node {
 	m := n.left
 	n.left = m.right
 	m.right = n
@@ -206,7 +206,7 @@ func (n *AVLNode) rotateRight() *AVLNode {
 
 // Select returns the node with the ith smallest value in the
 // subtree rooted at the node..
-func (n *AVLNode) Select(i int) order.Node {
+func (n *Node) Select(i int) order.Node {
 	if n == nil {
 		return nil
 	}
@@ -223,7 +223,7 @@ func (n *AVLNode) Select(i int) order.Node {
 
 // Rank returns the number of nodes strictly less than the value that
 // are contained in the subtree rooted at the node.
-func (n *AVLNode) Rank(val float64) int {
+func (n *Node) Rank(val float64) int {
 	if n == nil {
 		return 0
 	} else if val < n.val {
@@ -247,7 +247,7 @@ func (n *AVLNode) Rank(val float64) int {
 //     └── 2.000000
 //         └── 1.000000
 //             └── 1.000000
-func (n *AVLNode) treeString(prefix string, result string, isTail bool) string {
+func (n *Node) treeString(prefix string, result string, isTail bool) string {
 	// isTail indicates whether or not the current node's parent branch needs to be represented
 	// as a "tail", i.e. its branch needs to hang in the string representation, rather than branch upwards.
 	if isTail {

@@ -1,44 +1,44 @@
-package ost
+package rb
 
 import "github.com/alexander-yu/stream/quantile/order"
 
-// RBTree implements a red-black tree data structure,
-// and also satisfies the Tree interface.
-type RBTree struct {
-	root *RBNode
+// Tree implements a red-black tree data structure,
+// and also satisfies the order.Tree interface.
+type Tree struct {
+	root *Node
 }
 
 // Size returns the size of the tree.
-func (t *RBTree) Size() int {
+func (t *Tree) Size() int {
 	return t.root.Size()
 }
 
 // Add inserts a value into the tree.
-func (t *RBTree) Add(val float64) {
+func (t *Tree) Add(val float64) {
 	t.root = t.root.add(val)
 }
 
 // Remove deletes a value from the tree.
-func (t *RBTree) Remove(val float64) {
+func (t *Tree) Remove(val float64) {
 	t.root = t.root.remove(val)
 }
 
 // Select returns the node with the ith smallest value in the tree.
-func (t *RBTree) Select(i int) order.Node {
+func (t *Tree) Select(i int) order.Node {
 	return t.root.Select(i)
 }
 
 // Rank returns the number of nodes strictly less than the value.
-func (t *RBTree) Rank(val float64) int {
+func (t *Tree) Rank(val float64) int {
 	return t.root.Rank(val)
 }
 
 // String returns the string representation of the tree.
-func (t *RBTree) String() string {
+func (t *Tree) String() string {
 	return t.root.TreeString()
 }
 
 // Clear resets the tree.
-func (t *RBTree) Clear() {
-	*t = RBTree{}
+func (t *Tree) Clear() {
+	*t = Tree{}
 }
