@@ -38,7 +38,7 @@ func push(metrics []stream.Metric) error {
 
 func main() {
 	// tracks the global median via a red-black tree
-	median, err := quantile.NewMedian(0, quantile.RB)
+	median, err := quantile.NewMedian(0, quantile.RedBlack)
 	if err != nil {
 		log.Fatal(err)
 	}

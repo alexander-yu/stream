@@ -15,7 +15,7 @@ func TestImplInit(t *testing.T) {
 	})
 
 	t.Run("pass: red black implementation is supported", func(t *testing.T) {
-		i := RB
+		i := RedBlack
 		_, err := i.init()
 		assert.NoError(t, err)
 	})

@@ -16,8 +16,8 @@ type Impl int
 const (
 	// AVL represents the AVL tree implementation for the order.Statistic interface
 	AVL Impl = iota
-	// RB represents the red black tree implementation for the order.Statistic interface
-	RB
+	// RedBlack represents the red black tree implementation for the order.Statistic interface
+	RedBlack
 	// SkipList represents the skip list implementation for the order.Statistic interface
 	SkipList
 )
@@ -30,7 +30,7 @@ func (i Impl) Ptr() *Impl {
 // Valid returns whether or not the Impl value is a valid value.
 func (i Impl) Valid() bool {
 	switch i {
-	case AVL, RB, SkipList:
+	case AVL, RedBlack, SkipList:
 		return true
 	default:
 		return false
@@ -43,7 +43,7 @@ func (i Impl) init() (order.Statistic, error) {
 	switch i {
 	case AVL:
 		return &avl.Tree{}, nil
-	case RB:
+	case RedBlack:
 		return &rb.Tree{}, nil
 	case SkipList:
 		return skiplist.New()
