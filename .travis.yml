@@ -19,7 +19,7 @@ git:
   depth: 1
 
 before_install:
-  - go get github.com/golang/lint/golint
+  - go get golang.org/x/lint/golint
 
 # Disable email notifications for build results
 notifications:
