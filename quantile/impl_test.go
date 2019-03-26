@@ -20,6 +20,12 @@ func TestImplInit(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("pass: skip list implementation is supported", func(t *testing.T) {
+		i := SkipList
+		_, err := i.init()
+		assert.NoError(t, err)
+	})
+
 	t.Run("fail: unsupported implementations return an error", func(t *testing.T) {
 		i := Impl(-1)
 		_, err := i.init()

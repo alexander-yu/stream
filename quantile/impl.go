@@ -6,6 +6,7 @@ import (
 	"github.com/alexander-yu/stream/quantile/order"
 	"github.com/alexander-yu/stream/quantile/ost/avl"
 	"github.com/alexander-yu/stream/quantile/ost/rb"
+	"github.com/alexander-yu/stream/quantile/skiplist"
 )
 
 // Impl represents an enum that enumerates the currently supported implementations
@@ -13,10 +14,12 @@ import (
 type Impl int
 
 const (
-	// AVL represents the AVL tree implementation for the Tree interface
+	// AVL represents the AVL tree implementation for the order.Statistic interface
 	AVL Impl = iota
-	// RB represents the red black tree implementation for the Tree interface
+	// RB represents the red black tree implementation for the order.Statistic interface
 	RB
+	// SkipList represents the skip list implementation for the order.Statistic interface
+	SkipList
 )
 
 // Ptr returns a pointer to the Impl value.
@@ -27,7 +30,7 @@ func (i Impl) Ptr() *Impl {
 // Valid returns whether or not the Impl value is a valid value.
 func (i Impl) Valid() bool {
 	switch i {
-	case AVL, RB:
+	case AVL, RB, SkipList:
 		return true
 	default:
 		return false
@@ -42,6 +45,8 @@ func (i Impl) init() (order.Statistic, error) {
 		return &avl.Tree{}, nil
 	case RB:
 		return &rb.Tree{}, nil
+	case SkipList:
+		return skiplist.New()
 	default:
 		return nil, errors.Errorf("%v is not a supported Impl value", i)
 	}
