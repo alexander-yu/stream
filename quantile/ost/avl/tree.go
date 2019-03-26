@@ -29,9 +29,9 @@ func (t *Tree) Remove(val float64) {
 	t.root = t.root.remove(val)
 }
 
-// Select returns the node with the ith smallest value in the tree.
-func (t *Tree) Select(i int) order.Node {
-	return t.root.Select(i)
+// Select returns the node with the kth smallest value in the tree.
+func (t *Tree) Select(k int) order.Node {
+	return t.root.Select(k)
 }
 
 // Rank returns the number of nodes strictly less than the value.

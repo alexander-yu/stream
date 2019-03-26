@@ -204,18 +204,18 @@ func (n *Node) rotateRight() *Node {
  * Order Statistics
  *******************/
 
-// Select returns the node with the ith smallest value in the
+// Select returns the node with the kth smallest value in the
 // subtree rooted at the node..
-func (n *Node) Select(i int) order.Node {
+func (n *Node) Select(k int) order.Node {
 	if n == nil {
 		return nil
 	}
 
 	size := n.left.Size()
-	if i < size {
-		return n.left.Select(i)
-	} else if i > size {
-		return n.right.Select(i - size - 1)
+	if k < size {
+		return n.left.Select(k)
+	} else if k > size {
+		return n.right.Select(k - size - 1)
 	}
 
 	return n
