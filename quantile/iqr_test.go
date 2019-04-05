@@ -12,22 +12,22 @@ import (
 
 func TestNewIQR(t *testing.T) {
 	t.Run("pass: nonnegative window is valid", func(t *testing.T) {
-		iqr, err := NewIQR(0, AVL)
+		iqr, err := NewIQR(0)
 		require.NoError(t, err)
 		assert.Equal(t, 0, iqr.quantile.window)
 
-		iqr, err = NewIQR(5, AVL)
+		iqr, err = NewIQR(5)
 		require.NoError(t, err)
 		assert.Equal(t, 5, iqr.quantile.window)
 	})
 
 	t.Run("fail: negative window is invalid", func(t *testing.T) {
-		_, err := NewIQR(-1, AVL)
+		_, err := NewIQR(-1)
 		testutil.ContainsError(t, err, "error creating Quantile")
 	})
 
-	t.Run("fail: unsupported Impl is invalid", func(t *testing.T) {
-		_, err := NewIQR(3, Impl(-1))
+	t.Run("fail: invalid Option is invalid", func(t *testing.T) {
+		_, err := NewIQR(3, ImplOption(-1))
 		testutil.ContainsError(t, err, "error creating Quantile")
 	})
 }
@@ -37,7 +37,7 @@ func TestIQRString(t *testing.T) {
 		"quantile.IQR_{quantile:quantile.Quantile_{window:3,interpolation:%d}}",
 		Midpoint,
 	)
-	iqr, err := NewIQR(3, AVL)
+	iqr, err := NewIQR(3)
 	require.NoError(t, err)
 
 	assert.Equal(t, expectedString, iqr.String())
@@ -45,7 +45,7 @@ func TestIQRString(t *testing.T) {
 
 func TestIQRPush(t *testing.T) {
 	t.Run("pass: successfully pushes values", func(t *testing.T) {
-		iqr, err := NewIQR(3, AVL)
+		iqr, err := NewIQR(3)
 		require.NoError(t, err)
 		for i := 0.; i < 5; i++ {
 			err := iqr.Push(i)
@@ -54,7 +54,7 @@ func TestIQRPush(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		iqr, err := NewIQR(3, AVL)
+		iqr, err := NewIQR(3)
 		require.NoError(t, err)
 
 		for i := 0.; i < 3; i++ {
@@ -69,7 +69,7 @@ func TestIQRPush(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		iqr, err := NewIQR(3, AVL)
+		iqr, err := NewIQR(3)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -82,7 +82,7 @@ func TestIQRPush(t *testing.T) {
 
 func TestIQRValue(t *testing.T) {
 	t.Run("pass: returns IQR", func(t *testing.T) {
-		iqr, err := NewIQR(3, AVL)
+		iqr, err := NewIQR(3)
 		require.NoError(t, err)
 		for i := 0.; i < 6; i++ {
 			err := iqr.Push(i)
@@ -96,7 +96,7 @@ func TestIQRValue(t *testing.T) {
 	})
 
 	t.Run("fail: if no values seen, return error", func(t *testing.T) {
-		iqr, err := NewIQR(3, AVL)
+		iqr, err := NewIQR(3)
 		require.NoError(t, err)
 
 		_, err = iqr.Value()
@@ -105,7 +105,7 @@ func TestIQRValue(t *testing.T) {
 }
 
 func TestIQRClear(t *testing.T) {
-	iqr, err := NewIQR(3, AVL)
+	iqr, err := NewIQR(3)
 	require.NoError(t, err)
 
 	for i := 0.; i < 10; i++ {

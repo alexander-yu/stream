@@ -22,11 +22,6 @@ const (
 	SkipList
 )
 
-// Ptr returns a pointer to the Impl value.
-func (i Impl) Ptr() *Impl {
-	return &i
-}
-
 // Valid returns whether or not the Impl value is a valid value.
 func (i Impl) Valid() bool {
 	switch i {
@@ -39,14 +34,14 @@ func (i Impl) Valid() bool {
 
 // Init returns an empty Impl struct, depending on which implementation
 // is being called.
-func (i Impl) init() (order.Statistic, error) {
+func (i Impl) init(options ...order.Option) (order.Statistic, error) {
 	switch i {
 	case AVL:
 		return &avl.Tree{}, nil
 	case RedBlack:
 		return &rb.Tree{}, nil
 	case SkipList:
-		return skiplist.New()
+		return skiplist.New(options...)
 	default:
 		return nil, errors.Errorf("%v is not a supported Impl value", i)
 	}

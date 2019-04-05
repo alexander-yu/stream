@@ -40,8 +40,3 @@ func (i Interpolation) Valid() bool {
 		return false
 	}
 }
-
-// Ptr returns a pointer to the Interpolation value.
-func (i Interpolation) Ptr() *Interpolation {
-	return &i
-}

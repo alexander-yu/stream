@@ -38,7 +38,7 @@ func push(metrics []stream.Metric) error {
 
 func main() {
 	// tracks the global median via a red-black tree
-	median, err := quantile.NewMedian(0, quantile.RedBlack)
+	median, err := quantile.NewMedian(0, quantile.ImplOption(quantile.RedBlack))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,11 +46,7 @@ func main() {
 	// tracks quantiles via an AVL tree over a rolling window of size 3
 	// and with linear interpolation
 	avlQuantile, err := quantile.NewQuantile(
-		&quantile.Config{
-			Window:        stream.IntPtr(3),
-			Interpolation: quantile.Linear.Ptr(),
-			Impl:          quantile.AVL.Ptr(),
-		},
+		3, quantile.InterpolationOption(quantile.Linear), quantile.ImplOption(quantile.AVL),
 	)
 	if err != nil {
 		log.Fatal(err)

@@ -21,27 +21,31 @@ type Quantile struct {
 }
 
 // NewQuantile instantiates a Quantile struct.
-func NewQuantile(config *Config) (*Quantile, error) {
-	// set defaults for any remaining unset fields
-	config = setConfigDefaults(config)
-
-	// validate config
-	err := validateConfig(config)
-	if err != nil {
-		return nil, errors.Wrap(err, "error validating config")
+func NewQuantile(window int, options ...Option) (*Quantile, error) {
+	if window < 0 {
+		return nil, errors.Errorf("attempted to set negative window of %d", window)
 	}
 
-	statistic, err := config.Impl.init()
+	avl, err := AVL.init()
 	if err != nil {
-		return nil, errors.Wrap(err, "error instantiating order.Statistic")
+		return nil, errors.Wrap(err, "error instantiating default AVL order.Statistic")
 	}
 
-	return &Quantile{
-		window:        *config.Window,
-		interpolation: *config.Interpolation,
-		queue:         queue.NewRingBuffer(uint64(*config.Window)),
-		statistic:     statistic,
-	}, nil
+	quantile := &Quantile{
+		window:        window,
+		interpolation: Linear,
+		queue:         queue.NewRingBuffer(uint64(window)),
+		statistic:     avl,
+	}
+
+	for _, option := range options {
+		err = option(quantile)
+		if err != nil {
+			return nil, errors.Wrap(err, "error setting option")
+		}
+	}
+
+	return quantile, nil
 }
 
 // String returns a string representation of the metric.

@@ -97,7 +97,7 @@ For time/space complexity details on the algorithms listed below, see [here](com
 
 #### Quantile
 
-Quantile keeps track of the quantiles of a stream. Quantile can calculate the global quantiles of a stream, or over a rolling window. You can also configure which implementation to use as the underlying data structure (see the [godoc](https://godoc.org/github.com/alexander-yu/stream/quantile#NewQuantile) entry for details), as well as which interpolation method to use in the case that a quantile actually lies in between two elements. For now [skip lists](https://en.wikipedia.org/wiki/Skip_list) as well as [order statistic trees](https://en.wikipedia.org/wiki/Order_statistic_tree) (in particular modified forms of [AVL trees](https://en.wikipedia.org/wiki/AVL_tree) and [red black trees](https://en.wikipedia.org/wiki/Red-black_tree)) are supported.
+Quantile keeps track of the quantiles of a stream. Quantile can calculate the global quantiles of a stream, or over a rolling window. You can also configure which implementation to use as the underlying data structure, as well as which interpolation method to use in the case that a quantile actually lies in between two elements. For now [skip lists](https://en.wikipedia.org/wiki/Skip_list) as well as [order statistic trees](https://en.wikipedia.org/wiki/Order_statistic_tree) (in particular modified forms of [AVL trees](https://en.wikipedia.org/wiki/AVL_tree) and [red black trees](https://en.wikipedia.org/wiki/Red-black_tree)) are supported.
 
 #### Median
 

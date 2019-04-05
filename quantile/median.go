@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-
-	"github.com/alexander-yu/stream"
 )
 
 // Median keeps track of the median of a stream using order statistics.
@@ -16,12 +14,8 @@ type Median struct {
 // NewMedian instantiates a Median struct. The implementation of the underlying data
 // structure for tracking order statistics can be configured by passing in a constant
 // of type Impl.
-func NewMedian(window int, impl Impl) (*Median, error) {
-	quantile, err := NewQuantile(&Config{
-		Window:        stream.IntPtr(window),
-		Interpolation: Midpoint.Ptr(),
-		Impl:          impl.Ptr(),
-	})
+func NewMedian(window int, options ...Option) (*Median, error) {
+	quantile, err := NewQuantile(window, append(options, InterpolationOption(Midpoint))...)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating Quantile")
 	}

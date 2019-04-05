@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-
-	"github.com/alexander-yu/stream"
 )
 
 // IQR keeps track of the interquartile range of a stream using order statistics.
@@ -13,15 +11,9 @@ type IQR struct {
 	quantile *Quantile
 }
 
-// NewIQR instantiates an IQR struct. The implementation of the underlying data
-// structure for tracking order statistics can be configured by passing in a constant
-// of type Impl.
-func NewIQR(window int, impl Impl) (*IQR, error) {
-	quantile, err := NewQuantile(&Config{
-		Window:        stream.IntPtr(window),
-		Interpolation: Midpoint.Ptr(),
-		Impl:          impl.Ptr(),
-	})
+// NewIQR instantiates an IQR struct.
+func NewIQR(window int, options ...Option) (*IQR, error) {
+	quantile, err := NewQuantile(window, append(options, InterpolationOption(Midpoint))...)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating Quantile")
 	}

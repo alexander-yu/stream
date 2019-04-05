@@ -8,6 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/alexander-yu/stream/quantile/skiplist"
 )
 
 func TestImplInit(t *testing.T) {
@@ -27,6 +29,12 @@ func TestImplInit(t *testing.T) {
 		i := SkipList
 		_, err := i.init()
 		assert.NoError(t, err)
+	})
+
+	t.Run("fail: invalid Option is invalid", func(t *testing.T) {
+		i := SkipList
+		_, err := i.init(skiplist.ProbabilityOption(-1))
+		assert.Error(t, err)
 	})
 
 	t.Run("fail: unsupported implementations return an error", func(t *testing.T) {

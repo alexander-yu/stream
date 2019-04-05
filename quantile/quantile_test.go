@@ -7,20 +7,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/alexander-yu/stream"
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
 func TestNewQuantile(t *testing.T) {
-	t.Run("fail: unsupported Impl is invalid", func(t *testing.T) {
-		impl := Impl(-1)
-		config := &Config{
-			Window:        stream.IntPtr(3),
-			Interpolation: Linear.Ptr(),
-			Impl:          &impl,
-		}
-		_, err := NewQuantile(config)
-		testutil.ContainsError(t, err, "error validating config")
+	t.Run("fail: invalid Option is invalid", func(t *testing.T) {
+		_, err := NewQuantile(3, ImplOption(-1))
+		testutil.ContainsError(t, err, "error setting option")
 	})
 }
 
@@ -29,12 +22,7 @@ func TestQuantileString(t *testing.T) {
 		"quantile.Quantile_{window:3,interpolation:%d}",
 		Linear,
 	)
-	config := &Config{
-		Window:        stream.IntPtr(3),
-		Interpolation: Linear.Ptr(),
-		Impl:          AVL.Ptr(),
-	}
-	quantile, err := NewQuantile(config)
+	quantile, err := NewQuantile(3)
 	require.NoError(t, err)
 
 	assert.Equal(t, expectedString, quantile.String())
@@ -42,12 +30,7 @@ func TestQuantileString(t *testing.T) {
 
 func TestQuantilePush(t *testing.T) {
 	t.Run("pass: successfully pushes values", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(3),
-			Interpolation: Linear.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(3)
 		require.NoError(t, err)
 		for i := 0.; i < 5; i++ {
 			err := quantile.Push(i)
@@ -66,12 +49,7 @@ func TestQuantilePush(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(3),
-			Interpolation: Linear.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(3)
 		require.NoError(t, err)
 
 		for i := 0.; i < 3; i++ {
@@ -86,12 +64,7 @@ func TestQuantilePush(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(3),
-			Interpolation: Linear.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(3)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -104,12 +77,7 @@ func TestQuantilePush(t *testing.T) {
 
 func TestQuantileValue(t *testing.T) {
 	t.Run("pass: returns quantile for exact index", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(5),
-			Interpolation: Linear.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(5)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -123,12 +91,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with linear interpolation", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(6),
-			Interpolation: Linear.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(6)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -142,12 +105,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with lower interpolation", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(6),
-			Interpolation: Lower.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(6, InterpolationOption(Lower))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -161,12 +119,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with higher interpolation", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(6),
-			Interpolation: Higher.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(6, InterpolationOption(Higher))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -180,12 +133,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta < 0.5)", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(6),
-			Interpolation: Nearest.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(6, InterpolationOption(Nearest))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -199,12 +147,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta == 0.5, idx % 2 == 0)", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(6),
-			Interpolation: Nearest.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(6, InterpolationOption(Nearest))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -218,12 +161,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta == 0.5, idx % 2 == 1)", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(8),
-			Interpolation: Nearest.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(8, InterpolationOption(Nearest))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -237,12 +175,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta > 0.5)", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(6),
-			Interpolation: Nearest.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(6, InterpolationOption(Nearest))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -256,12 +189,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with midpoint interpolation", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(6),
-			Interpolation: Midpoint.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(6, InterpolationOption(Midpoint))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -275,12 +203,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("fail: if no values seen, return error", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(6),
-			Interpolation: Linear.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(6)
 		require.NoError(t, err)
 
 		_, err = quantile.Value(0.25)
@@ -288,12 +211,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("fail: if quantile not in (0, 1), return error", func(t *testing.T) {
-		config := &Config{
-			Window:        stream.IntPtr(6),
-			Interpolation: Linear.Ptr(),
-			Impl:          AVL.Ptr(),
-		}
-		quantile, err := NewQuantile(config)
+		quantile, err := NewQuantile(6)
 		require.NoError(t, err)
 
 		_, err = quantile.Value(0.)
@@ -305,12 +223,7 @@ func TestQuantileValue(t *testing.T) {
 }
 
 func TestQuantileClear(t *testing.T) {
-	config := &Config{
-		Window:        stream.IntPtr(3),
-		Interpolation: Linear.Ptr(),
-		Impl:          AVL.Ptr(),
-	}
-	quantile, err := NewQuantile(config)
+	quantile, err := NewQuantile(3)
 	require.NoError(t, err)
 
 	for i := 0.; i < 10; i++ {
@@ -324,12 +237,7 @@ func TestQuantileClear(t *testing.T) {
 }
 
 func TestQuantileRLock(t *testing.T) {
-	config := &Config{
-		Window:        stream.IntPtr(3),
-		Interpolation: Linear.Ptr(),
-		Impl:          AVL.Ptr(),
-	}
-	quantile, err := NewQuantile(config)
+	quantile, err := NewQuantile(3)
 	require.NoError(t, err)
 
 	done := make(chan bool)
