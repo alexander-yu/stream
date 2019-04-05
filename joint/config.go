@@ -22,7 +22,7 @@ type CoreConfig struct {
 	Sums   SumsConfig // sums tracked must be positive, and must track > 1 variables
 	Window *int       // must be 0 if decay is set, must be nonnegative in general
 	Vars   *int       // must be inferrable from Sums if not set; otherwise must be > 1
-	Decay  *float64   // must lie in the interval (0, 1)
+	Decay  *float64   // optional, must lie in the interval (0, 1)
 }
 
 var defaultConfig = &CoreConfig{

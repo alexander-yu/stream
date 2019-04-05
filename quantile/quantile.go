@@ -20,7 +20,7 @@ type Quantile struct {
 	mux           sync.RWMutex
 }
 
-// NewQuantile instantiates a Quantile struct.
+// New instantiates a Quantile struct.
 func New(window int, options ...Option) (*Quantile, error) {
 	if window < 0 {
 		return nil, errors.Errorf("attempted to set negative window of %d", window)

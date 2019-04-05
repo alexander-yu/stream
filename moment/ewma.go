@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+
+	"github.com/alexander-yu/stream"
 )
 
 // EWMA is a metric that tracks the exponentially weighted moving average.
@@ -30,7 +32,8 @@ func (a *EWMA) IsSetCore() bool {
 // Config returns the CoreConfig needed.
 func (a *EWMA) Config() *CoreConfig {
 	return &CoreConfig{
-		Decay: &a.decay,
+		Window: stream.IntPtr(0),
+		Decay:  &a.decay,
 	}
 }
 

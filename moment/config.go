@@ -2,8 +2,6 @@ package moment
 
 import (
 	"github.com/pkg/errors"
-
-	"github.com/alexander-yu/stream"
 )
 
 // CoreConfig is the struct containing configuration options for
@@ -11,12 +9,12 @@ import (
 type CoreConfig struct {
 	Sums   SumsConfig // sums tracked must be positive
 	Window *int       // must be 0 if decay is set, must be nonnegative in general
-	Decay  *float64   // must lie in the interval (0, 1)
+	Decay  *float64   // optional, must lie in the interval (0, 1)
 }
 
 var defaultConfig = &CoreConfig{
 	Sums:   map[int]bool{},
-	Window: stream.IntPtr(0),
+	Window: nil,
 	Decay:  nil,
 }
 

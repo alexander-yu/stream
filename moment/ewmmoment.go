@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
+	"github.com/alexander-yu/stream"
 )
 
 // EWMMoment is a metric that tracks the kth exponentially weighted sample central moment.
@@ -35,8 +37,12 @@ func (m *EWMMoment) IsSetCore() bool {
 // Config returns the CoreConfig needed.
 func (m *EWMMoment) Config() *CoreConfig {
 	return &CoreConfig{
-		Sums:  SumsConfig{m.k: true},
-		Decay: &m.decay,
+		Sums: SumsConfig{m.k: true},
+		// exponentially-weighted moments must be global, as the
+		// weighting scheme that's used prevents weights from being
+		// updated in a time-efficient manner
+		Window: stream.IntPtr(0),
+		Decay:  &m.decay,
 	}
 }
 

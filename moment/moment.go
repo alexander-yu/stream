@@ -14,7 +14,7 @@ type Moment struct {
 	core   *Core
 }
 
-// NewMoment instantiates a Moment struct.
+// New instantiates a Moment struct.
 func New(k int, window int) *Moment {
 	return &Moment{
 		k:      k,
