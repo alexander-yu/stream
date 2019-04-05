@@ -5,8 +5,28 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+
+	testutil "github.com/alexander-yu/stream/util/test"
 )
+
+func TestNewSkipList(t *testing.T) {
+	t.Run("fail: invalid Option is invalid", func(t *testing.T) {
+		_, err := New(ProbabilityOption(-1))
+		testutil.ContainsError(t, err, "error setting option")
+	})
+
+	t.Run("pass: no options is valid", func(t *testing.T) {
+		_, err := New()
+		require.NoError(t, err)
+	})
+
+	t.Run("pass: valid Options are valid", func(t *testing.T) {
+		_, err := New(ProbabilityOption(0.25), MaxLevelOption(12))
+		require.NoError(t, err)
+	})
+}
 
 type SkipListSuite struct {
 	suite.Suite
