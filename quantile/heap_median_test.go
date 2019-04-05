@@ -2,6 +2,8 @@ package quantile
 
 import (
 	"fmt"
+	"math"
+	"math/rand"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -184,4 +186,32 @@ func TestHeapMedianClear(t *testing.T) {
 	assert.Equal(t, 0, median.lowHeap.Len())
 	assert.Equal(t, 0, median.highHeap.Len())
 	assert.Equal(t, uint64(0), median.queue.Len())
+}
+
+func BenchmarkHeapMedianPush(b *testing.B) {
+	for k := 3.; k < 20; k++ {
+		n := int(math.Pow(2, k))
+		xs := make([]float64, n)
+		for i := 0; i < n; i++ {
+			xs[i] = 200*rand.Float64() - 100
+		}
+		y := 200*rand.Float64() - 100
+
+		median, err := NewHeapMedian(n)
+		require.NoError(b, err)
+
+		for _, x := range xs {
+			err = median.Push(x)
+			require.NoError(b, err)
+		}
+
+		b.Run(fmt.Sprintf("HeapMedian [%d]", n), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				b.StartTimer()
+				err := median.Push(y)
+				b.StopTimer()
+				require.NoError(b, err)
+			}
+		})
+	}
 }
