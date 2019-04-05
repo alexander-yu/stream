@@ -15,3 +15,6 @@ type Statistic interface {
 	Rank(float64) int
 	Clear()
 }
+
+// Option is an optional argument which sets an optional field for creating an order.Statistic
+type Option func(Statistic) error

@@ -58,7 +58,7 @@ type SkipList struct {
 }
 
 // New instantiates a SkipList struct.
-func New(options ...Option) (*SkipList, error) {
+func New(options ...order.Option) (*SkipList, error) {
 	s := &SkipList{
 		maxLevel: DefaultMaxLevel,
 		p:        DefaultProbability,
@@ -66,14 +66,10 @@ func New(options ...Option) (*SkipList, error) {
 	}
 
 	for _, option := range options {
-		option(s)
-	}
-
-	// validate fields that are settable by options
-	if s.maxLevel < 1 || s.maxLevel > 64 {
-		return nil, errors.Errorf("max level %d not in [1, 64]", s.maxLevel)
-	} else if s.p <= 0 || s.p >= 1 {
-		return nil, errors.Errorf("probability %f not in (0, 1)", s.p)
+		err := option(s)
+		if err != nil {
+			return nil, errors.Wrap(err, "error setting option")
+		}
 	}
 
 	// initialize head and tail nodes
