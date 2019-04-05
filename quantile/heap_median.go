@@ -42,6 +42,17 @@ func NewHeapMedian(window int) (*HeapMedian, error) {
 	}, nil
 }
 
+// NewGlobalHeapMedian instantiates a global HeapMedian struct.
+// This is equivalent to calling NewHeapMedian(0).
+func NewGlobalHeapMedian() *HeapMedian {
+	return &HeapMedian{
+		window:   0,
+		lowHeap:  heap.New("low", []float64{}, fmax),
+		highHeap: heap.New("high", []float64{}, fmin),
+		queue:    queue.NewRingBuffer(uint64(0)),
+	}
+}
+
 // String returns a string representation of the metric.
 func (m *HeapMedian) String() string {
 	name := "quantile.HeapMedian"

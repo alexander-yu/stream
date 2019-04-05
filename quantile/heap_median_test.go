@@ -25,6 +25,16 @@ func TestNewHeapMedian(t *testing.T) {
 	})
 }
 
+func TestNewGlobalHeapMedian(t *testing.T) {
+	median, err := NewHeapMedian(0)
+	require.NoError(t, err)
+
+	globalMedian := NewGlobalHeapMedian()
+	globalMedian.lowHeap = median.lowHeap
+	globalMedian.highHeap = median.highHeap
+	assert.Equal(t, median, globalMedian)
+}
+
 func TestHeapMedianString(t *testing.T) {
 	expectedString := "quantile.HeapMedian_{window:3}"
 	median, err := NewHeapMedian(3)

@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/alexander-yu/stream/quantile/skiplist"
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
@@ -15,6 +16,26 @@ func TestNewQuantile(t *testing.T) {
 		_, err := NewQuantile(3, ImplOption(-1))
 		testutil.ContainsError(t, err, "error setting option")
 	})
+
+	t.Run("pass: valid Options are set", func(t *testing.T) {
+		quantile, err := NewQuantile(3, ImplOption(SkipList), InterpolationOption(Nearest))
+		require.NoError(t, err)
+
+		assert.Equal(t, 3, quantile.window)
+		_, ok := quantile.statistic.(*skiplist.SkipList)
+		assert.True(t, ok)
+		assert.Equal(t, Nearest, quantile.interpolation)
+	})
+}
+
+func TestNewGlobalQuantile(t *testing.T) {
+	quantile, err := NewQuantile(0)
+	require.NoError(t, err)
+
+	globalQuantile, err := NewGlobalQuantile()
+	require.NoError(t, err)
+
+	assert.Equal(t, quantile, globalQuantile)
 }
 
 func TestQuantileString(t *testing.T) {

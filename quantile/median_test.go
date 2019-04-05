@@ -32,6 +32,16 @@ func TestNewMedian(t *testing.T) {
 	})
 }
 
+func TestNewGlobalMedian(t *testing.T) {
+	median, err := NewMedian(0)
+	require.NoError(t, err)
+
+	globalMedian, err := NewGlobalMedian()
+	require.NoError(t, err)
+
+	assert.Equal(t, median, globalMedian)
+}
+
 func TestMedianString(t *testing.T) {
 	expectedString := fmt.Sprintf(
 		"quantile.Median_{quantile:quantile.Quantile_{window:3,interpolation:%d}}",

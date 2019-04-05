@@ -23,6 +23,12 @@ func NewMedian(window int, options ...Option) (*Median, error) {
 	return &Median{quantile: quantile}, nil
 }
 
+// NewGlobalMedian instantiates a global Median struct.
+// This is equivalent to calling NewMedian(0, options...).
+func NewGlobalMedian(options ...Option) (*Median, error) {
+	return NewMedian(0, options...)
+}
+
 // String returns a string representation of the metric.
 func (m *Median) String() string {
 	name := "quantile.Median"

@@ -32,6 +32,16 @@ func TestNewIQR(t *testing.T) {
 	})
 }
 
+func TestNewGlobalIQR(t *testing.T) {
+	IQR, err := NewIQR(0)
+	require.NoError(t, err)
+
+	globalIQR, err := NewGlobalIQR()
+	require.NoError(t, err)
+
+	assert.Equal(t, IQR, globalIQR)
+}
+
 func TestIQRString(t *testing.T) {
 	expectedString := fmt.Sprintf(
 		"quantile.IQR_{quantile:quantile.Quantile_{window:3,interpolation:%d}}",

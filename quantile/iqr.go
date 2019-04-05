@@ -21,6 +21,12 @@ func NewIQR(window int, options ...Option) (*IQR, error) {
 	return &IQR{quantile: quantile}, nil
 }
 
+// NewGlobalIQR instantiates a global IQR struct.
+// This is equivalent to calling NewIQR(0, options...).
+func NewGlobalIQR(options ...Option) (*IQR, error) {
+	return NewIQR(0, options...)
+}
+
 // String returns a string representation of the metric.
 func (i *IQR) String() string {
 	name := "quantile.IQR"
