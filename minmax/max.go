@@ -36,6 +36,17 @@ func NewMax(window int) (*Max, error) {
 	}, nil
 }
 
+// NewGlobalMax instantiates a global Max struct.
+// This is equivalent to calling NewMax(0).
+func NewGlobalMax() *Max {
+	return &Max{
+		queue:  queue.NewRingBuffer(uint64(0)),
+		deque:  &deque.Deque{},
+		max:    math.Inf(-1),
+		window: 0,
+	}
+}
+
 // String returns a string representation of the metric.
 func (m *Max) String() string {
 	name := "minmax.Max"

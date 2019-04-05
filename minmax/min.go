@@ -36,6 +36,17 @@ func NewMin(window int) (*Min, error) {
 	}, nil
 }
 
+// NewGlobalMin instantiates a global Min struct.
+// This is equivalent to calling NewMin(0).
+func NewGlobalMin() *Min {
+	return &Min{
+		queue:  queue.NewRingBuffer(uint64(0)),
+		deque:  &deque.Deque{},
+		min:    math.Inf(1),
+		window: 0,
+	}
+}
+
 // String returns a string representation of the metric.
 func (m *Min) String() string {
 	name := "minmax.Min"

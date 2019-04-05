@@ -29,6 +29,16 @@ func TestNewMin(t *testing.T) {
 	})
 }
 
+func TestNewGlobalMin(t *testing.T) {
+	min, err := NewMin(0)
+	require.NoError(t, err)
+
+	globalMin := NewGlobalMin()
+	require.NoError(t, err)
+
+	assert.Equal(t, min, globalMin)
+}
+
 func TestMinString(t *testing.T) {
 	expectedString := "minmax.Min_{window:3}"
 	min, err := NewMin(3)
