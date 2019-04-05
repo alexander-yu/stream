@@ -45,7 +45,7 @@ func main() {
 
 	// tracks quantiles via an AVL tree over a rolling window of size 3
 	// and with linear interpolation
-	avlQuantile, err := quantile.NewQuantile(
+	avlQuantile, err := quantile.New(
 		3, quantile.InterpolationOption(quantile.Linear), quantile.ImplOption(quantile.AVL),
 	)
 	if err != nil {

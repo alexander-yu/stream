@@ -14,7 +14,7 @@ type Std struct {
 
 // NewStd instantiates an Std struct.
 func NewStd(window int) *Std {
-	return &Std{variance: NewMoment(2, window)}
+	return &Std{variance: New(2, window)}
 }
 
 // SetCore sets the Core.

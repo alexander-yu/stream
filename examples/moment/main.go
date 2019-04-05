@@ -88,7 +88,7 @@ func main() {
 	// tracks the global standard deviation
 	std := moment.NewStd(0)
 	// tracks the variance over a rolling window of size 5
-	variance := moment.NewMoment(2, 5)
+	variance := moment.New(2, 5)
 	// tracks the skewness over a rolling window of size 5
 	skewness := moment.NewSkewness(5)
 	// tracks the kurtosis over a rolling window of size 5

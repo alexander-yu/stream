@@ -26,8 +26,8 @@ func NewKurtosis(window int) *Kurtosis {
 	}
 
 	return &Kurtosis{
-		variance: NewMoment(2, window),
-		moment4:  NewMoment(4, window),
+		variance: New(2, window),
+		moment4:  New(4, window),
 		config:   config,
 	}
 }

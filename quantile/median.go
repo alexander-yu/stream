@@ -15,7 +15,7 @@ type Median struct {
 // structure for tracking order statistics can be configured by passing in a constant
 // of type Impl.
 func NewMedian(window int, options ...Option) (*Median, error) {
-	quantile, err := NewQuantile(window, append(options, InterpolationOption(Midpoint))...)
+	quantile, err := New(window, append(options, InterpolationOption(Midpoint))...)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating Quantile")
 	}

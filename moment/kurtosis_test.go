@@ -15,8 +15,8 @@ func TestNewKurtosis(t *testing.T) {
 	window := 3
 	kurtosis := NewKurtosis(window)
 	assert.Equal(t, &Kurtosis{
-		variance: NewMoment(2, window),
-		moment4:  NewMoment(4, window),
+		variance: New(2, window),
+		moment4:  New(4, window),
 		config: &CoreConfig{
 			Sums: SumsConfig{
 				2: true,

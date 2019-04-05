@@ -144,7 +144,7 @@ EWMMoment keeps track of the global `k`-sample exponentially weighted moving sam
 Std keeps track of the sample [standard deviation](https://en.wikipedia.org/wiki/Standard_deviation) of a stream; it can track either the global standard deviation, or over a rolling window. To track the sample [variance](https://en.wikipedia.org/wiki/Variance) instead, you should use [Moment](#Moment), i.e.
 
 ```go
-variance := NewMoment(2, window)
+variance := New(2, window)
 ```
 
 #### EWMStd

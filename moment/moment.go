@@ -15,7 +15,7 @@ type Moment struct {
 }
 
 // NewMoment instantiates a Moment struct.
-func NewMoment(k int, window int) *Moment {
+func New(k int, window int) *Moment {
 	return &Moment{
 		k:      k,
 		window: window,

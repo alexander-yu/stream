@@ -13,7 +13,7 @@ import (
 
 func TestNewStd(t *testing.T) {
 	std := NewStd(3)
-	assert.Equal(t, NewMoment(2, 3), std.variance)
+	assert.Equal(t, New(2, 3), std.variance)
 }
 
 type StdPushSuite struct {

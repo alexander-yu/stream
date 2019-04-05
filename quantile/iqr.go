@@ -13,7 +13,7 @@ type IQR struct {
 
 // NewIQR instantiates an IQR struct.
 func NewIQR(window int, options ...Option) (*IQR, error) {
-	quantile, err := NewQuantile(window, append(options, InterpolationOption(Midpoint))...)
+	quantile, err := New(window, append(options, InterpolationOption(Midpoint))...)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating Quantile")
 	}

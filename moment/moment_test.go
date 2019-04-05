@@ -10,8 +10,8 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
-func TestNewMoment(t *testing.T) {
-	moment := NewMoment(2, 3)
+func TestNew(t *testing.T) {
+	moment := New(2, 3)
 	assert.Equal(t, 2, moment.k)
 	assert.Equal(t, 3, moment.window)
 }
@@ -26,7 +26,7 @@ func TestMomentPushSuite(t *testing.T) {
 }
 
 func (s *MomentPushSuite) SetupTest() {
-	s.moment = NewMoment(2, 3)
+	s.moment = New(2, 3)
 	err := Init(s.moment)
 	s.Require().NoError(err)
 }
@@ -37,7 +37,7 @@ func (s *MomentPushSuite) TestPushSuccess() {
 }
 
 func (s *MomentPushSuite) TestPushFailOnNullCore() {
-	moment := NewMoment(2, 3)
+	moment := New(2, 3)
 	err := moment.Push(0.)
 	testutil.ContainsError(s.T(), err, "Core is not set")
 }
@@ -74,7 +74,7 @@ func TestMomentValueSuite(t *testing.T) {
 }
 
 func (s *MomentValueSuite) SetupTest() {
-	s.moment = NewMoment(2, 3)
+	s.moment = New(2, 3)
 	err := Init(s.moment)
 	s.Require().NoError(err)
 
@@ -92,13 +92,13 @@ func (s *MomentValueSuite) TestValueSuccess() {
 }
 
 func (s *MomentValueSuite) TestValueFailOnNullCore() {
-	moment := NewMoment(2, 3)
+	moment := New(2, 3)
 	_, err := moment.Value()
 	testutil.ContainsError(s.T(), err, "Core is not set")
 }
 
 func (s *MomentValueSuite) TestValueFailIfNoValuesSeen() {
-	moment := NewMoment(2, 3)
+	moment := New(2, 3)
 	err := Init(moment)
 	s.Require().NoError(err)
 
@@ -107,7 +107,7 @@ func (s *MomentValueSuite) TestValueFailIfNoValuesSeen() {
 }
 
 func TestMomentClear(t *testing.T) {
-	moment := NewMoment(2, 3)
+	moment := New(2, 3)
 	err := Init(moment)
 	require.NoError(t, err)
 
@@ -125,7 +125,7 @@ func TestMomentClear(t *testing.T) {
 }
 
 func TestMomentString(t *testing.T) {
-	moment := NewMoment(2, 3)
+	moment := New(2, 3)
 	expectedString := "moment.Moment_{k:2,window:3}"
 	assert.Equal(t, expectedString, moment.String())
 }

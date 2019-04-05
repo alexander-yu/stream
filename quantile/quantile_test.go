@@ -11,14 +11,14 @@ import (
 	testutil "github.com/alexander-yu/stream/util/test"
 )
 
-func TestNewQuantile(t *testing.T) {
+func TestNew(t *testing.T) {
 	t.Run("fail: invalid Option is invalid", func(t *testing.T) {
-		_, err := NewQuantile(3, ImplOption(-1))
+		_, err := New(3, ImplOption(-1))
 		testutil.ContainsError(t, err, "error setting option")
 	})
 
 	t.Run("pass: valid Options are set", func(t *testing.T) {
-		quantile, err := NewQuantile(3, ImplOption(SkipList), InterpolationOption(Nearest))
+		quantile, err := New(3, ImplOption(SkipList), InterpolationOption(Nearest))
 		require.NoError(t, err)
 
 		assert.Equal(t, 3, quantile.window)
@@ -29,7 +29,7 @@ func TestNewQuantile(t *testing.T) {
 }
 
 func TestNewGlobalQuantile(t *testing.T) {
-	quantile, err := NewQuantile(0)
+	quantile, err := New(0)
 	require.NoError(t, err)
 
 	globalQuantile, err := NewGlobalQuantile()
@@ -43,7 +43,7 @@ func TestQuantileString(t *testing.T) {
 		"quantile.Quantile_{window:3,interpolation:%d}",
 		Linear,
 	)
-	quantile, err := NewQuantile(3)
+	quantile, err := New(3)
 	require.NoError(t, err)
 
 	assert.Equal(t, expectedString, quantile.String())
@@ -51,7 +51,7 @@ func TestQuantileString(t *testing.T) {
 
 func TestQuantilePush(t *testing.T) {
 	t.Run("pass: successfully pushes values", func(t *testing.T) {
-		quantile, err := NewQuantile(3)
+		quantile, err := New(3)
 		require.NoError(t, err)
 		for i := 0.; i < 5; i++ {
 			err := quantile.Push(i)
@@ -70,7 +70,7 @@ func TestQuantilePush(t *testing.T) {
 	})
 
 	t.Run("fail: if queue retrieval fails, return error", func(t *testing.T) {
-		quantile, err := NewQuantile(3)
+		quantile, err := New(3)
 		require.NoError(t, err)
 
 		for i := 0.; i < 3; i++ {
@@ -85,7 +85,7 @@ func TestQuantilePush(t *testing.T) {
 	})
 
 	t.Run("fail: if queue insertion fails, return error", func(t *testing.T) {
-		quantile, err := NewQuantile(3)
+		quantile, err := New(3)
 		require.NoError(t, err)
 
 		// dispose the queue to simulate an error when we try to insert into the queue
@@ -98,7 +98,7 @@ func TestQuantilePush(t *testing.T) {
 
 func TestQuantileValue(t *testing.T) {
 	t.Run("pass: returns quantile for exact index", func(t *testing.T) {
-		quantile, err := NewQuantile(5)
+		quantile, err := New(5)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -112,7 +112,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with linear interpolation", func(t *testing.T) {
-		quantile, err := NewQuantile(6)
+		quantile, err := New(6)
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -126,7 +126,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with lower interpolation", func(t *testing.T) {
-		quantile, err := NewQuantile(6, InterpolationOption(Lower))
+		quantile, err := New(6, InterpolationOption(Lower))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -140,7 +140,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with higher interpolation", func(t *testing.T) {
-		quantile, err := NewQuantile(6, InterpolationOption(Higher))
+		quantile, err := New(6, InterpolationOption(Higher))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -154,7 +154,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta < 0.5)", func(t *testing.T) {
-		quantile, err := NewQuantile(6, InterpolationOption(Nearest))
+		quantile, err := New(6, InterpolationOption(Nearest))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -168,7 +168,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta == 0.5, idx % 2 == 0)", func(t *testing.T) {
-		quantile, err := NewQuantile(6, InterpolationOption(Nearest))
+		quantile, err := New(6, InterpolationOption(Nearest))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -182,7 +182,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta == 0.5, idx % 2 == 1)", func(t *testing.T) {
-		quantile, err := NewQuantile(8, InterpolationOption(Nearest))
+		quantile, err := New(8, InterpolationOption(Nearest))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -196,7 +196,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with nearest interpolation (delta > 0.5)", func(t *testing.T) {
-		quantile, err := NewQuantile(6, InterpolationOption(Nearest))
+		quantile, err := New(6, InterpolationOption(Nearest))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -210,7 +210,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("pass: returns quantile with midpoint interpolation", func(t *testing.T) {
-		quantile, err := NewQuantile(6, InterpolationOption(Midpoint))
+		quantile, err := New(6, InterpolationOption(Midpoint))
 		require.NoError(t, err)
 
 		for i := 0.; i < 10; i++ {
@@ -224,7 +224,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("fail: if no values seen, return error", func(t *testing.T) {
-		quantile, err := NewQuantile(6)
+		quantile, err := New(6)
 		require.NoError(t, err)
 
 		_, err = quantile.Value(0.25)
@@ -232,7 +232,7 @@ func TestQuantileValue(t *testing.T) {
 	})
 
 	t.Run("fail: if quantile not in (0, 1), return error", func(t *testing.T) {
-		quantile, err := NewQuantile(6)
+		quantile, err := New(6)
 		require.NoError(t, err)
 
 		_, err = quantile.Value(0.)
@@ -244,7 +244,7 @@ func TestQuantileValue(t *testing.T) {
 }
 
 func TestQuantileClear(t *testing.T) {
-	quantile, err := NewQuantile(3)
+	quantile, err := New(3)
 	require.NoError(t, err)
 
 	for i := 0.; i < 10; i++ {
@@ -258,7 +258,7 @@ func TestQuantileClear(t *testing.T) {
 }
 
 func TestQuantileRLock(t *testing.T) {
-	quantile, err := NewQuantile(3)
+	quantile, err := New(3)
 	require.NoError(t, err)
 
 	done := make(chan bool)

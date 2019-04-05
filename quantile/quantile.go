@@ -21,7 +21,7 @@ type Quantile struct {
 }
 
 // NewQuantile instantiates a Quantile struct.
-func NewQuantile(window int, options ...Option) (*Quantile, error) {
+func New(window int, options ...Option) (*Quantile, error) {
 	if window < 0 {
 		return nil, errors.Errorf("attempted to set negative window of %d", window)
 	}
@@ -49,9 +49,9 @@ func NewQuantile(window int, options ...Option) (*Quantile, error) {
 }
 
 // NewGlobalQuantile instantiates a global Quantile struct.
-// This is equivalent to calling NewQuantile(0, options...).
+// This is equivalent to calling New(0, options...).
 func NewGlobalQuantile(options ...Option) (*Quantile, error) {
-	return NewQuantile(0, options...)
+	return New(0, options...)
 }
 
 // String returns a string representation of the metric.
