@@ -26,11 +26,11 @@ func TestHeapSuite(t *testing.T) {
 }
 
 func (s *HeapSuite) SetupTest() {
-	s.maxHeap = NewHeap("a", []float64{1, 2, 3, 4}, fmax)
-	s.minHeap = NewHeap("", []float64{1, 2, 3, 4}, fmin)
+	s.maxHeap = New("a", []float64{1, 2, 3, 4}, fmax)
+	s.minHeap = New("", []float64{1, 2, 3, 4}, fmin)
 }
 
-func (s *HeapSuite) TestNewHeap() {
+func (s *HeapSuite) TestNew() {
 	s.Equal("a", s.maxHeap.ID)
 	s.Equal(4., heapops.Pop(s.maxHeap).(*Item).Val)
 

@@ -129,8 +129,8 @@ func TestHeapMedianValue(t *testing.T) {
 		median, err := NewHeapMedian(10)
 		require.NoError(t, err)
 
-		median.lowHeap = heap.NewHeap("low", []float64{2., 2., 1., 0.}, fmax)
-		median.highHeap = heap.NewHeap("high", []float64{3., 3., 4.}, fmin)
+		median.lowHeap = heap.New("low", []float64{2., 2., 1., 0.}, fmax)
+		median.highHeap = heap.New("high", []float64{3., 3., 4.}, fmin)
 
 		value, err := median.Value()
 		require.NoError(t, err)
@@ -142,8 +142,8 @@ func TestHeapMedianValue(t *testing.T) {
 		median, err := NewHeapMedian(10)
 		require.NoError(t, err)
 
-		median.lowHeap = heap.NewHeap("low", []float64{1., 0.}, fmax)
-		median.highHeap = heap.NewHeap("high", []float64{2., 3., 4.}, fmin)
+		median.lowHeap = heap.New("low", []float64{1., 0.}, fmax)
+		median.highHeap = heap.New("high", []float64{2., 3., 4.}, fmin)
 
 		value, err := median.Value()
 		require.NoError(t, err)
@@ -155,8 +155,8 @@ func TestHeapMedianValue(t *testing.T) {
 		median, err := NewHeapMedian(10)
 		require.NoError(t, err)
 
-		median.lowHeap = heap.NewHeap("low", []float64{2., 0., 1.}, fmax)
-		median.highHeap = heap.NewHeap("high", []float64{3., 3., 4.}, fmin)
+		median.lowHeap = heap.New("low", []float64{2., 0., 1.}, fmax)
+		median.highHeap = heap.New("high", []float64{3., 3., 4.}, fmin)
 
 		value, err := median.Value()
 		require.NoError(t, err)

@@ -36,8 +36,8 @@ func NewHeapMedian(window int) (*HeapMedian, error) {
 
 	return &HeapMedian{
 		window:   window,
-		lowHeap:  heap.NewHeap("low", []float64{}, fmax),
-		highHeap: heap.NewHeap("high", []float64{}, fmin),
+		lowHeap:  heap.New("low", []float64{}, fmax),
+		highHeap: heap.New("high", []float64{}, fmin),
 		queue:    queue.NewRingBuffer(uint64(window)),
 	}, nil
 }
@@ -145,6 +145,6 @@ func (m *HeapMedian) Clear() {
 	defer m.mux.Unlock()
 	m.queue.Dispose()
 	m.queue = queue.NewRingBuffer(uint64(m.window))
-	m.lowHeap = heap.NewHeap("low", []float64{}, fmax)
-	m.highHeap = heap.NewHeap("high", []float64{}, fmin)
+	m.lowHeap = heap.New("low", []float64{}, fmax)
+	m.highHeap = heap.New("high", []float64{}, fmin)
 }

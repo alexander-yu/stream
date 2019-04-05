@@ -26,8 +26,8 @@ type Item struct {
 	index  int
 }
 
-// NewHeap initializes a new Heap.
-func NewHeap(id string, vals []float64, cmp func(float64, float64) bool) *Heap {
+// New initializes a new Heap.
+func New(id string, vals []float64, cmp func(float64, float64) bool) *Heap {
 	items := []*Item{}
 	for i, val := range vals {
 		items = append(items, &Item{
