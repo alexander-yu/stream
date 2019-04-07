@@ -22,6 +22,12 @@ func New(k int, window int) *Moment {
 	}
 }
 
+// NewGlobal instantiates a global Moment struct.
+// This is equivalent to calling New(k, 0).
+func NewGlobal(k int) *Moment {
+	return New(k, 0)
+}
+
 // SetCore sets the Core.
 func (m *Moment) SetCore(c *Core) {
 	m.core = c

@@ -27,6 +27,12 @@ func TestNewKurtosis(t *testing.T) {
 	}, kurtosis)
 }
 
+func TestNewGlobalKurtosis(t *testing.T) {
+	kurtosis := NewKurtosis(0)
+	globalKurtosis := NewGlobalKurtosis()
+	assert.Equal(t, kurtosis, globalKurtosis)
+}
+
 type KurtosisPushSuite struct {
 	suite.Suite
 	kurtosis *Kurtosis

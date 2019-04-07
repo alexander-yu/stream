@@ -16,6 +16,12 @@ func TestNew(t *testing.T) {
 	assert.Equal(t, 3, moment.window)
 }
 
+func TestNewGlobal(t *testing.T) {
+	moment := New(2, 0)
+	globalMoment := NewGlobal(2)
+	assert.Equal(t, moment, globalMoment)
+}
+
 type MomentPushSuite struct {
 	suite.Suite
 	moment *Moment

@@ -17,6 +17,12 @@ func NewMean(window int) *Mean {
 	return &Mean{window: window}
 }
 
+// NewGlobalMean instantiates a global Mean struct.
+// This is equivalent to calling NewMean(0).
+func NewGlobalMean() *Mean {
+	return NewMean(0)
+}
+
 // SetCore sets the Core.
 func (m *Mean) SetCore(c *Core) {
 	m.core = c

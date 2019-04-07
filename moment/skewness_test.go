@@ -27,6 +27,12 @@ func TestNewSkewness(t *testing.T) {
 	}, skewness)
 }
 
+func TestNewGlobalSkewness(t *testing.T) {
+	skewness := NewSkewness(0)
+	globalSkewness := NewGlobalSkewness()
+	assert.Equal(t, skewness, globalSkewness)
+}
+
 type SkewnessPushSuite struct {
 	suite.Suite
 	skewness *Skewness

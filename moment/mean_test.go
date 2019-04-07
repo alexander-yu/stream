@@ -15,6 +15,12 @@ func TestNewMean(t *testing.T) {
 	assert.Equal(t, 3, mean.window)
 }
 
+func TestNewGlobalMean(t *testing.T) {
+	mean := NewMean(0)
+	globalMean := NewGlobalMean()
+	assert.Equal(t, mean, globalMean)
+}
+
 type MeanPushSuite struct {
 	suite.Suite
 	mean *Mean

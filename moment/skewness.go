@@ -32,6 +32,12 @@ func NewSkewness(window int) *Skewness {
 	}
 }
 
+// NewGlobalSkewness instantiates a global Skewness struct.
+// This is equivalent to calling NewSkewness(0).
+func NewGlobalSkewness() *Skewness {
+	return NewSkewness(0)
+}
+
 // SetCore sets the Core.
 func (s *Skewness) SetCore(c *Core) {
 	s.variance.SetCore(c)

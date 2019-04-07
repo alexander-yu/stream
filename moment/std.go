@@ -17,6 +17,12 @@ func NewStd(window int) *Std {
 	return &Std{variance: New(2, window)}
 }
 
+// NewGlobalStd instantiates a global Std struct.
+// This is equivalent to calling NewStd(0).
+func NewGlobalStd() *Std {
+	return NewStd(0)
+}
+
 // SetCore sets the Core.
 func (s *Std) SetCore(c *Core) {
 	s.variance.SetCore(c)

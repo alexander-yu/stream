@@ -32,6 +32,12 @@ func NewKurtosis(window int) *Kurtosis {
 	}
 }
 
+// NewGlobalKurtosis instantiates a global Kurtosis struct.
+// This is equivalent to calling NewKurtosis(0).
+func NewGlobalKurtosis() *Kurtosis {
+	return NewKurtosis(0)
+}
+
 // SetCore sets the Core.
 func (k *Kurtosis) SetCore(c *Core) {
 	k.variance.SetCore(c)

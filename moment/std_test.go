@@ -16,6 +16,12 @@ func TestNewStd(t *testing.T) {
 	assert.Equal(t, New(2, 3), std.variance)
 }
 
+func TestNewGlobalStd(t *testing.T) {
+	std := NewStd(0)
+	globalStd := NewGlobalStd()
+	assert.Equal(t, std, globalStd)
+}
+
 type StdPushSuite struct {
 	suite.Suite
 	std *Std
