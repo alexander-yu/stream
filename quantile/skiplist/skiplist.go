@@ -37,7 +37,7 @@ func (n *Node) equals(m *Node) bool {
 
 func (n *Node) string() string {
 	if n == nil {
-		return "nil"
+		return "tail"
 	} else if n.head {
 		return "head"
 	}
@@ -195,10 +195,11 @@ func (s *SkipList) Rank(val float64) int {
 func (s *SkipList) String() string {
 	result := ""
 	for i := s.maxLevel - 1; i >= 0; i-- {
-		for prev := s.head; prev != nil; prev = prev.next[i] {
+		var prev *Node
+		for prev = s.head; prev != nil; prev = prev.next[i] {
 			result += prev.string() + strings.Repeat("-", prev.width[i])
 		}
-		result += "tail\n"
+		result += prev.string() + "\n"
 	}
 	return result
 }
