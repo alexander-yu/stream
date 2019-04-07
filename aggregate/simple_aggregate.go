@@ -26,9 +26,11 @@ func NewSimpleAggregateMetric(metrics ...stream.SimpleMetric) *SimpleAggregateMe
 func (s *SimpleAggregateMetric) Push(x float64) error {
 	s.mux.Lock()
 	defer s.mux.Unlock()
-	var errs []error
-	var mux sync.Mutex
-	var wg sync.WaitGroup
+	var (
+		result *multierror.Error
+		mux    sync.Mutex
+		wg     sync.WaitGroup
+	)
 
 	for _, metric := range s.metrics {
 		wg.Add(1)
@@ -37,7 +39,7 @@ func (s *SimpleAggregateMetric) Push(x float64) error {
 			err := metric.Push(x)
 			if err != nil {
 				mux.Lock()
-				errs = append(errs, err)
+				result = multierror.Append(result, err)
 				mux.Unlock()
 			}
 		}(metric)
@@ -45,12 +47,9 @@ func (s *SimpleAggregateMetric) Push(x float64) error {
 
 	wg.Wait()
 
-	if len(errs) != 0 {
-		var result *multierror.Error
-		for _, err := range errs {
-			result = multierror.Append(result, err)
-		}
-		return errors.Wrapf(result, "error pushing %f to metrics", x)
+	err := result.ErrorOrNil()
+	if err != nil {
+		return errors.Wrapf(err, "error pushing %f to metrics", x)
 	}
 
 	return nil
