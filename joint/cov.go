@@ -17,6 +17,12 @@ func NewCov(window int) *Cov {
 	return &Cov{window: window}
 }
 
+// NewGlobalCov instantiates a global Cov struct.
+// This is equivalent to calling NewCov(0).
+func NewGlobalCov() *Cov {
+	return NewCov(0)
+}
+
 // SetCore sets the Core.
 func (cov *Cov) SetCore(c *Core) {
 	cov.core = c

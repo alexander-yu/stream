@@ -16,6 +16,12 @@ func TestNewCov(t *testing.T) {
 	assert.Equal(t, 3, cov.window)
 }
 
+func TestNewGlobalCov(t *testing.T) {
+	cov := NewCov(0)
+	globalCov := NewGlobalCov()
+	assert.Equal(t, cov, globalCov)
+}
+
 type CovPushSuite struct {
 	suite.Suite
 	cov *Cov

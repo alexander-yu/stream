@@ -18,6 +18,12 @@ func NewCorr(window int) *Corr {
 	return &Corr{window: window}
 }
 
+// NewGlobalCorr instantiates a global Corr struct.
+// This is equivalent to calling NewCorr(0).
+func NewGlobalCorr() *Corr {
+	return NewCorr(0)
+}
+
 // SetCore sets the Core.
 func (corr *Corr) SetCore(c *Core) {
 	corr.core = c

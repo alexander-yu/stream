@@ -27,6 +27,15 @@ func TestNewAutocorr(t *testing.T) {
 	})
 }
 
+func TestNewGlobalAutocorr(t *testing.T) {
+	autocorr, err := NewAutocorr(1, 0)
+	require.NoError(t, err)
+	globalAutocorr, err := NewGlobalAutocorr(1)
+	require.NoError(t, err)
+
+	assert.Equal(t, autocorr, globalAutocorr)
+}
+
 type AutocorrPushSuite struct {
 	suite.Suite
 	autocorr  *Autocorr

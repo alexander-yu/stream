@@ -32,6 +32,12 @@ func NewAutocorr(lag int, window int) (*Autocorr, error) {
 	}, nil
 }
 
+// NewGlobalAutocorr instantiates a global Autocorr struct.
+// This is equivalent to calling NewAutocorr(lag, 0).
+func NewGlobalAutocorr(lag int) (*Autocorr, error) {
+	return NewAutocorr(lag, 0)
+}
+
 // SetCore sets the Core.
 func (a *Autocorr) SetCore(c *Core) {
 	a.corr.SetCore(c)
