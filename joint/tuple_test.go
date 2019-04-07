@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	multierror "github.com/hashicorp/go-multierror"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -149,8 +151,9 @@ func TestIter(t *testing.T) {
 		}
 
 		runs := []uint64{}
-		iter(tuple, false, func(xs ...int) {
+		_ = iter(tuple, false, func(xs ...int) error {
 			runs = append(runs, Tuple(xs).hash())
+			return nil
 		})
 
 		assert.Equal(t, expectedRuns, runs)
@@ -166,10 +169,25 @@ func TestIter(t *testing.T) {
 		}
 
 		runs := []uint64{}
-		iter(tuple, true, func(xs ...int) {
+		_ = iter(tuple, true, func(xs ...int) error {
 			runs = append(runs, Tuple(xs).hash())
+			return nil
 		})
 
 		assert.Equal(t, expectedRuns, runs)
+	})
+
+	t.Run("fail: callback failures returns multi-error", func(t *testing.T) {
+		tuple := Tuple{1, 0}
+		expectedErr := multierror.Append(
+			&multierror.Error{},
+			errors.New("[0 0]"),
+			errors.New("[1 0]"),
+		)
+		err := iter(tuple, false, func(xs ...int) error {
+			return errors.Errorf("%v", xs)
+		})
+		require.Error(t, err)
+		assert.Equal(t, expectedErr.Error(), err.Error())
 	})
 }

@@ -59,11 +59,13 @@ func NewCore(config *CoreConfig) (*Core, error) {
 	c.sums = map[uint64]float64{}
 	c.newSums = map[uint64]float64{}
 	for _, tuple := range config.Sums {
-		iter(tuple, false, func(xs ...int) {
+		_ = iter(tuple, false, func(xs ...int) error {
 			c.sums[Tuple(xs).hash()] = 0
+			return nil
 		})
-		iter(tuple, false, func(xs ...int) {
+		_ = iter(tuple, false, func(xs ...int) error {
 			c.newSums[Tuple(xs).hash()] = 0
+			return nil
 		})
 	}
 
@@ -142,18 +144,16 @@ func (c *Core) add(xs ...float64) error {
 	}
 
 	for _, tuple := range c.tuples {
-		var err error
-		iter(tuple, true, func(xs ...int) {
+		err := iter(tuple, true, func(xs ...int) error {
 			a := Tuple(xs)
 			hash := a.hash()
 			c.newSums[hash] = 0
-			iter(a, false, func(xs ...int) {
+			return iter(a, false, func(xs ...int) error {
 				b := Tuple(xs)
 
-				var deltaPow float64
-				deltaPow, err = pow(delta, b)
+				deltaPow, err := pow(delta, b)
 				if err != nil {
-					return
+					return err
 				}
 
 				abs := b.abs()
@@ -164,24 +164,23 @@ func (c *Core) add(xs ...float64) error {
 						(math.Pow(count-1, float64(abs-1)) + float64(mathutil.Sign(abs)))
 					c.newSums[hash] += coeff * deltaPow
 				} else {
-					var multinomial int
-					multinomial, err = multinom(a, b)
+					multinomial, err := multinom(a, b)
 					if err != nil {
-						return
+						return err
 					}
 
-					var diff Tuple
-					diff, err = sub(a, b)
+					diff, err := sub(a, b)
 					if err != nil {
-						return
+						return err
 					}
 
 					c.newSums[hash] += float64(multinomial*mathutil.Sign(abs)) /
 						math.Pow(count, float64(abs)) * deltaPow * c.sums[diff.hash()]
 				}
+
+				return nil
 			})
 		})
-
 		if err != nil {
 			return errors.Wrapf(err, "error adding %v to sums for tuple %v", xs, tuple)
 		}
@@ -217,18 +216,16 @@ func (c *Core) addDecay(xs ...float64) error {
 	}
 
 	for _, tuple := range c.tuples {
-		var err error
-		iter(tuple, true, func(xs ...int) {
+		err := iter(tuple, true, func(xs ...int) error {
 			a := Tuple(xs)
 			hash := a.hash()
 			c.newSums[hash] = 0
-			iter(a, false, func(xs ...int) {
+			return iter(a, false, func(xs ...int) error {
 				b := Tuple(xs)
 
-				var deltaPow float64
-				deltaPow, err = pow(delta, b)
+				deltaPow, err := pow(delta, b)
 				if err != nil {
-					return
+					return err
 				}
 
 				abs := b.abs()
@@ -238,25 +235,24 @@ func (c *Core) addDecay(xs ...float64) error {
 					coeff := (1-decay)*math.Pow(-decay, float64(abs)) + decay*math.Pow(1-decay, float64(abs))
 					c.newSums[hash] += coeff * deltaPow
 				} else {
-					var multinomial int
-					multinomial, err = multinom(a, b)
+					multinomial, err := multinom(a, b)
 					if err != nil {
-						return
+						return err
 					}
 
-					var diff Tuple
-					diff, err = sub(a, b)
+					diff, err := sub(a, b)
 					if err != nil {
-						return
+						return err
 					}
 
 					c.newSums[hash] += float64(multinomial*mathutil.Sign(abs)) *
 						math.Pow(decay, float64(abs)) * deltaPow *
 						(1 - decay) * c.sums[diff.hash()]
 				}
+
+				return nil
 			})
 		})
-
 		if err != nil {
 			return errors.Wrapf(err, "error adding %v to sums for tuple %v", xs, tuple)
 		}
@@ -284,18 +280,16 @@ func (c *Core) remove(xs ...float64) error {
 		}
 
 		for _, tuple := range c.tuples {
-			var err error
-			iter(tuple, false, func(xs ...int) {
+			err := iter(tuple, false, func(xs ...int) error {
 				a := Tuple(xs)
 				hash := a.hash()
 				c.newSums[hash] = 0
-				iter(a, false, func(xs ...int) {
+				return iter(a, false, func(xs ...int) error {
 					b := Tuple(xs)
 
-					var deltaPow float64
-					deltaPow, err = pow(delta, b)
+					deltaPow, err := pow(delta, b)
 					if err != nil {
-						return
+						return err
 					}
 
 					abs := b.abs()
@@ -306,24 +300,23 @@ func (c *Core) remove(xs ...float64) error {
 							(math.Pow(count, float64(abs-1)) + float64(mathutil.Sign(abs)))
 						c.newSums[hash] -= coeff * deltaPow
 					} else {
-						var multinomial int
-						multinomial, err = multinom(a, b)
+						multinomial, err := multinom(a, b)
 						if err != nil {
-							return
+							return err
 						}
 
-						var diff Tuple
-						diff, err = sub(a, b)
+						diff, err := sub(a, b)
 						if err != nil {
-							return
+							return err
 						}
 
 						c.newSums[hash] -= float64(multinomial*mathutil.Sign(abs)) /
 							math.Pow(count+1, float64(abs)) * deltaPow * c.newSums[diff.hash()]
 					}
+
+					return nil
 				})
 			})
-
 			if err != nil {
 				return errors.Wrapf(err, "error removing %v from sums for tuple %v", xs, tuple)
 			}

@@ -67,12 +67,17 @@ func TestNewCore(t *testing.T) {
 		assert.Equal(t, uint64(0), core.queue.Len())
 
 		for _, tuple := range config.Sums {
-			iter(tuple, false, func(xs ...int) {
+			_ = iter(tuple, false, func(xs ...int) error {
 				assert.Equal(t, 0., core.sums[Tuple(xs).hash()])
+				return nil
 			})
-			iter(tuple, false, func(xs ...int) {
+			require.NoError(t, err)
+
+			_ = iter(tuple, false, func(xs ...int) error {
 				assert.Equal(t, 0., core.newSums[Tuple(xs).hash()])
+				return nil
 			})
+			require.NoError(t, err)
 		}
 
 		config = &CoreConfig{
@@ -92,11 +97,13 @@ func TestNewCore(t *testing.T) {
 		assert.Equal(t, 0.3, *core.decay)
 
 		for _, tuple := range config.Sums {
-			iter(tuple, false, func(xs ...int) {
+			_ = iter(tuple, false, func(xs ...int) error {
 				assert.Equal(t, 0., core.sums[Tuple(xs).hash()])
+				return nil
 			})
-			iter(tuple, false, func(xs ...int) {
+			_ = iter(tuple, false, func(xs ...int) error {
 				assert.Equal(t, 0., core.newSums[Tuple(xs).hash()])
+				return nil
 			})
 		}
 	})
@@ -405,11 +412,12 @@ func (s *CoreSumSuite) TestSumSuccess() {
 		64: 112538. / 9.,
 	}
 
-	iter(Tuple{2, 2}, false, func(xs ...int) {
+	_ = iter(Tuple{2, 2}, false, func(xs ...int) error {
 		tuple := Tuple(xs)
 		sum, err := s.wrapper.core.Sum(tuple...)
 		s.Require().NoError(err)
 		testutil.Approx(s.T(), expectedSums[tuple.hash()], sum)
+		return nil
 	})
 }
 

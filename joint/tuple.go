@@ -3,6 +3,7 @@ package joint
 import (
 	"math"
 
+	multierror "github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 
 	mathutil "github.com/alexander-yu/stream/util/math"
@@ -112,24 +113,29 @@ func pow(x []float64, n Tuple) (float64, error) {
 // This execution order (rather than the expected one of having i on the
 // outer loop) is due to the recursive nature of iter, and fact that it is
 // faster to append arguments at the end rather than insert them at the beginning.
-func iter(tuple Tuple, reverse bool, cb func(...int)) {
+func iter(tuple Tuple, reverse bool, cb func(...int) error) error {
 	if len(tuple) == 0 {
-		cb()
+		return cb()
+	}
+
+	var result *multierror.Error
+	if reverse {
+		for i := tuple[len(tuple)-1]; i >= 0; i-- {
+			err := iter(tuple[:len(tuple)-1], reverse, func(xs ...int) error {
+				xs = append(xs, i)
+				return cb(xs...)
+			})
+			result = multierror.Append(result, err)
+		}
 	} else {
-		if reverse {
-			for i := tuple[len(tuple)-1]; i >= 0; i-- {
-				iter(tuple[:len(tuple)-1], reverse, func(xs ...int) {
-					xs = append(xs, i)
-					cb(xs...)
-				})
-			}
-		} else {
-			for i := 0; i <= tuple[len(tuple)-1]; i++ {
-				iter(tuple[:len(tuple)-1], reverse, func(xs ...int) {
-					xs = append(xs, i)
-					cb(xs...)
-				})
-			}
+		for i := 0; i <= tuple[len(tuple)-1]; i++ {
+			err := iter(tuple[:len(tuple)-1], reverse, func(xs ...int) error {
+				xs = append(xs, i)
+				return cb(xs...)
+			})
+			result = multierror.Append(result, err)
 		}
 	}
+
+	return result.ErrorOrNil()
 }
