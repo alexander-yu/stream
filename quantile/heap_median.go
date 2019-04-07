@@ -91,15 +91,7 @@ func (m *HeapMedian) Push(x float64) error {
 			item.Val = x
 			heapops.Push(m.lowHeap, item)
 		}
-
-		// rebalance heaps
-		if m.lowHeap.Len()+1 < m.highHeap.Len() {
-			item = heapops.Pop(m.highHeap).(*heap.Item)
-			heapops.Push(m.lowHeap, item)
-		} else if m.lowHeap.Len() > m.highHeap.Len()+1 {
-			item = heapops.Pop(m.lowHeap).(*heap.Item)
-			heapops.Push(m.highHeap, item)
-		}
+		m.rebalance()
 	} else {
 		item = &heap.Item{Val: x}
 		if m.lowHeap.Len() == 0 || x <= m.lowHeap.Peek() {
@@ -107,15 +99,7 @@ func (m *HeapMedian) Push(x float64) error {
 		} else {
 			heapops.Push(m.highHeap, item)
 		}
-
-		// rebalance heaps
-		if m.lowHeap.Len()+1 < m.highHeap.Len() {
-			item = heapops.Pop(m.highHeap).(*heap.Item)
-			heapops.Push(m.lowHeap, item)
-		} else if m.lowHeap.Len() > m.highHeap.Len()+1 {
-			item = heapops.Pop(m.lowHeap).(*heap.Item)
-			heapops.Push(m.highHeap, item)
-		}
+		m.rebalance()
 	}
 
 	if m.window != 0 {
@@ -126,6 +110,16 @@ func (m *HeapMedian) Push(x float64) error {
 	}
 
 	return nil
+}
+
+func (m *HeapMedian) rebalance() {
+	if m.lowHeap.Len()+1 < m.highHeap.Len() {
+		item := heapops.Pop(m.highHeap).(*heap.Item)
+		heapops.Push(m.lowHeap, item)
+	} else if m.lowHeap.Len() > m.highHeap.Len()+1 {
+		item := heapops.Pop(m.lowHeap).(*heap.Item)
+		heapops.Push(m.highHeap, item)
+	}
 }
 
 // Value returns the value of the median.

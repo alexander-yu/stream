@@ -77,50 +77,54 @@ func MergeConfigs(configs ...*CoreConfig) (*CoreConfig, error) {
 			}
 		}
 
-		// remove any duplicate Tuples, or Tuples that are less than or equal
-		// to other Tuples, since they'll get tracked automatically
-		tupleMap := map[uint64]bool{}
-		sums := SumsConfig{}
-		for i, m := range mergedConfig.Sums {
-			// remove dupes
-			if _, ok := tupleMap[m.hash()]; ok {
-				continue
-			}
-
-			// if Tuple is less than or equal to an already existing Tuple,
-			// skip this one
-			leq := false
-			for j, n := range mergedConfig.Sums {
-				if i <= j {
-					continue
-				}
-
-				allLeq := true
-				for i := range m {
-					if m[i] > n[i] {
-						allLeq = false
-						break
-					}
-				}
-				if allLeq {
-					leq = true
-					break
-				}
-			}
-			if leq {
-				continue
-			}
-
-			tupleMap[m.hash()] = true
-			sums = append(sums, m)
-		}
-
-		mergedConfig.Sums = sums
+		mergedConfig.Sums = simplifySums(mergedConfig.Sums)
 		mergedConfig.Window = window
 		mergedConfig.Vars = vars
 		mergedConfig.Decay = decay
 		return mergedConfig, nil
 	}
+}
+
+// remove any duplicate Tuples, or Tuples that are less than or equal
+// to other Tuples, since they'll get tracked automatically
+func simplifySums(sums SumsConfig) SumsConfig {
+	tupleMap := map[uint64]bool{}
+	newSums := SumsConfig{}
+	for i, m := range sums {
+		// remove dupes
+		if _, ok := tupleMap[m.hash()]; ok {
+			continue
+		}
+
+		// if Tuple is less than or equal to an already existing Tuple,
+		// skip this one
+		leq := false
+		for j, n := range sums {
+			if i <= j {
+				continue
+			}
+
+			allLeq := true
+			for i := range m {
+				if m[i] > n[i] {
+					allLeq = false
+					break
+				}
+			}
+			if allLeq {
+				leq = true
+				break
+			}
+		}
+		if leq {
+			continue
+		}
+
+		tupleMap[m.hash()] = true
+		newSums = append(newSums, m)
+	}
+
+	return newSums
 }
 
 func validateConfig(config *CoreConfig) error {
@@ -143,41 +147,50 @@ func validateConfig(config *CoreConfig) error {
 	}
 
 	for _, tuple := range config.Sums {
-		if len(tuple) != len(config.Sums[0]) {
-			return errors.New("sums have differing length")
-		} else if len(tuple) < 2 {
-			return errors.Errorf("config has a Tuple (%v) with length %d < 2", tuple, len(tuple))
-		}
-
-		if config.Vars != nil && len(tuple) != *config.Vars {
-			return errors.Errorf(
-				"config has a Tuple (%v) with length %d but Vars = %d",
-				tuple,
-				len(tuple),
-				*config.Vars,
-			)
-		}
-
-		for _, k := range tuple {
-			if k < 0 {
-				// The reason we allow for k = 0 here (even though there is no such
-				// thing as a "0th moment") is because we can use it to ignore
-				// variables; for example, we can have a Tuple of {2, 0, 0} represent a
-				// calculation of the variance (or equivalently the sum of squared differences)
-				// of the first variable, and simply ignore the other two. However, we still
-				// need to make sure that an actual moment is being calculated, i.e. some
-				// element of the Tuple is still positive.
-				return errors.Errorf("config has a Tuple with a negative exponent of %d", k)
-			}
-		}
-
-		if tuple.abs() == 0 {
-			return errors.New("config has a Tuple that is all 0s (i.e. skips all variables)")
+		err := validateTuple(tuple, config)
+		if err != nil {
+			return err
 		}
 	}
 
 	if config.Vars == nil && len(config.Sums) == 0 {
 		return errors.New("config Vars is not set and cannot be inferred from empty Sums")
+	}
+
+	return nil
+}
+
+func validateTuple(tuple Tuple, config *CoreConfig) error {
+	if len(tuple) != len(config.Sums[0]) {
+		return errors.New("sums have differing length")
+	} else if len(tuple) < 2 {
+		return errors.Errorf("config has a Tuple (%v) with length %d < 2", tuple, len(tuple))
+	}
+
+	if config.Vars != nil && len(tuple) != *config.Vars {
+		return errors.Errorf(
+			"config has a Tuple (%v) with length %d but Vars = %d",
+			tuple,
+			len(tuple),
+			*config.Vars,
+		)
+	}
+
+	for _, k := range tuple {
+		if k < 0 {
+			// The reason we allow for k = 0 here (even though there is no such
+			// thing as a "0th moment") is because we can use it to ignore
+			// variables; for example, we can have a Tuple of {2, 0, 0} represent a
+			// calculation of the variance (or equivalently the sum of squared differences)
+			// of the first variable, and simply ignore the other two. However, we still
+			// need to make sure that an actual moment is being calculated, i.e. some
+			// element of the Tuple is still positive.
+			return errors.Errorf("config has a Tuple with a negative exponent of %d", k)
+		}
+	}
+
+	if tuple.abs() == 0 {
+		return errors.New("config has a Tuple that is all 0s (i.e. skips all variables)")
 	}
 
 	return nil

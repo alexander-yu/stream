@@ -109,10 +109,10 @@ func (a *Autocorr) Value() (float64, error) {
 	if !a.IsSetCore() {
 		return 0, errors.New("Core is not set")
 	} else if a.corr.core.Count() == 0 {
-		return 0, errors.New(fmt.Sprintf(
+		return 0, errors.Errorf(
 			"Not enough values seen; at least %d observations must be made",
 			a.lag+1,
-		))
+		)
 	}
 
 	return a.corr.Value()
