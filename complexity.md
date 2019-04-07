@@ -32,6 +32,7 @@ provided in the library.
       - [Corr](#corr)
       - [EWMCorr](#ewmcorr)
       - [Autocorr](#autocorr)
+      - [Autocov](#autocov)
       - [Core (Multivariate)](#core-multivariate)
   - [References](#references)
 
@@ -198,6 +199,14 @@ Let `n` be the size of the window, or the stream if tracking the global correlat
 #### Autocorr
 
 Let `n` be the size of the window, or the stream if tracking the global autocorrelation; let `l` be the lag of the autocorrelation. Then we have the following complexities:
+
+| Push (time) | Value (time) | Space                             |
+| :---------: | :----------: | :-------------------------------: |
+| `O(1)`      | `O(1)`       | `O(l)` if global, else `O(l + n)` |
+
+#### Autocov
+
+Let `n` be the size of the window, or the stream if tracking the global autocovariance; let `l` be the lag of the autocovariance. Then we have the following complexities:
 
 | Push (time) | Value (time) | Space                             |
 | :---------: | :----------: | :-------------------------------: |

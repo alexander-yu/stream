@@ -39,6 +39,7 @@ Stream is a Go library for online statistical algorithms. Provided statistics ca
       - [Corr](#corr)
       - [EWMCorr](#ewmcorr)
       - [Autocorr](#autocorr)
+      - [Autocov](#autocov)
       - [Core (Multivariate)](#core-multivariate)
     - [Aggregate Statistics](#aggregate-statistics)
       - [SimpleAggregateMetric](#simpleaggregatemetric)
@@ -204,6 +205,10 @@ EWMCorr keeps track of the global sample exponentially weighted [correlation](ht
 #### Autocorr
 
 Autocorr keeps track of the sample [autocorrelation](https://en.wikipedia.org/wiki/Autocorrelation) of a stream (in particular, the [sample autocorrelation](https://en.wikipedia.org/wiki/Autocorrelation#Estimation)) for a given lag; it can track either the global autocorrelation, or over a rolling window.
+
+#### Autocov
+
+Autocov keeps track of the sample [autocovariance](https://en.wikipedia.org/wiki/Autocovariance) of a stream (in particular, the sample autocovariance) for a given lag; it can track either the global autocovariance, or over a rolling window.
 
 #### Core (Multivariate)
 
