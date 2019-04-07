@@ -71,12 +71,8 @@ func (s *CovPushSuite) TestPushFailOnQueueRetrievalFailure() {
 }
 
 func (s *CovPushSuite) TestPushFailOnWrongNumberOfValues() {
-	cov := NewCov(3)
-	err := Init(cov)
-	s.Require().NoError(err)
-
 	vals := []float64{3.}
-	err = cov.Push(vals...)
+	err := s.cov.Push(vals...)
 	testutil.ContainsError(s.T(), err, fmt.Sprintf(
 		"Cov expected 2 arguments: got %d (%v)",
 		len(vals),
@@ -84,7 +80,7 @@ func (s *CovPushSuite) TestPushFailOnWrongNumberOfValues() {
 	))
 
 	vals = []float64{3., 9., 27.}
-	err = cov.Push(vals...)
+	err = s.cov.Push(vals...)
 	testutil.ContainsError(s.T(), err, fmt.Sprintf(
 		"Cov expected 2 arguments: got %d (%v)",
 		len(vals),

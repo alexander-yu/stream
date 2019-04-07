@@ -17,6 +17,12 @@ func TestNewCorr(t *testing.T) {
 	assert.Equal(t, 3, corr.window)
 }
 
+func TestNewGlobalCorr(t *testing.T) {
+	corr := NewCorr(0)
+	globalCorr := NewGlobalCorr()
+	assert.Equal(t, corr, globalCorr)
+}
+
 type CorrPushSuite struct {
 	suite.Suite
 	corr *Corr

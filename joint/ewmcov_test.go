@@ -1,6 +1,7 @@
 package joint
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -39,6 +40,24 @@ func (s *EWMCovPushSuite) TestPushFailOnNullCore() {
 	cov := NewEWMCov(0.3)
 	err := cov.Push(0., 0.)
 	testutil.ContainsError(s.T(), err, "Core is not set")
+}
+
+func (s *EWMCovPushSuite) TestPushFailOnWrongNumberOfValues() {
+	vals := []float64{3.}
+	err := s.cov.Push(vals...)
+	testutil.ContainsError(s.T(), err, fmt.Sprintf(
+		"EWMCov expected 2 arguments: got %d (%v)",
+		len(vals),
+		vals,
+	))
+
+	vals = []float64{3., 9., 27.}
+	err = s.cov.Push(vals...)
+	testutil.ContainsError(s.T(), err, fmt.Sprintf(
+		"EWMCov expected 2 arguments: got %d (%v)",
+		len(vals),
+		vals,
+	))
 }
 
 type EWMCovValueSuite struct {
