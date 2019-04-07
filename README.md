@@ -68,7 +68,7 @@ err = joint.Init(autocorr)
 // handle err
 
 // tracks the global median using a pair of heaps
-median, err := quantile.NewHeapMedian(0)
+median, err := quantile.NewGlobalHeapMedian()
 // handle err
 
 for i := 0., i < 100; i++ {
