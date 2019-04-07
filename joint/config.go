@@ -2,8 +2,6 @@ package joint
 
 import (
 	"github.com/pkg/errors"
-
-	"github.com/alexander-yu/stream"
 )
 
 // SumsConfig is an alias for a slice of Tuples; this configures
@@ -27,7 +25,7 @@ type CoreConfig struct {
 
 var defaultConfig = &CoreConfig{
 	Sums:   SumsConfig{},
-	Window: stream.IntPtr(0),
+	Window: nil,
 	Vars:   nil,
 	Decay:  nil,
 }

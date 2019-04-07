@@ -112,7 +112,10 @@ func TestInit(t *testing.T) {
 	})
 
 	t.Run("pass: valid config sets Core for wrapper", func(t *testing.T) {
-		wrapper := &mockWrapper{decay: stream.FloatPtr(0.3)}
+		wrapper := &mockWrapper{
+			decay:  stream.FloatPtr(0.3),
+			window: stream.IntPtr(0),
+		}
 		err := Init(wrapper)
 		require.NoError(t, err)
 		assert.NotNil(t, wrapper.core)
@@ -145,7 +148,10 @@ func (s *CorePushSuite) SetupTest() {
 		s.Require().NoError(err)
 	}
 
-	s.decayWrapper = &mockWrapper{decay: stream.FloatPtr(0.3)}
+	s.decayWrapper = &mockWrapper{
+		decay:  stream.FloatPtr(0.3),
+		window: stream.IntPtr(0),
+	}
 	err = Init(s.decayWrapper)
 	s.Require().NoError(err)
 
@@ -348,7 +354,8 @@ func (s *CoreMeanSuite) TestMeanSuccess() {
 
 func (s *CoreMeanSuite) TestMeanFailIfNoValuesSeen() {
 	core, err := NewCore(&CoreConfig{
-		Vars: stream.IntPtr(2),
+		Vars:   stream.IntPtr(2),
+		Window: stream.IntPtr(0),
 	})
 	s.Require().NoError(err)
 
@@ -408,7 +415,8 @@ func (s *CoreSumSuite) TestSumSuccess() {
 
 func (s *CoreSumSuite) TestFailIfNoValuesSeen() {
 	core, err := NewCore(&CoreConfig{
-		Vars: stream.IntPtr(2),
+		Vars:   stream.IntPtr(2),
+		Window: stream.IntPtr(0),
 	})
 	s.Require().NoError(err)
 
