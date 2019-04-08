@@ -1,6 +1,6 @@
 # Stream
 
-[![GoDoc](http://godoc.org/github.com/alexander-yu/stream?status.svg)](http://godoc.org/github.com/alexander-yu/stream)
+[![GoDoc](https://godoc.org/github.com/alexander-yu/stream?status.svg)](https://godoc.org/github.com/alexander-yu/stream)
 [![Build Status](https://travis-ci.org/alexander-yu/stream.svg?branch=master)](https://travis-ci.org/alexander-yu/stream)
 [![Go Report Card](https://goreportcard.com/badge/github.com/alexander-yu/stream)](https://goreportcard.com/report/github.com/alexander-yu/stream)
 [![codecov](https://codecov.io/gh/alexander-yu/stream/branch/master/graph/badge.svg)](https://codecov.io/gh/alexander-yu/stream)
