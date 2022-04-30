@@ -70,7 +70,7 @@ Let `n` be the size of the window, or the stream if tracking the global median. 
 
 | Push (time) | Value (time) | Space  |
 | :---------: | :----------: | :----: |
-| `O(log n)`  | `O(log n)`   | `O(n)` |
+| `O(log n)`  | `O(1)`       | `O(n)` |
 
 ### [Min/Max](https://godoc.org/github.com/alexander-yu/stream/minmax)
 
