@@ -81,7 +81,7 @@ func (s *MinPushSuite) TestPushWindowSuccess() {
 	for i, val := range vals {
 		err := s.windowMin.Push(val)
 		s.Require().NoError(err)
-		s.Equal(maxes[i], *s.windowMin.deque.Front().(*float64))
+		s.Equal(maxes[i], s.windowMin.deque.Front())
 	}
 
 	// reset test
@@ -92,7 +92,7 @@ func (s *MinPushSuite) TestPushWindowSuccess() {
 	for i, val := range vals {
 		err := s.windowMin.Push(val)
 		s.Require().NoError(err)
-		s.Equal(maxes[i], *s.windowMin.deque.Front().(*float64))
+		s.Equal(maxes[i], s.windowMin.deque.Front())
 	}
 
 	// reset test
@@ -103,7 +103,7 @@ func (s *MinPushSuite) TestPushWindowSuccess() {
 	for i, val := range vals {
 		err := s.windowMin.Push(val)
 		s.Require().NoError(err)
-		s.Equal(maxes[i], *s.windowMin.deque.Front().(*float64))
+		s.Equal(maxes[i], s.windowMin.deque.Front())
 	}
 }
 
