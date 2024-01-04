@@ -17,7 +17,7 @@ type Min struct {
 	count  int
 	// Used if window > 0
 	queue *queue.RingBuffer
-	deque *deque.Deque
+	deque *deque.Deque[float64]
 	// Used if window == 0
 	min float64
 }
@@ -30,7 +30,7 @@ func NewMin(window int) (*Min, error) {
 
 	return &Min{
 		queue:  queue.NewRingBuffer(uint64(window)),
-		deque:  &deque.Deque{},
+		deque:  deque.New[float64](),
 		min:    math.Inf(1),
 		window: window,
 	}, nil
@@ -41,7 +41,7 @@ func NewMin(window int) (*Min, error) {
 func NewGlobalMin() *Min {
 	return &Min{
 		queue:  queue.NewRingBuffer(uint64(0)),
-		deque:  &deque.Deque{},
+		deque:  deque.New[float64](),
 		min:    math.Inf(1),
 		window: 0,
 	}
@@ -68,7 +68,7 @@ func (m *Min) Push(x float64) error {
 
 			m.count--
 
-			if m.deque.Front().(*float64) == val.(*float64) {
+			if m.deque.Front() == *val.(*float64) {
 				m.deque.PopFront()
 			}
 		}
@@ -80,10 +80,10 @@ func (m *Min) Push(x float64) error {
 
 		m.count++
 
-		for m.deque.Len() > 0 && *m.deque.Back().(*float64) > x {
+		for m.deque.Len() > 0 && m.deque.Back() > x {
 			m.deque.PopBack()
 		}
-		m.deque.PushBack(&x)
+		m.deque.PushBack(x)
 
 	} else {
 		m.count++
@@ -104,7 +104,7 @@ func (m *Min) Value() (float64, error) {
 		return m.min, nil
 	}
 
-	return *m.deque.Front().(*float64), nil
+	return m.deque.Front(), nil
 }
 
 // Clear resets the metric.
@@ -115,5 +115,5 @@ func (m *Min) Clear() {
 	m.min = math.Inf(1)
 	m.queue.Dispose()
 	m.queue = queue.NewRingBuffer(uint64(m.window))
-	m.deque = &deque.Deque{}
+	m.deque = deque.New[float64]()
 }
