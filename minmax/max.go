@@ -30,7 +30,7 @@ func NewMax(window int) (*Max, error) {
 
 	return &Max{
 		queue:  queue.NewRingBuffer(uint64(window)),
-		deque:  deque.New[float64](),
+		deque:  new(deque.Deque[float64]),
 		max:    math.Inf(-1),
 		window: window,
 	}, nil
@@ -41,7 +41,7 @@ func NewMax(window int) (*Max, error) {
 func NewGlobalMax() *Max {
 	return &Max{
 		queue:  queue.NewRingBuffer(uint64(0)),
-		deque:  deque.New[float64](),
+		deque:  new(deque.Deque[float64]),
 		max:    math.Inf(-1),
 		window: 0,
 	}
@@ -115,5 +115,5 @@ func (m *Max) Clear() {
 	m.max = math.Inf(-1)
 	m.queue.Dispose()
 	m.queue = queue.NewRingBuffer(uint64(m.window))
-	m.deque = deque.New[float64]()
+	m.deque = new(deque.Deque[float64])
 }
